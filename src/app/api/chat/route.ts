@@ -1,15 +1,18 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
-import { readFileSync } from "fs";
-import { join } from "path";
 
-// Manually load .env.local for server-side env vars (workaround for Next.js 16 / Node 24)
+// Load .env.local manually for local dev (Next.js 16 / Node 24 workaround)
+// In production (Vercel), process.env is populated directly
 function loadEnv(): Record<string, string> {
   try {
-    const envPath = join(process.cwd(), ".env.local");
-    const content = readFileSync(envPath, "utf-8");
+    // Only attempt file read in non-production environments
+    if (process.env.VERCEL) return {};
+    const fs = require("fs");
+    const path = require("path");
+    const envPath = path.join(process.cwd(), ".env.local");
+    const content = fs.readFileSync(envPath, "utf-8");
     const vars: Record<string, string> = {};
-    content.split("\n").forEach((line) => {
+    content.split("\n").forEach((line: string) => {
       const match = line.match(/^([^#=]+)=(.*)$/);
       if (match) vars[match[1].trim()] = match[2].trim();
     });
