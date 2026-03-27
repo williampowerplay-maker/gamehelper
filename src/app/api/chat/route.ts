@@ -1,0 +1,278 @@
+import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
+import { readFileSync } from "fs";
+import { join } from "path";
+
+// Manually load .env.local for server-side env vars (workaround for Next.js 16 / Node 24)
+function loadEnv(): Record<string, string> {
+  try {
+    const envPath = join(process.cwd(), ".env.local");
+    const content = readFileSync(envPath, "utf-8");
+    const vars: Record<string, string> = {};
+    content.split("\n").forEach((line) => {
+      const match = line.match(/^([^#=]+)=(.*)$/);
+      if (match) vars[match[1].trim()] = match[2].trim();
+    });
+    return vars;
+  } catch {
+    return {};
+  }
+}
+
+const envVars = loadEnv();
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL || "";
+const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+
+// Spoiler tier system prompt instructions
+const SPOILER_INSTRUCTIONS: Record<string, string> = {
+  nudge: `You are a Crimson Desert game guide. The player wants a NUDGE — a gentle directional hint that preserves the satisfaction of figuring it out themselves.
+
+General rules:
+- Keep it to 1-2 sentences maximum
+- Use encouraging language
+- NEVER reveal exact solutions, codes, sequences, or specific numbers
+- NEVER name the exact item, weapon, or reward they'll get
+
+Adapt your nudge based on the type of question:
+
+PUZZLES: Hint at the mechanic or tool involved, never the sequence or solution.
+  Good: "Have you tried interacting with the environment using one of your force abilities?"
+  Bad: "Use Force Push on walls 2 and 3 on the left" (that's the answer)
+
+ITEM/GEAR LOCATIONS: Name the general area or landmark, never the exact building, room, or container.
+  Good: "One of the manors on the north side of Hernand has something special hidden upstairs."
+  Bad: "Go to Lion Crest Manor barracks, climb the window, open the chest" (that's a walkthrough)
+
+BOSS FIGHTS: Give one defensive or preparation tip, never the full strategy or cheese method.
+  Good: "This boss punishes aggression — focus on learning when it's safe to attack after his combos."
+  Bad: "Hide behind the pillar and hit him after his spear throw" (that's the strategy)
+
+MECHANICS/SYSTEMS: You can be slightly more generous here since there's less to spoil, but still keep it brief.
+  Good: "There's a skill tree that directly affects how long you can stay airborne — worth investing in early."
+  Bad: "Put 4 points into the stamina blue tree to get 200 stamina for aerial maneuver" (too specific)`,
+
+  guide: `You are a Crimson Desert game guide. The player wants a GUIDE — a step-by-step walkthrough.
+- Provide clear, actionable steps to solve their problem
+- Use bold for key actions (wrap in **)
+- Be specific but don't over-explain (e.g., "Shoot a fire arrow at the vines on the 2nd floor door")
+- Keep it concise — 3-5 steps max
+- Mention relevant items or abilities they might need`,
+
+  full: `You are a Crimson Desert game guide. The player wants the FULL SOLUTION — complete detailed answer.
+- Provide the complete, detailed answer with nothing held back
+- Include item locations, exact strategies, boss move patterns, video timestamps if available
+- Format for easy scanning: short paragraphs, bold key info
+- Include any related tips or things they might miss`,
+};
+
+const BASE_SYSTEM_PROMPT = `You are an expert Crimson Desert game companion AI. You help players with quests, puzzles, bosses, items, mechanics, crafting, and exploration.
+
+Rules:
+- ONLY answer based on the provided context. If the context doesn't contain the answer, say so honestly.
+- Use game-specific terminology (Abyss Artifacts, Pywel, Greymane, etc.)
+- Format for quick mobile scanning: short paragraphs, bold key actions
+- Never spoil content beyond what the player asks about
+- Be warm and encouraging — the player is stuck and needs help`;
+
+export async function POST(req: NextRequest) {
+  try {
+    const { question, spoilerTier = "guide" } = await req.json();
+
+    if (!question || typeof question !== "string") {
+      return NextResponse.json(
+        { error: "Question is required" },
+        { status: 400 }
+      );
+    }
+
+    // Check if API keys are configured
+    const anthropicKey = process.env.ANTHROPIC_API_KEY || envVars.ANTHROPIC_API_KEY;
+    const voyageKey = process.env.VOYAGE_API_KEY || envVars.VOYAGE_API_KEY;
+
+    if (!anthropicKey || anthropicKey === "your-claude-api-key-here") {
+      // Demo mode — return a helpful placeholder
+      return NextResponse.json({
+        answer: getDemoResponse(question, spoilerTier),
+        sources: [],
+        demo: true,
+      });
+    }
+
+    // ===== FULL RAG PIPELINE =====
+    const supabase = createClient(supabaseUrl, supabaseKey);
+    let chunks: Record<string, unknown>[] | null = null;
+    let searchError: Error | null = null;
+
+    // Step 1: Try vector search if Voyage AI key is available
+    console.log("Voyage key present:", !!voyageKey);
+    if (voyageKey && voyageKey !== "your-voyage-api-key-here") {
+      try {
+        const embeddingRes = await fetch(
+          "https://api.voyageai.com/v1/embeddings",
+          {
+            method: "POST",
+            headers: {
+              Authorization: `Bearer ${voyageKey}`,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              model: "voyage-3.5-lite",
+              input: [question],
+              input_type: "query",
+            }),
+          }
+        );
+        if (!embeddingRes.ok) {
+          console.error("Voyage query error:", embeddingRes.status, await embeddingRes.text().then(t => t.slice(0, 200)));
+        }
+        const embeddingData = await embeddingRes.json();
+        const queryEmbedding = embeddingData.data?.[0]?.embedding;
+
+        console.log("Query embedding generated:", !!queryEmbedding, "dim:", queryEmbedding?.length);
+        if (queryEmbedding) {
+          const { data, error } = await supabase.rpc(
+            "match_knowledge_chunks",
+            {
+              query_embedding: queryEmbedding,
+              match_threshold: 0.0,
+              match_count: 5,
+            }
+          );
+          console.log("Vector search:", data?.length || 0, "results, error:", error?.message || "none");
+          chunks = data;
+          if (error) searchError = error as unknown as Error;
+        }
+      } catch (e) {
+        console.error("Voyage embedding error:", e);
+      }
+    }
+
+    // Step 2: Fallback to text search if no vector results
+    if (!chunks || chunks.length === 0) {
+      const stopWords = new Set(["the", "how", "what", "where", "when", "can", "does", "this", "that", "with", "from", "have", "solve", "find", "get", "best", "way", "need", "help", "crimson", "desert"]);
+      const keywords = question
+        .toLowerCase()
+        .replace(/[^a-z0-9\s]/g, "")
+        .split(/\s+/)
+        .filter((w) => w.length > 2 && !stopWords.has(w))
+        .slice(0, 8);
+
+      console.log("Text search keywords:", keywords);
+
+      // Fetch more candidates, then rank by keyword match count
+      const { data, error } = await supabase
+        .from("knowledge_chunks")
+        .select("id, content, source_url, source_type, quest_name, content_type")
+        .or(keywords.map((kw) => `content.ilike.%${kw}%`).join(","))
+        .limit(20);
+
+      if (data && data.length > 0) {
+        // Rank by how many keywords each chunk contains
+        const ranked = data.map((chunk) => {
+          const lowerContent = String(chunk.content).toLowerCase();
+          const matchCount = keywords.filter((kw) => lowerContent.includes(kw)).length;
+          return { ...chunk, matchCount };
+        });
+        ranked.sort((a, b) => b.matchCount - a.matchCount);
+        chunks = ranked.slice(0, 5);
+        console.log("Text search: top match has", ranked[0]?.matchCount, "/", keywords.length, "keywords");
+      } else {
+        chunks = data;
+      }
+      if (error) searchError = error as unknown as Error;
+    }
+
+    if (searchError) {
+      console.error("Search error:", searchError);
+    }
+
+    const context =
+      chunks && chunks.length > 0
+        ? chunks.map((c) => String(c.content || "")).join("\n\n---\n\n")
+        : "No specific information found in the knowledge base for this question.";
+
+    const sources =
+      chunks
+        ?.filter((c) => c.source_url)
+        .map((c) => ({
+          title: String(c.quest_name || c.source_type || "Source"),
+          url: String(c.source_url),
+        })) || [];
+
+    // Step 3: Call Claude
+    const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${SPOILER_INSTRUCTIONS[spoilerTier] || SPOILER_INSTRUCTIONS.guide}`;
+
+    const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
+      method: "POST",
+      headers: {
+        "x-api-key": anthropicKey,
+        "anthropic-version": "2023-06-01",
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: "claude-sonnet-4-20250514",
+        max_tokens: 1024,
+        system: systemPrompt,
+        messages: [
+          {
+            role: "user",
+            content: `Context from knowledge base:\n${context}\n\nPlayer's question: ${question}`,
+          },
+        ],
+      }),
+    });
+
+    const claudeData = await claudeRes.json();
+    if (claudeData.error) {
+      console.error("Claude API error:", JSON.stringify(claudeData.error));
+    }
+    const answer =
+      claudeData.content?.[0]?.text ||
+      "Sorry, I couldn't generate an answer right now.";
+
+    // Step 4: Log the query (async, don't block response)
+    supabase
+      .from("queries")
+      .insert({
+        question,
+        response: answer,
+        spoiler_tier: spoilerTier,
+        chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
+        tokens_used: claudeData.usage?.output_tokens || 0,
+      })
+      .then(() => {});
+
+    return NextResponse.json({ answer, sources });
+  } catch (error) {
+    console.error("Chat API error:", error);
+    return NextResponse.json(
+      { error: "Internal server error" },
+      { status: 500 }
+    );
+  }
+}
+
+// Demo responses when API keys aren't configured yet
+function getDemoResponse(question: string, tier: string): string {
+  const q = question.toLowerCase();
+
+  if (tier === "nudge") {
+    if (q.includes("labyrinth") || q.includes("puzzle"))
+      return "Take a closer look at the walls near the entrance. Something there reacts to light differently than the rest...";
+    if (q.includes("boss") || q.includes("kailok") || q.includes("hornsplitter"))
+      return "Watch his left shoulder closely before his big attacks. There's a tell you might be missing.";
+    return "That's a great question! Explore the area more carefully — the answer is closer than you think.";
+  }
+
+  if (tier === "guide") {
+    if (q.includes("labyrinth") || q.includes("puzzle"))
+      return "**1.** Enter the labyrinth and take the left path at the first fork.\n**2.** Look for the glowing rune on the north wall — interact with it.\n**3.** This opens a hidden passage. Follow it to the central chamber.\n**4.** In the central chamber, activate the three pillars in order: left, right, center.";
+    if (q.includes("boss") || q.includes("kailok") || q.includes("hornsplitter"))
+      return "**Phase 1:** Stay at mid-range. Dodge his charge attack by rolling to the right.\n**Phase 2:** When he glows red, he's about to do an AoE — back away.\n**Phase 3:** Use fire-based attacks for extra damage. His weak point is his back legs.\n\n**Tip:** Bring at least 5 healing potions.";
+    return "I'd love to help with that! This is a **demo response** — connect your Claude API key in `.env.local` to get real AI-powered answers from the knowledge base.";
+  }
+
+  // Full solution
+  return `This is a **demo response** showing how the full solution tier works.\n\nTo get real answers powered by AI:\n1. Get a Claude API key from **console.anthropic.com**\n2. Add it to \`.env.local\` as \`ANTHROPIC_API_KEY\`\n3. Add an OpenAI key for embeddings as \`OPENAI_API_KEY\`\n4. Seed the knowledge base with game content\n\nOnce connected, this tier provides complete detailed walkthroughs with sources.`;
+}
