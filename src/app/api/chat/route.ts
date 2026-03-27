@@ -197,10 +197,33 @@ export async function POST(req: NextRequest) {
       console.error("Search error:", searchError);
     }
 
-    const context =
-      chunks && chunks.length > 0
-        ? chunks.map((c) => String(c.content || "")).join("\n\n---\n\n")
-        : "No specific information found in the knowledge base for this question.";
+    // Snarky no-info responses for when we can't help
+    const NO_INFO_RESPONSES = [
+      "I haven't been trained on that yet... maybe you should just man up and figure it out yourself.",
+      "No clue on that one. Skill issue.",
+      "My database is empty on this. You're on your own, adventurer.",
+      "Haven't learned that one yet. Just don't die, I guess.",
+      "I got nothing. Sounds like a you problem.",
+    ];
+    const randomNoInfo = () => NO_INFO_RESPONSES[Math.floor(Math.random() * NO_INFO_RESPONSES.length)];
+
+    // Check if we have genuinely relevant results (not just partial keyword matches)
+    const hasRelevantContext = chunks && chunks.length > 0 && (
+      // Vector search results have similarity scores — trust those
+      (chunks[0] as Record<string, unknown>).similarity !== undefined
+        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.3
+        // Text search results — check if top result matched most keywords
+        : (chunks[0] as Record<string, unknown>).matchCount !== undefined
+          ? Number((chunks[0] as Record<string, unknown>).matchCount) >= 2
+          : true
+    );
+
+    // If no relevant context, return snarky response immediately (skip Claude call)
+    if (!hasRelevantContext) {
+      return NextResponse.json({ answer: randomNoInfo(), sources: [] });
+    }
+
+    const context = chunks!.map((c) => String(c.content || "")).join("\n\n---\n\n");
 
     const sources =
       chunks
