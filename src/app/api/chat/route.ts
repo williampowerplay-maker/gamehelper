@@ -226,10 +226,12 @@ export async function POST(req: NextRequest) {
       }),
     });
 
+    console.log("Claude API status:", claudeRes.status);
     const claudeData = await claudeRes.json();
     if (claudeData.error) {
       console.error("Claude API error:", JSON.stringify(claudeData.error));
     }
+    console.log("Claude response type:", claudeData.type, "has content:", !!claudeData.content);
     const answer =
       claudeData.content?.[0]?.text ||
       "Sorry, I couldn't generate an answer right now.";
