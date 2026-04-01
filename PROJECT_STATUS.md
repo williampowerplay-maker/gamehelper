@@ -1,0 +1,106 @@
+# Crimson Desert Guide - Project Status
+
+**Last updated:** 2026-04-01
+
+## Overview
+
+AI-powered game companion for Crimson Desert. Players ask questions about quests, puzzles, bosses, items, and mechanics, and get answers filtered through a spoiler-tier system (Nudge / Guide / Full Solution).
+
+## Tech Stack
+
+| Layer | Technology | Version |
+|-------|-----------|---------|
+| Framework | Next.js (App Router) | 16.2.1 |
+| Frontend | React + TypeScript | 19.2.4 / 6.0.2 |
+| Styling | Tailwind CSS 4 + PostCSS | 4.2.2 |
+| Database | Supabase (Postgres + pgvector) | supabase-js 2.100.0 |
+| AI (Answers) | Claude Sonnet (Anthropic API) | claude-sonnet-4-20250514 |
+| AI (Embeddings) | Voyage AI | voyage-3.5-lite |
+| Auth | Supabase Auth (Email + Google OAuth) | via supabase-js |
+| Deployment | Vercel | - |
+
+## Current Status: MVP Functional
+
+The app runs locally and has a working RAG pipeline, but needs content seeding and production polish.
+
+### What's Built and Working
+
+- [x] **Chat UI** - Dark-themed chat interface with message bubbles, loading animation, sample starter questions
+- [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts controlling response detail level
+- [x] **RAG Pipeline** (`/api/chat/route.ts`)
+  - Voyage AI embedding of user question
+  - Supabase pgvector similarity search (`match_knowledge_chunks` RPC)
+  - Text-search fallback with keyword ranking when vector search returns no results
+  - Relevance threshold checks (similarity > 0.3 for vector, >= 2 keyword matches for text)
+  - Claude Sonnet generates the answer using retrieved context
+- [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
+- [x] **User Tiers** - Free/Premium tier tracking with daily query counter and reset logic
+- [x] **Query Logging** - All queries logged to `queries` table (async, non-blocking)
+- [x] **Voice I/O** - Speech-to-text input (Web Speech API) + text-to-speech playback on responses
+- [x] **Demo Mode** - Placeholder responses when API keys aren't configured
+- [x] **Snarky Fallbacks** - Random humorous responses when no relevant context is found
+- [x] **Source Attribution** - Links to source content shown below AI answers
+
+### What's NOT Built Yet
+
+- [ ] **Knowledge Base Seeding** - No game content has been ingested yet; the `knowledge_chunks` table exists but is empty
+- [ ] **Content Ingestion Pipeline** - No scripts/tools to scrape, chunk, embed, and upload game guide content
+- [ ] **Rate Limiting** - User tier (free/premium) exists in auth but isn't enforced in the API route
+- [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
+- [ ] **Conversation History** - Each question is standalone; no multi-turn context
+- [ ] **Mobile Optimization** - Basic responsive layout but not fully tested/polished
+- [ ] **Error Boundaries** - No React error boundaries for graceful failure
+- [ ] **Analytics Dashboard** - Query logs exist but no admin view to analyze usage
+- [ ] **Content Management** - No admin interface for managing knowledge chunks
+- [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
+
+## Supabase Schema
+
+### Tables
+- **`knowledge_chunks`** - Game content with vector embeddings (id, content, embedding, source_url, source_type, chapter, region, quest_name, content_type, character, spoiler_level)
+- **`queries`** - Query log (question, response, spoiler_tier, chunk_ids_used, tokens_used)
+- **`users`** - User profiles (tier, queries_today, queries_today_reset_at)
+
+### RPC Functions
+- **`match_knowledge_chunks`** - pgvector similarity search (query_embedding, match_threshold, match_count)
+
+### Content Types
+`puzzle | boss | item | mechanic | recipe | exploration | quest | character`
+
+## File Structure
+
+```
+crimson-guide/
+  src/
+    app/
+      page.tsx              # Main chat page
+      layout.tsx            # Root layout with AuthProvider
+      globals.css           # Tailwind + custom CSS variables + animations
+      api/chat/route.ts     # RAG pipeline API endpoint
+      auth/callback/route.ts # Supabase OAuth callback
+    components/
+      ChatInput.tsx         # Text input + voice input (mic button)
+      ChatMessage.tsx       # Message bubble with tier badge, sources, TTS
+      SpoilerTierSelector.tsx # Nudge/Guide/Full toggle
+      AuthButton.tsx        # Sign in modal (email + Google OAuth)
+    lib/
+      supabase.ts           # Supabase client + TypeScript types
+      auth-context.tsx      # React context for auth state
+    types/
+      speech.d.ts           # Web Speech API type declarations
+  next.config.ts            # Env vars passthrough
+  tsconfig.json
+  postcss.config.mjs
+  package.json
+  .gitignore
+  .env.local                # API keys (not committed)
+```
+
+## Environment Variables Required
+
+```
+NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
+NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+ANTHROPIC_API_KEY=<your-claude-api-key>
+VOYAGE_API_KEY=<your-voyage-ai-key>
+```
