@@ -82,18 +82,18 @@ export default function Home() {
   };
 
   return (
-    <div className="flex h-screen max-w-5xl mx-auto">
+    <div className="flex h-[100dvh] max-w-5xl mx-auto">
     {/* Main chat column */}
     <div className="flex flex-col flex-1 min-w-0 max-w-3xl mx-auto">
       {/* Header */}
-      <header className="flex-shrink-0 border-b border-[#2a2a3a] px-4 py-4">
+      <header className="flex-shrink-0 border-b border-[#2a2a3a] px-4 py-2 sm:py-4">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="text-xl font-bold">
               <span className="text-red-500">Crimson</span>{" "}
               <span className="text-gray-100">Desert Guide</span>
             </h1>
-            <p className="text-xs text-gray-500 mt-0.5">
+            <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">
               AI-powered game companion
             </p>
           </div>
@@ -102,7 +102,7 @@ export default function Home() {
       </header>
 
       {/* Spoiler tier selector */}
-      <div className="flex-shrink-0 px-4 py-3 border-b border-[#2a2a3a]">
+      <div className="flex-shrink-0 px-4 py-2 sm:py-3 border-b border-[#2a2a3a]">
         <div className="flex items-center justify-between">
           <span className="text-xs text-gray-500 mr-3">Spoiler level:</span>
           <SpoilerTierSelector

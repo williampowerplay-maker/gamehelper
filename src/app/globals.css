@@ -11,7 +11,13 @@
   --color-text-secondary: #9ca3af;
 }
 
+html {
+  height: 100%;
+}
+
 body {
+  height: 100%;
+  overflow: hidden;
   background-color: var(--color-dark-bg);
   color: var(--color-text-primary);
   font-family: "Inter", system-ui, -apple-system, sans-serif;
