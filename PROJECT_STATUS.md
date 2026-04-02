@@ -35,7 +35,10 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
   - Claude Sonnet generates the answer using retrieved context
 - [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
 - [x] **User Tiers** - Free/Premium tier tracking with daily query counter and reset logic
-- [x] **Query Logging** - All queries logged to `queries` table (async, non-blocking)
+- [x] **Signup Cap + Waitlist** - Limits signups to 100 users (configurable via `NEXT_PUBLIC_MAX_USERS`). When full, shows waitlist email form. Waitlist table in Supabase.
+- [x] **Rate Limiting** - IP-based, server-side. Free: 5/min, 20/hr. Premium: 10/min, 60/hr. Returns friendly messages shown inline in chat.
+- [x] **Google AdSense Integration** - Banner ads after every 3rd response, desktop sidebar ad (300x250), upgrade CTA every 5th response. Premium users see zero ads. Requires AdSense account setup (see TODO_MANUAL.md).
+- [x] **Query Logging** - All queries logged to `queries` table with client_ip (async, non-blocking)
 - [x] **Voice I/O** - Speech-to-text input (Web Speech API) + text-to-speech playback on responses
 - [x] **Demo Mode** - Placeholder responses when API keys aren't configured
 - [x] **Snarky Fallbacks** - Random humorous responses when no relevant context is found
@@ -45,7 +48,6 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 
 - [ ] **Knowledge Base Seeding** - No game content has been ingested yet; the `knowledge_chunks` table exists but is empty
 - [ ] **Content Ingestion Pipeline** - No scripts/tools to scrape, chunk, embed, and upload game guide content
-- [ ] **Rate Limiting** - User tier (free/premium) exists in auth but isn't enforced in the API route
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [ ] **Mobile Optimization** - Basic responsive layout but not fully tested/polished
@@ -54,12 +56,17 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 
+### Manual Setup Required
+
+See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and configs needed (AdSense, Stripe, Google OAuth, domain, content seeding, legal pages).
+
 ## Supabase Schema
 
 ### Tables
 - **`knowledge_chunks`** - Game content with vector embeddings (id, content, embedding, source_url, source_type, chapter, region, quest_name, content_type, character, spoiler_level)
-- **`queries`** - Query log (question, response, spoiler_tier, chunk_ids_used, tokens_used)
+- **`queries`** - Query log (question, response, spoiler_tier, chunk_ids_used, tokens_used, client_ip)
 - **`users`** - User profiles (tier, queries_today, queries_today_reset_at)
+- **`waitlist`** - Email waitlist for when signups are at capacity (id, email unique, created_at)
 
 ### RPC Functions
 - **`match_knowledge_chunks`** - pgvector similarity search (query_embedding, match_threshold, match_count)
@@ -82,7 +89,9 @@ crimson-guide/
       ChatInput.tsx         # Text input + voice input (mic button)
       ChatMessage.tsx       # Message bubble with tier badge, sources, TTS
       SpoilerTierSelector.tsx # Nudge/Guide/Full toggle
-      AuthButton.tsx        # Sign in modal (email + Google OAuth)
+      AuthButton.tsx        # Sign in modal (email + Google OAuth) + waitlist
+      AdBanner.tsx          # Google AdSense ad unit component
+      UpgradeCTA.tsx        # Premium upgrade prompt (shown between responses)
     lib/
       supabase.ts           # Supabase client + TypeScript types
       auth-context.tsx      # React context for auth state
@@ -99,8 +108,15 @@ crimson-guide/
 ## Environment Variables Required
 
 ```
+# Required
 NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
 ANTHROPIC_API_KEY=<your-claude-api-key>
 VOYAGE_API_KEY=<your-voyage-ai-key>
+
+# Optional (features activate when set)
+NEXT_PUBLIC_MAX_USERS=100
+NEXT_PUBLIC_ADSENSE_ID=ca-pub-XXXXXXXXXX
+NEXT_PUBLIC_AD_SLOT_BANNER=<slot-id>
+NEXT_PUBLIC_AD_SLOT_SIDEBAR=<slot-id>
 ```

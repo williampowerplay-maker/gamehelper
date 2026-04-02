@@ -5,9 +5,17 @@ import ChatInput from "@/components/ChatInput";
 import ChatMessage, { type Message } from "@/components/ChatMessage";
 import SpoilerTierSelector from "@/components/SpoilerTierSelector";
 import AuthButton from "@/components/AuthButton";
+import AdBanner from "@/components/AdBanner";
+import UpgradeCTA from "@/components/UpgradeCTA";
+import { useAuth } from "@/lib/auth-context";
 import { type SpoilerTier } from "@/lib/supabase";
 
+const AD_SLOT_BANNER = process.env.NEXT_PUBLIC_AD_SLOT_BANNER || "";
+const AD_SLOT_SIDEBAR = process.env.NEXT_PUBLIC_AD_SLOT_SIDEBAR || "";
+
 export default function Home() {
+  const { tier } = useAuth();
+  const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
   const [messages, setMessages] = useState<Message[]>([]);
   const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("guide");
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +82,9 @@ export default function Home() {
   };
 
   return (
-    <div className="flex flex-col h-screen max-w-3xl mx-auto">
+    <div className="flex h-screen max-w-5xl mx-auto">
+    {/* Main chat column */}
+    <div className="flex flex-col flex-1 min-w-0 max-w-3xl mx-auto">
       {/* Header */}
       <header className="flex-shrink-0 border-b border-[#2a2a3a] px-4 py-4">
         <div className="flex items-center justify-between">
@@ -133,9 +143,25 @@ export default function Home() {
           </div>
         )}
 
-        {messages.map((msg) => (
-          <ChatMessage key={msg.id} message={msg} />
-        ))}
+        {messages.map((msg, i) => {
+          // Count how many assistant messages have appeared up to this point
+          const assistantCount = messages.slice(0, i + 1).filter(m => m.role === "assistant").length;
+          const isAssistant = msg.role === "assistant";
+
+          return (
+            <div key={msg.id}>
+              <ChatMessage message={msg} />
+              {/* Show upgrade CTA after every 5th assistant response */}
+              {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && (
+                <UpgradeCTA />
+              )}
+              {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}
+              {showAds && isAssistant && assistantCount > 0 && assistantCount % 3 === 0 && assistantCount % 5 !== 0 && (
+                <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
+              )}
+            </div>
+          );
+        })}
 
         {isLoading && (
           <div className="flex justify-start mb-4">
@@ -162,6 +188,16 @@ export default function Home() {
       <div className="flex-shrink-0 border-t border-[#2a2a3a] px-4 py-3">
         <ChatInput onSend={handleSend} disabled={isLoading} />
       </div>
+    </div>
+
+    {/* Desktop sidebar ad */}
+    {showAds && AD_SLOT_SIDEBAR && (
+      <aside className="hidden lg:flex flex-shrink-0 w-[300px] border-l border-[#2a2a3a] p-4 items-start justify-center pt-20">
+        <div className="sticky top-4">
+          <AdBanner slot={AD_SLOT_SIDEBAR} format="rectangle" />
+        </div>
+      </aside>
+    )}
     </div>
   );
 }
