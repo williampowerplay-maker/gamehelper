@@ -4,6 +4,16 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.4.1] - 2026-04-02 (Mobile UX Fix)
+
+### Fixed
+- **Input above fold on mobile**: Replaced `h-screen` (`100vh`) with `h-[100dvh]` (dynamic viewport height). `100vh` includes mobile browser chrome (address bar, nav bar), pushing the input just below the visible area. `dvh` respects the actual visible viewport.
+- **Header padding tightened on mobile**: `py-2 sm:py-4` saves ~16px vertical space on small screens.
+- **Subtitle hidden on mobile**: "AI-powered game companion" tagline hidden on small screens (`hidden sm:block`) to recover space.
+- **Page scroll locked**: Added `height: 100%` + `overflow: hidden` to `html`/`body` so the flex layout stays locked and the page doesn't scroll outside the container.
+
+---
+
 ## [0.4.0] - 2026-04-02 (Cost Optimizations)
 
 ### Changed

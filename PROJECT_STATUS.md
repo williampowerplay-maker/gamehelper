@@ -53,7 +53,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
-- [ ] **Mobile Optimization** - Basic responsive layout but not fully tested/polished
+- [x] **Mobile Optimization (partial)** - Input field now always above fold: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
 - [ ] **Error Boundaries** - No React error boundaries for graceful failure
 - [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log
 - [ ] **Content Management** - No admin interface for managing knowledge chunks

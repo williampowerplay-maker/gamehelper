@@ -44,6 +44,11 @@ Things discovered during development that are worth remembering across sessions.
 - **Browser compatibility**: Web Speech API (SpeechRecognition) only works reliably in Chrome and Edge. Firefox has partial support. Safari is inconsistent. The app shows an alert for unsupported browsers.
 - **Type declarations**: Needed a custom `speech.d.ts` for TypeScript to recognize `webkitSpeechRecognition` and related types.
 
+## Mobile Layout
+
+- **`100vh` vs `100dvh` on mobile**: `h-screen` in Tailwind maps to `height: 100vh`, which on mobile browsers includes the browser chrome (address bar, bottom nav bar). The actual visible area is smaller, so a bottom-anchored input gets pushed just below the fold. Fix: use `h-[100dvh]` (dynamic viewport height) which tracks the true visible area. Safari 15.4+, Chrome 108+, Firefox 101+ support `dvh`.
+- **Lock body scroll for app-shell layouts**: Add `height: 100%` + `overflow: hidden` to `html` and `body` so the flex container owns all scrolling. Without this, the page itself can scroll and break the fixed-input illusion.
+
 ## Deployment
 
 - **Vercel**: The app is configured for Vercel deployment. `next.config.ts` passes through `ANTHROPIC_API_KEY` and `VOYAGE_API_KEY` via the `env` config. On Vercel, set these in the project's environment variables dashboard.
