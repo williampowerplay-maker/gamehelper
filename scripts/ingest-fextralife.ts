@@ -5,34 +5,51 @@
  * chunks it by section, generates Voyage AI embeddings, and upserts into Supabase.
  *
  * Usage:
- *   npx tsx scripts/ingest-fextralife.ts                  # Ingest all categories
+ *   npx tsx scripts/ingest-fextralife.ts                    # Ingest all categories
  *   npx tsx scripts/ingest-fextralife.ts --category abyss-gear
- *   npx tsx scripts/ingest-fextralife.ts --dry-run         # Preview without inserting
- *   npx tsx scripts/ingest-fextralife.ts --deep            # Follow links 2 levels deep
+ *   npx tsx scripts/ingest-fextralife.ts --dry-run           # Preview without inserting
+ *   npx tsx scripts/ingest-fextralife.ts --deep              # Follow links 2 levels deep
+ *   npx tsx scripts/ingest-fextralife.ts --changed-only      # Skip pages with unchanged content
+ *   npx tsx scripts/ingest-fextralife.ts --deep --changed-only  # Deep + skip unchanged
  *
- * Requires in .env.local:
+ * Requires env vars (from .env.local locally, or process.env in CI):
  *   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, VOYAGE_API_KEY
  */
 
 import { createClient } from "@supabase/supabase-js";
 import * as fs from "fs";
 import * as path from "path";
+import * as crypto from "crypto";
 
 // ===== ENV SETUP =====
-const envPath = path.join(__dirname, "..", ".env.local");
-const envContent = fs.readFileSync(envPath, "utf-8");
+// Supports both local (.env.local) and CI (process.env / GitHub Actions secrets)
 const env: Record<string, string> = {};
-envContent.split("\n").forEach((line) => {
-  const match = line.match(/^([^#=]+)=(.*)$/);
-  if (match) env[match[1].trim()] = match[2].trim();
-});
+try {
+  const envPath = path.join(__dirname, "..", ".env.local");
+  const envContent = fs.readFileSync(envPath, "utf-8");
+  envContent.split("\n").forEach((line) => {
+    const match = line.match(/^([^#=]+)=(.*)$/);
+    if (match) env[match[1].trim()] = match[2].trim();
+  });
+} catch {
+  // No .env.local — running in CI, rely on process.env
+}
+
+function getEnv(key: string): string {
+  return process.env[key] || env[key] || "";
+}
 
 const supabase = createClient(
-  env.NEXT_PUBLIC_SUPABASE_URL,
-  env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  getEnv("NEXT_PUBLIC_SUPABASE_URL"),
+  getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
 );
-const VOYAGE_KEY = env.VOYAGE_API_KEY;
+const VOYAGE_KEY = getEnv("VOYAGE_API_KEY");
 const BASE_URL = "https://crimsondesert.wiki.fextralife.com";
+
+// ===== CONTENT HASHING =====
+function hashContent(content: string): string {
+  return crypto.createHash("sha256").update(content).digest("hex").slice(0, 16);
+}
 
 // ===== RATE LIMITING =====
 const DELAY_MS = 1500; // Be respectful — 1.5s between requests
@@ -347,9 +364,9 @@ async function fetchPage(pagePath: string): Promise<string | null> {
 
 // ===== MAIN INGESTION =====
 
-async function ingestCategory(category: Category, dryRun: boolean, deep: boolean) {
+async function ingestCategory(category: Category, dryRun: boolean, deep: boolean, changedOnly: boolean) {
   console.log(`\n========== ${category.name.toUpperCase()} ==========`);
-  console.log(`Index: ${BASE_URL}${category.indexPath}${deep ? " (deep crawl ON)" : ""}`);
+  console.log(`Index: ${BASE_URL}${category.indexPath}${deep ? " (deep)" : ""}${changedOnly ? " (changed-only)" : ""}`);
 
   // Step 1: Fetch index page
   const indexHtml = await fetchPage(category.indexPath);
@@ -375,9 +392,27 @@ async function ingestCategory(category: Category, dryRun: boolean, deep: boolean
     category
   );
 
+  // Load existing hashes for changed-only mode
+  const existingHashes = new Map<string, string>();
+  if (changedOnly) {
+    const { data: hashRows } = await supabase
+      .from("page_hashes")
+      .select("url, content_hash")
+      .eq("category", category.name);
+    for (const row of hashRows || []) {
+      existingHashes.set(row.url, row.content_hash);
+    }
+    console.log(`  Loaded ${existingHashes.size} existing hashes`);
+  }
+
+  // Track new hashes to upsert after ingest
+  const newHashes: { url: string; content_hash: string; category: string; last_checked_at: string; last_changed_at: string }[] = [];
+  const now = new Date().toISOString();
+
   // Step 2: Crawl level-1 pages; optionally collect level-2 links
   const level2Links = new Set<string>();
   let crawled = 0;
+  let skipped = 0;
   const level1Array = Array.from(allLinks);
 
   for (const link of level1Array) {
@@ -390,28 +425,43 @@ async function ingestCategory(category: Category, dryRun: boolean, deep: boolean
 
     const content = extractMainContent(html);
     const title = extractPageTitle(html);
-
     if (content.length < 100) { console.log(" too short, skipping"); continue; }
 
-    const chunks = chunkPageContent(content, title, `${BASE_URL}${link}`, category);
-    allChunks.push(...chunks);
+    const pageUrl = `${BASE_URL}${link}`;
+    const hash = hashContent(content);
+    const prevHash = existingHashes.get(pageUrl);
 
-    // In deep mode, collect outbound links from this page
+    // In changed-only mode, skip pages whose content hash hasn't changed
+    if (changedOnly && prevHash === hash) {
+      newHashes.push({ url: pageUrl, content_hash: hash, category: category.name, last_checked_at: now, last_changed_at: now });
+      console.log(" unchanged, skipping");
+      skipped++;
+      // Still collect deep links even for skipped pages
+      if (deep) {
+        for (const ol of extractLinks(html, link)) {
+          if (!allLinks.has(ol)) { allLinks.add(ol); level2Links.add(ol); }
+        }
+      }
+      continue;
+    }
+
+    const chunks = chunkPageContent(content, title, pageUrl, category);
+    allChunks.push(...chunks);
+    newHashes.push({ url: pageUrl, content_hash: hash, category: category.name, last_checked_at: now, last_changed_at: now });
+
     if (deep) {
       const outLinks = extractLinks(html, link);
       let newLinks = 0;
       for (const ol of outLinks) {
-        if (!allLinks.has(ol)) {
-          allLinks.add(ol);
-          level2Links.add(ol);
-          newLinks++;
-        }
+        if (!allLinks.has(ol)) { allLinks.add(ol); level2Links.add(ol); newLinks++; }
       }
       console.log(` ${chunks.length} chunks (+${newLinks} new links)`);
     } else {
       console.log(` ${chunks.length} chunks`);
     }
   }
+
+  if (changedOnly) console.log(`  Skipped ${skipped} unchanged pages`);
 
   // Step 3: Crawl level-2 pages (deep mode only)
   if (deep && level2Links.size > 0) {
@@ -429,11 +479,22 @@ async function ingestCategory(category: Category, dryRun: boolean, deep: boolean
 
       const content = extractMainContent(html);
       const title = extractPageTitle(html);
-
       if (content.length < 100) { console.log(" too short, skipping"); continue; }
 
-      const chunks = chunkPageContent(content, title, `${BASE_URL}${link}`, category);
+      const pageUrl = `${BASE_URL}${link}`;
+      const hash = hashContent(content);
+      const prevHash = existingHashes.get(pageUrl);
+
+      if (changedOnly && prevHash === hash) {
+        newHashes.push({ url: pageUrl, content_hash: hash, category: category.name, last_checked_at: now, last_changed_at: now });
+        console.log(" unchanged, skipping");
+        skipped++;
+        continue;
+      }
+
+      const chunks = chunkPageContent(content, title, pageUrl, category);
       allChunks.push(...chunks);
+      newHashes.push({ url: pageUrl, content_hash: hash, category: category.name, last_checked_at: now, last_changed_at: now });
       console.log(` ${chunks.length} chunks`);
     }
   }
@@ -485,6 +546,14 @@ async function ingestCategory(category: Category, dryRun: boolean, deep: boolean
   }
 
   console.log(`  Done: ${inserted} inserted, ${errors} batch errors`);
+
+  // Step 7: Upsert page hashes so next run knows what changed
+  if (newHashes.length > 0) {
+    console.log(`  Saving ${newHashes.length} page hashes...`);
+    for (let i = 0; i < newHashes.length; i += 50) {
+      await supabase.from("page_hashes").upsert(newHashes.slice(i, i + 50), { onConflict: "url" });
+    }
+  }
 }
 
 // ===== CLI =====
@@ -493,12 +562,14 @@ async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
   const deep = args.includes("--deep");
+  const changedOnly = args.includes("--changed-only");
   const categoryFlag = args.indexOf("--category");
   const targetCategory = categoryFlag >= 0 ? args[categoryFlag + 1] : null;
 
   console.log("Fextralife Wiki Ingestion Script");
   console.log(`Mode: ${dryRun ? "DRY RUN" : "LIVE"}`);
   console.log(`Depth: ${deep ? "2 levels (following in-page links)" : "1 level (index links only)"}`);
+  console.log(`Changed-only: ${changedOnly ? "YES (skip unchanged pages)" : "NO (re-ingest all pages)"}`);
   console.log(`Target: ${targetCategory || "ALL categories"}`);
   console.log(`Delay between requests: ${DELAY_MS}ms`);
   console.log(`\nCategories: ${CATEGORIES.map(c => c.name).join(", ")}`);
@@ -514,7 +585,7 @@ async function main() {
   }
 
   for (const category of categories) {
-    await ingestCategory(category, dryRun, deep);
+    await ingestCategory(category, dryRun, deep, changedOnly);
   }
 
   console.log("\n========== COMPLETE ==========");

@@ -71,6 +71,16 @@ Things that need to be done by hand (accounts, keys, configs) that can't be auto
 - [ ] Upload chunks + embeddings to `knowledge_chunks` table
 - [ ] Test with 20+ sample questions to verify retrieval quality
 
+## GitHub Actions Secrets (Wiki Auto-Reseed)
+
+- [ ] Go to GitHub repo → **Settings → Secrets and variables → Actions**
+- [ ] Add secret: `NEXT_PUBLIC_SUPABASE_URL` (same value as in .env.local)
+- [ ] Add secret: `NEXT_PUBLIC_SUPABASE_ANON_KEY` (same value as in .env.local)
+- [ ] Add secret: `VOYAGE_API_KEY` (same value as in .env.local)
+- [ ] Verify by going to **Actions → Wiki Reseed → Run workflow** and triggering manually once
+
+Once secrets are set, the workflow runs automatically every Sunday at 3am UTC.
+
 ## User Cap
 
 - [ ] Current cap: **100 users** (set via `NEXT_PUBLIC_MAX_USERS` env var)

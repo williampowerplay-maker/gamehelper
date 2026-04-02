@@ -27,6 +27,8 @@ Things discovered during development that are worth remembering across sessions.
 
 ## RAG Pipeline Design
 
+- **CI env loading pattern**: Scripts that read `.env.local` via `fs.readFileSync` will throw in CI (no file present). Wrap in try/catch and fall back to `process.env`. GitHub Actions injects secrets as environment variables, so `process.env.VOYAGE_API_KEY` works there. Pattern: `process.env[key] || env[key] || ""`.
+- **Content change detection via hashing**: Store `sha256(pageContent).slice(0,16)` in a `page_hashes` table keyed by URL. On re-crawl, hash the new content and compare — skip embedding if unchanged. This is the correct way to make scheduled re-ingestion cheap; don't rely on HTTP `Last-Modified` headers (Fextralife doesn't send them reliably).
 - **Wiki nav exclusion list can hide entire sub-categories**: `/Abyss+Gear` was in the `navPages` exclusion set, so the ingestion script never crawled it and never followed links to it. When adding new wiki categories, check the exclusion set and remove any that should be crawled. The correct pattern: nav-only pages (index pages, UI pages) go in the exclusion set; content pages do not.
 - **1-level crawl misses interconnected content**: The original script crawled Index → linked pages and stopped. Pages like Crow's Pursuit (linked from Abyss Gear, not from Items index) were invisible. Fix: BFS `--deep` mode follows links within level-1 pages to discover level-2 content.
 - **Idempotent ingestion**: Use delete-by-source-url before inserting to safely re-run categories without duplicating chunks. Supabase `knowledge_chunks` has no unique constraint on `source_url`, so without this, re-runs multiply the data.

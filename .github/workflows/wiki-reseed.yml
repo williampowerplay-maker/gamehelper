@@ -1,0 +1,56 @@
+name: Wiki Reseed
+
+on:
+  # Run every Sunday at 3am UTC
+  schedule:
+    - cron: "0 3 * * 0"
+
+  # Allow manual trigger from GitHub Actions UI
+  workflow_dispatch:
+    inputs:
+      deep:
+        description: "Follow links 2 levels deep"
+        type: boolean
+        default: false
+      category:
+        description: "Single category to reseed (leave blank for all)"
+        type: string
+        default: ""
+
+jobs:
+  reseed:
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ingestion (scheduled — changed-only, no deep)
+        if: github.event_name == 'schedule'
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+        run: npx tsx scripts/ingest-fextralife.ts --changed-only
+
+      - name: Run ingestion (manual — respects inputs)
+        if: github.event_name == 'workflow_dispatch'
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_ANON_KEY }}
+          VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+        run: |
+          ARGS="--changed-only"
+          if [ "${{ inputs.deep }}" = "true" ]; then ARGS="$ARGS --deep"; fi
+          if [ -n "${{ inputs.category }}" ]; then ARGS="$ARGS --category ${{ inputs.category }}"; fi
+          npx tsx scripts/ingest-fextralife.ts $ARGS

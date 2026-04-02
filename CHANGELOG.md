@@ -4,6 +4,25 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.1] - 2026-04-02 (Automated Wiki Monitoring)
+
+### Added
+- **`page_hashes` Supabase table**: Stores `sha256(content)[0:16]` per crawled URL + category. Enables change detection between runs.
+- **`--changed-only` flag**: Before embedding, the script hashes each page's content and compares against `page_hashes`. Unchanged pages are skipped entirely — no Voyage API call, no DB write. Only new/changed pages get re-embedded and re-inserted.
+- **GitHub Actions workflow** (`.github/workflows/wiki-reseed.yml`):
+  - Runs every Sunday at 3am UTC with `--changed-only` (only processes changed wiki pages)
+  - Manual trigger via GitHub Actions UI with options for `--deep` and `--category`
+  - Reads secrets: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `VOYAGE_API_KEY`
+- **CI-safe env loading**: Ingestion script now wraps `.env.local` read in try/catch and falls back to `process.env` — works in GitHub Actions without the file.
+
+### Setup required
+Add these three secrets to GitHub repo → Settings → Secrets and variables → Actions:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `VOYAGE_API_KEY`
+
+---
+
 ## [0.5.0] - 2026-04-02 (Deeper Wiki Ingestion)
 
 ### Changed
