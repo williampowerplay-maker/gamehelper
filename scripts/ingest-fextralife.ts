@@ -87,6 +87,11 @@ function stripHtml(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&nbsp;/g, " ")
+    // Clean up table formatting noise
+    .replace(/\|[\s|]+\|/g, " ") // collapse empty table cells
+    .replace(/\|\s*\|/g, " ")
+    .replace(/^\s*\|\s*/gm, "") // leading pipe on a line
+    .replace(/\s*\|\s*$/gm, "") // trailing pipe on a line
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+/g, " ")
     .trim();

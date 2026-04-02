@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
     const hasRelevantContext = chunks && chunks.length > 0 && (
       // Vector search results have similarity scores — trust those
       (chunks[0] as Record<string, unknown>).similarity !== undefined
-        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.3
+        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.15
         // Text search results — check if top result matched most keywords
         : (chunks[0] as Record<string, unknown>).matchCount !== undefined
           ? Number((chunks[0] as Record<string, unknown>).matchCount) >= 2
