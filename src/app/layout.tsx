@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
+import ErrorBoundary from "@/components/ErrorBoundary";
 
 const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
 
@@ -34,7 +35,11 @@ export default function RootLayout({
             strategy="lazyOnload"
           />
         )}
-        <AuthProvider>{children}</AuthProvider>
+        <AuthProvider>
+          <ErrorBoundary componentName="RootLayout">
+            {children}
+          </ErrorBoundary>
+        </AuthProvider>
       </body>
     </html>
   );

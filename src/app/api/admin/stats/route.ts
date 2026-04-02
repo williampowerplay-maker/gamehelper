@@ -38,6 +38,7 @@ export async function GET(req: NextRequest) {
 
   const today = new Date().toISOString().split("T")[0];
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
+  const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
 
   const [
     totalQueriesRes,
@@ -50,6 +51,8 @@ export async function GET(req: NextRequest) {
     premiumUsersRes,
     waitlistRes,
     knowledgeRes,
+    recentErrorsRes,
+    errorsLast24hRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -64,6 +67,8 @@ export async function GET(req: NextRequest) {
     supabase.from("users").select("id", { count: "exact", head: true }).eq("tier", "premium"),
     supabase.from("waitlist").select("id", { count: "exact", head: true }),
     supabase.from("knowledge_chunks").select("content_type"),
+    supabase.from("error_logs").select("id, error_type, message, context, client_ip, created_at").order("created_at", { ascending: false }).limit(30),
+    supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", oneDayAgo),
   ]);
 
   // Tier breakdown
@@ -103,6 +108,7 @@ export async function GET(req: NextRequest) {
       premiumUsers: premiumUsersRes.count ?? 0,
       waitlistCount: waitlistRes.count ?? 0,
       totalTokens,
+      errorsLast24h: errorsLast24hRes.count ?? 0,
     },
     tierBreakdown: tierCounts,
     last7Days,
@@ -111,5 +117,6 @@ export async function GET(req: NextRequest) {
       total: knowledgeRes.data?.length ?? 0,
       byType: typeMap,
     },
+    recentErrors: recentErrorsRes.data ?? [],
   });
 }

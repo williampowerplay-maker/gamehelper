@@ -213,7 +213,14 @@ export async function POST(req: NextRequest) {
           }
         );
         if (!embeddingRes.ok) {
-          console.error("Voyage query error:", embeddingRes.status, await embeddingRes.text().then(t => t.slice(0, 200)));
+          const errText = await embeddingRes.text().then((t: string) => t.slice(0, 200));
+          console.error("Voyage query error:", embeddingRes.status, errText);
+          supabase.from("error_logs").insert({
+            error_type: "voyage",
+            message: `Voyage API ${embeddingRes.status}: ${errText}`,
+            context: { tier: spoilerTier },
+            client_ip: clientIp,
+          }).then(() => {});
         }
         const embeddingData = await embeddingRes.json();
         const queryEmbedding = embeddingData.data?.[0]?.embedding;
@@ -339,6 +346,12 @@ export async function POST(req: NextRequest) {
     const claudeData = await claudeRes.json();
     if (claudeData.error) {
       console.error("Claude API error:", JSON.stringify(claudeData.error));
+      supabase.from("error_logs").insert({
+        error_type: "claude",
+        message: claudeData.error?.message || JSON.stringify(claudeData.error).slice(0, 300),
+        context: { tier: spoilerTier, model: tierConfig.model, status: claudeRes.status },
+        client_ip: clientIp,
+      }).then(() => {});
     }
     console.log("Claude response type:", claudeData.type, "has content:", !!claudeData.content);
     const answer =
@@ -361,6 +374,17 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ answer, sources });
   } catch (error) {
     console.error("Chat API error:", error);
+    // Log to error_logs table (best effort)
+    try {
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      await supabase.from("error_logs").insert({
+        error_type: "api_chat",
+        message: error instanceof Error ? error.message : String(error),
+        stack: error instanceof Error ? error.stack?.slice(0, 2000) : null,
+        context: { endpoint: "/api/chat" },
+        client_ip: getClientIp(req),
+      });
+    } catch { /* swallow logging errors */ }
     return NextResponse.json(
       { error: "Internal server error" },
       { status: 500 }

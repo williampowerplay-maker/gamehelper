@@ -10,6 +10,7 @@ interface StatsData {
     premiumUsers: number;
     waitlistCount: number;
     totalTokens: number;
+    errorsLast24h: number;
   };
   tierBreakdown: { nudge: number; guide: number; full: number };
   last7Days: { date: string; count: number }[];
@@ -24,6 +25,14 @@ interface StatsData {
     total: number;
     byType: Record<string, number>;
   };
+  recentErrors: {
+    id: string;
+    error_type: string;
+    message: string;
+    context: Record<string, unknown> | null;
+    client_ip: string | null;
+    created_at: string;
+  }[];
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -222,7 +231,7 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors } = data;
   const totalTier = tierBreakdown.nudge + tierBreakdown.guide + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
@@ -276,7 +285,7 @@ export default function AdminPage() {
         {/* Overview cards */}
         <section>
           <h2 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Overview</h2>
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-7 gap-3">
             <StatCard label="Total Queries" value={overview.totalQueries} />
             <StatCard label="Today" value={overview.queriesToday} />
             <StatCard label="Total Users" value={overview.totalUsers} />
@@ -296,6 +305,7 @@ export default function AdminPage() {
                   : overview.totalTokens
               }
             />
+            <StatCard label="Errors (24h)" value={overview.errorsLast24h ?? 0} />
           </div>
         </section>
 
@@ -393,6 +403,76 @@ export default function AdminPage() {
                   <tr>
                     <td colSpan={4} className="py-8 text-center text-gray-600">
                       No queries yet
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        {/* Recent errors */}
+        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
+          <h2 className="text-sm font-medium text-gray-300 mb-4">
+            Recent Errors
+            <span className="text-gray-600 font-normal ml-2">(last 30)</span>
+          </h2>
+          <div className="overflow-x-auto">
+            <table className="w-full text-xs">
+              <thead>
+                <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
+                  <th className="pb-2 pr-4 font-medium w-28">Type</th>
+                  <th className="pb-2 pr-4 font-medium">Message</th>
+                  <th className="pb-2 pr-4 font-medium w-36">Context</th>
+                  <th className="pb-2 pr-4 font-medium w-24">IP</th>
+                  <th className="pb-2 font-medium w-20 text-right">When</th>
+                </tr>
+              </thead>
+              <tbody>
+                {(recentErrors ?? []).map((e) => {
+                  const badgeColor: Record<string, string> = {
+                    client_render: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+                    api_chat: "bg-red-500/20 text-red-400 border-red-500/30",
+                    voyage: "bg-purple-500/20 text-purple-400 border-purple-500/30",
+                    claude: "bg-blue-500/20 text-blue-400 border-blue-500/30",
+                    unhandled: "bg-orange-500/20 text-orange-400 border-orange-500/30",
+                  };
+                  const badge = badgeColor[e.error_type] ?? "bg-gray-500/20 text-gray-400 border-gray-500/30";
+                  return (
+                    <tr
+                      key={e.id}
+                      className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/50 transition-colors"
+                    >
+                      <td className="py-2 pr-4">
+                        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-medium ${badge}`}>
+                          {e.error_type}
+                        </span>
+                      </td>
+                      <td className="py-2 pr-4 text-gray-300 max-w-xs">
+                        <span className="line-clamp-1">{e.message}</span>
+                      </td>
+                      <td className="py-2 pr-4 text-gray-500 max-w-[144px]">
+                        {e.context ? (
+                          <span className="font-mono text-[10px] line-clamp-1">
+                            {JSON.stringify(e.context)}
+                          </span>
+                        ) : (
+                          <span className="text-gray-700">—</span>
+                        )}
+                      </td>
+                      <td className="py-2 pr-4 text-gray-600 font-mono">
+                        {e.client_ip ?? "—"}
+                      </td>
+                      <td className="py-2 text-gray-600 text-right whitespace-nowrap">
+                        {timeAgo(e.created_at)}
+                      </td>
+                    </tr>
+                  );
+                })}
+                {(recentErrors ?? []).length === 0 && (
+                  <tr>
+                    <td colSpan={5} className="py-8 text-center text-gray-600">
+                      No errors logged
                     </td>
                   </tr>
                 )}
