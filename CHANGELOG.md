@@ -4,6 +4,17 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.2] - 2026-04-02 (Admin CSV Export)
+
+### Added
+- **`/api/admin/export` route**: Protected by `ADMIN_SECRET` Bearer token. Accepts `?type=waitlist` or `?type=users` and returns a properly formatted `.csv` download with `Content-Disposition` header.
+  - `waitlist` export: `email, signed_up_at` — all waitlist signups ordered newest first
+  - `users` export: `id, email, tier, queries_today, signed_up_at` — all registered users
+  - Values with commas/quotes/newlines are properly escaped per RFC 4180
+- **Export buttons on `/admin` dashboard**: "↓ Waitlist CSV" (green) and "↓ Users CSV" (blue) buttons in the header — click to instantly download the CSV. Uses browser `Blob` + anchor click trick so no new tab opens.
+
+---
+
 ## [0.5.1] - 2026-04-02 (Automated Wiki Monitoring)
 
 ### Added

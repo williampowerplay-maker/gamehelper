@@ -129,6 +129,28 @@ export default function AdminPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [data, setData] = useState<StatsData | null>(null);
+  const [exporting, setExporting] = useState<string | null>(null);
+
+  const handleExport = async (type: "waitlist" | "users") => {
+    setExporting(type);
+    try {
+      const res = await fetch(`/api/admin/export?type=${type}`, {
+        headers: { Authorization: `Bearer ${secret}` },
+      });
+      if (!res.ok) { setExporting(null); return; }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${type}-${new Date().toISOString().slice(0, 10)}.csv`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      URL.revokeObjectURL(url);
+    } finally {
+      setExporting(null);
+    }
+  };
 
   const fetchStats = useCallback(
     async (secretToUse: string) => {
@@ -217,6 +239,22 @@ export default function AdminPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => handleExport("waitlist")}
+            disabled={exporting === "waitlist"}
+            title="Download waitlist emails as CSV"
+            className="text-xs text-green-400 hover:text-green-300 border border-green-500/30 hover:border-green-500/60 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            {exporting === "waitlist" ? "Exporting..." : "↓ Waitlist CSV"}
+          </button>
+          <button
+            onClick={() => handleExport("users")}
+            disabled={exporting === "users"}
+            title="Download all users as CSV"
+            className="text-xs text-blue-400 hover:text-blue-300 border border-blue-500/30 hover:border-blue-500/60 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            {exporting === "users" ? "Exporting..." : "↓ Users CSV"}
+          </button>
           <button
             onClick={() => fetchStats(secret)}
             disabled={loading}
