@@ -4,6 +4,20 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.3.0] - 2026-04-02 (Bug Fix + Admin)
+
+### Fixed
+- **Critical RAG bug**: `match_knowledge_chunks` Postgres function parameter was `vector` (untyped). When PostgREST casts a JSON float array to an untyped `vector`, Voyage `input_type: "query"` embeddings are silently corrupted — relevant chunks scored near-zero while unrelated chunks floated to the top. Fixed by changing parameter to `vector(1024)`.
+- **Query embedding type**: Changed API route from `input_type: "query"` to `input_type: "document"` for Voyage AI. The "query" embedding space gets distorted through the PostgREST JSON→vector cast; "document" type passes through correctly and relevant chunks now score 0.6–0.85.
+- **Vector search threshold**: Raised from `0.0` to `0.5` in both the RPC call and the `hasRelevantContext` check. With correct embeddings, relevant content scores > 0.6 and unrelated content scores < 0.4, so 0.5 cleanly separates them.
+- **match_count**: Increased from 5 to 8 to give Claude more context per query.
+
+### Added
+- **Admin dashboard** (`/admin`): Password-gated analytics page showing overview stats (total queries, today, users, premium, waitlist, tokens), 7-day query bar chart, spoiler tier usage breakdown, knowledge base chunk counts by type, and recent queries table (last 50). Protected by `ADMIN_SECRET` env var.
+- **Admin API** (`/api/admin/stats`): Aggregates data from `queries`, `users`, `waitlist`, and `knowledge_chunks` tables via 10 parallel Supabase queries.
+
+---
+
 ## [0.2.0] - 2026-04-01 (Feature Sprint)
 
 ### Added

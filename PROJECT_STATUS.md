@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-01
+**Last updated:** 2026-04-02 (session 2)
 
 ## Overview
 
@@ -28,11 +28,12 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] **Chat UI** - Dark-themed chat interface with message bubbles, loading animation, sample starter questions
 - [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts controlling response detail level
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
-  - Voyage AI embedding of user question
-  - Supabase pgvector similarity search (`match_knowledge_chunks` RPC)
+  - Voyage AI embedding of user question (`input_type: "document"` — see LEARNINGS.md)
+  - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count 8)
   - Text-search fallback with keyword ranking when vector search returns no results
-  - Relevance threshold checks (similarity > 0.3 for vector, >= 2 keyword matches for text)
+  - Relevance threshold checks (similarity > 0.5 for vector, >= 2 keyword matches for text)
   - Claude Sonnet generates the answer using retrieved context
+  - **Bug fixed**: `match_knowledge_chunks` parameter changed from `vector` to `vector(1024)` — untyped vector caused silent corruption of query embeddings through PostgREST
 - [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
 - [x] **User Tiers** - Free/Premium tier tracking with daily query counter and reset logic
 - [x] **Signup Cap + Waitlist** - Limits signups to 100 users (configurable via `NEXT_PUBLIC_MAX_USERS`). When full, shows waitlist email form. Waitlist table in Supabase.
@@ -52,7 +53,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [ ] **Mobile Optimization** - Basic responsive layout but not fully tested/polished
 - [ ] **Error Boundaries** - No React error boundaries for graceful failure
-- [ ] **Analytics Dashboard** - Query logs exist but no admin view to analyze usage
+- [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 
@@ -119,4 +120,5 @@ NEXT_PUBLIC_MAX_USERS=100
 NEXT_PUBLIC_ADSENSE_ID=ca-pub-XXXXXXXXXX
 NEXT_PUBLIC_AD_SLOT_BANNER=<slot-id>
 NEXT_PUBLIC_AD_SLOT_SIDEBAR=<slot-id>
+ADMIN_SECRET=<your-admin-password>   # Protects /admin dashboard
 ```

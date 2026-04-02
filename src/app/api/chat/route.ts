@@ -184,7 +184,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               model: "voyage-3.5-lite",
               input: [question],
-              input_type: "query",
+              input_type: "document",  // "query" type loses precision through PostgREST JSON→vector cast
             }),
           }
         );
@@ -200,8 +200,8 @@ export async function POST(req: NextRequest) {
             "match_knowledge_chunks",
             {
               query_embedding: queryEmbedding,
-              match_threshold: 0.0,
-              match_count: 5,
+              match_threshold: 0.5,
+              match_count: 8,
             }
           );
           console.log("Vector search:", data?.length || 0, "results, error:", error?.message || "none");
@@ -266,7 +266,7 @@ export async function POST(req: NextRequest) {
     const hasRelevantContext = chunks && chunks.length > 0 && (
       // Vector search results have similarity scores — trust those
       (chunks[0] as Record<string, unknown>).similarity !== undefined
-        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.15
+        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.5
         // Text search results — check if top result matched most keywords
         : (chunks[0] as Record<string, unknown>).matchCount !== undefined
           ? Number((chunks[0] as Record<string, unknown>).matchCount) >= 2

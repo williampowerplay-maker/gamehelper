@@ -12,10 +12,13 @@ Things discovered during development that are worth remembering across sessions.
 
 - **`match_knowledge_chunks` RPC**: This is a custom Postgres function that must exist in Supabase for vector search to work. It takes `query_embedding` (vector), `match_threshold` (float), and `match_count` (int). Make sure the function is created in the Supabase SQL editor before testing vector search.
 - **Embedding dimensions**: Voyage AI `voyage-3.5-lite` produces embeddings of a specific dimension. The `embedding` column in `knowledge_chunks` must match this dimension. If switching embedding models, the column and all existing embeddings need to be regenerated.
+- **CRITICAL — RPC parameter must be `vector(1024)` not `vector`**: If the `query_embedding` parameter is declared as untyped `vector` (no dimension), PostgREST's JSON→vector cast corrupts `input_type: "query"` embeddings from Voyage AI. The cosine similarity computation breaks silently — correct chunks score near-zero and wrong chunks float to the top. Fix: declare the parameter as `vector(1024)` to match the column type.
+- **Passing `match_threshold: 0.0` via supabase-js may use the DEFAULT instead**: When `0.0` is serialized as JSON `0`, PostgREST may treat it as falsy/absent and fall back to the function's DEFAULT threshold. Use an explicit non-zero value or test with negative thresholds to verify the parameter is being received.
 
 ## Voyage AI
 
-- **Model choice**: Using `voyage-3.5-lite` for embeddings. It's the lightweight model — good balance of cost and quality for a game guide use case. The `input_type: "query"` parameter should be set when embedding user questions (vs `"document"` when embedding knowledge chunks).
+- **Model choice**: Using `voyage-3.5-lite` for embeddings. It's the lightweight model — good balance of cost and quality for a game guide use case.
+- **Use `input_type: "document"` for query embeddings too**: Despite Voyage's docs recommending `input_type: "query"` for retrieval queries, this type's embeddings get corrupted when cast through PostgREST's JSON→`vector(1024)` conversion. Using `input_type: "document"` for both queries and stored chunks gives consistent, correct cosine similarity scores (Kailok query → Kailok chunks score 0.85 vs ~0.33 for unrelated content).
 
 ## Spoiler Tier Prompt Engineering
 
@@ -25,7 +28,7 @@ Things discovered during development that are worth remembering across sessions.
 ## RAG Pipeline Design
 
 - **Dual search strategy**: Vector search is primary, text search is fallback. This handles cases where embeddings miss something that simple keyword matching would catch.
-- **Relevance gating**: Without the threshold checks (similarity > 0.3 for vector, >= 2 keywords for text), Claude would confidently hallucinate answers from tangentially related chunks. The gating forces a "I don't know" response when context quality is low.
+- **Relevance gating**: Similarity threshold for vector results is 0.5 (with `input_type: "document"` embeddings, relevant chunks typically score 0.6–0.85 and unrelated chunks score < 0.4). Text search fallback requires >= 2 keyword matches. Without these gates, Claude would hallucinate from tangentially related chunks.
 - **Keyword extraction**: Stop words list includes game-generic terms ("crimson", "desert") that would match everything and dilute search quality.
 
 ## Auth
