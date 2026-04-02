@@ -17,7 +17,7 @@ export default function Home() {
   const { tier } = useAuth();
   const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
   const [messages, setMessages] = useState<Message[]>([]);
-  const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("guide");
+  const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("nudge");
   const [isLoading, setIsLoading] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
 

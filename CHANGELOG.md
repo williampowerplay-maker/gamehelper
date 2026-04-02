@@ -4,6 +4,13 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.4.2] - 2026-04-02 (Default Spoiler Tier)
+
+### Changed
+- **Default spoiler tier set to "nudge"**: New users start with the least spoilery experience instead of "guide".
+
+---
+
 ## [0.4.1] - 2026-04-02 (Mobile UX Fix)
 
 ### Fixed
