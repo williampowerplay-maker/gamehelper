@@ -40,6 +40,17 @@ export default function Home() {
 
       const data = await res.json();
 
+      // Handle rate limiting
+      if (data.rateLimited) {
+        const rateLimitMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: data.error,
+        };
+        setMessages((prev) => [...prev, rateLimitMessage]);
+        return;
+      }
+
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",

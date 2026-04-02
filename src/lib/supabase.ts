@@ -42,3 +42,9 @@ export interface QueryRecord {
   tokens_used: number;
   created_at: string;
 }
+
+export interface WaitlistEntry {
+  id: string;
+  email: string;
+  created_at: string;
+}

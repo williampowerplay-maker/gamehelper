@@ -4,12 +4,15 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import type { User, Session } from "@supabase/supabase-js";
 
+const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS) || 100;
+
 interface AuthState {
   user: User | null;
   session: Session | null;
   loading: boolean;
   tier: "free" | "premium";
   queriesToday: number;
+  signupsClosed: boolean;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<void>;
@@ -24,8 +27,23 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [loading, setLoading] = useState(true);
   const [tier, setTier] = useState<"free" | "premium">("free");
   const [queriesToday, setQueriesToday] = useState(0);
+  const [signupsClosed, setSignupsClosed] = useState(false);
+
+  // Check if signups are at capacity
+  async function checkCapacity(): Promise<boolean> {
+    const { count, error } = await supabase
+      .from("users")
+      .select("id", { count: "exact", head: true });
+    if (error) {
+      console.error("Capacity check error:", error);
+      return false; // Allow signup if check fails
+    }
+    return (count ?? 0) >= MAX_USERS;
+  }
 
   useEffect(() => {
+    // Check capacity on mount (only matters for logged-out users)
+    checkCapacity().then(setSignupsClosed);
     // Get initial session
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
@@ -79,6 +97,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signUp(email: string, password: string) {
+    // Re-check capacity at signup time to prevent races
+    const atCapacity = await checkCapacity();
+    if (atCapacity) {
+      setSignupsClosed(true);
+      return { error: "Signups are currently closed — we've hit our early access limit. Check back soon!" };
+    }
     const { error } = await supabase.auth.signUp({ email, password });
     if (!error) {
       // User profile will be created via trigger or on first sign-in
@@ -87,6 +111,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function signInWithGoogle() {
+    // Check capacity before initiating OAuth redirect
+    const atCapacity = await checkCapacity();
+    if (atCapacity) {
+      setSignupsClosed(true);
+      return;
+    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
@@ -109,6 +139,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         loading,
         tier,
         queriesToday,
+        signupsClosed,
         signIn,
         signUp,
         signInWithGoogle,

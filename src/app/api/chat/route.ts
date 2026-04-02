@@ -27,6 +27,20 @@ const envVars = loadEnv();
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
+// Rate limits by tier
+const RATE_LIMITS = {
+  free:    { perMinute: 5,  perHour: 20 },
+  premium: { perMinute: 10, perHour: 60 },
+};
+
+function getClientIp(req: NextRequest): string {
+  return (
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
+    req.headers.get("x-real-ip") ||
+    "unknown"
+  );
+}
+
 // Spoiler tier system prompt instructions
 const SPOILER_INSTRUCTIONS: Record<string, string> = {
   nudge: `You are a Crimson Desert game guide. The player wants a NUDGE — a gentle directional hint that preserves the satisfaction of figuring it out themselves.
@@ -93,6 +107,47 @@ export async function POST(req: NextRequest) {
       return NextResponse.json(
         { error: "Question is required" },
         { status: 400 }
+      );
+    }
+
+    // ===== RATE LIMITING =====
+    const clientIp = getClientIp(req);
+    const userTier = (spoilerTier === "full" ? "premium" : "free") as keyof typeof RATE_LIMITS; // TODO: check actual user tier from auth
+    const limits = RATE_LIMITS[userTier];
+
+    // Check against queries table using the Supabase client
+    const rateLimitDb = createClient(supabaseUrl, supabaseKey);
+    const now = new Date();
+    const oneMinuteAgo = new Date(now.getTime() - 60 * 1000).toISOString();
+    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+
+    const [minuteCheck, hourCheck] = await Promise.all([
+      rateLimitDb
+        .from("queries")
+        .select("id", { count: "exact", head: true })
+        .eq("client_ip", clientIp)
+        .gte("created_at", oneMinuteAgo),
+      rateLimitDb
+        .from("queries")
+        .select("id", { count: "exact", head: true })
+        .eq("client_ip", clientIp)
+        .gte("created_at", oneHourAgo),
+    ]);
+
+    const queriesLastMinute = minuteCheck.count ?? 0;
+    const queriesLastHour = hourCheck.count ?? 0;
+
+    if (queriesLastMinute >= limits.perMinute) {
+      return NextResponse.json(
+        { error: "Slow down! You can ask another question in a minute.", rateLimited: true },
+        { status: 429 }
+      );
+    }
+    if (queriesLastHour >= limits.perHour) {
+      const resetMinutes = Math.ceil((60 * 60 * 1000 - (now.getTime() - new Date(oneHourAgo).getTime())) / 60000);
+      return NextResponse.json(
+        { error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true },
+        { status: 429 }
       );
     }
 
@@ -275,6 +330,7 @@ export async function POST(req: NextRequest) {
         spoiler_tier: spoilerTier,
         chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
         tokens_used: claudeData.usage?.output_tokens || 0,
+        client_ip: clientIp,
       })
       .then(() => {});
 
