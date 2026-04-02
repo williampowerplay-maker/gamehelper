@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-02 (session 2)
+**Last updated:** 2026-04-02 (session 3)
 
 ## Overview
 
@@ -29,10 +29,12 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts controlling response detail level
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
   - Voyage AI embedding of user question (`input_type: "document"` — see LEARNINGS.md)
-  - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count 8)
+  - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count varies by tier)
   - Text-search fallback with keyword ranking when vector search returns no results
   - Relevance threshold checks (similarity > 0.5 for vector, >= 2 keyword matches for text)
-  - Claude Sonnet generates the answer using retrieved context
+  - **Response caching**: checks `queries` table for identical question+tier in last 7 days before calling any AI API
+  - **Per-tier Claude config**: Nudge→Haiku (150 tok, 3 chunks), Guide→Sonnet (600 tok, 6 chunks), Full→Sonnet (1024 tok, 8 chunks)
+  - **Single Supabase client** per request (was two separate clients)
   - **Bug fixed**: `match_knowledge_chunks` parameter changed from `vector` to `vector(1024)` — untyped vector caused silent corruption of query embeddings through PostgREST
 - [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
 - [x] **User Tiers** - Free/Premium tier tracking with daily query counter and reset logic

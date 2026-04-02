@@ -4,6 +4,16 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.4.0] - 2026-04-02 (Cost Optimizations)
+
+### Changed
+- **Per-tier Claude model**: Nudge tier now uses `claude-haiku-4-5-20251001` (150 max tokens, 3 chunks) instead of Sonnet — ~20x cheaper per nudge query. Guide uses Sonnet at 600 tokens/6 chunks. Full uses Sonnet at 1024 tokens/8 chunks. Configured via `TIER_CLAUDE` constant.
+- **Response caching**: Before calling Voyage AI or Claude, the API now checks the `queries` table for an identical `question` + `spoiler_tier` within the last 7 days. Cache hits skip all external API calls entirely.
+- **Single Supabase client**: Merged `rateLimitDb` and `supabase` into one `createClient()` call per request.
+- **Per-tier match count**: Vector search `match_count` is now 3/6/8 for nudge/guide/full respectively (was always 8).
+
+---
+
 ## [0.3.0] - 2026-04-02 (Bug Fix + Admin)
 
 ### Fixed

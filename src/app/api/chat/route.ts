@@ -33,6 +33,13 @@ const RATE_LIMITS = {
   premium: { perMinute: 10, perHour: 60 },
 };
 
+// Per-tier Claude settings — nudge uses Haiku (~20x cheaper), guide/full use Sonnet
+const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
+  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 150,  matchCount: 3 },
+  guide: { model: "claude-sonnet-4-20250514",  maxTokens: 600,  matchCount: 6 },
+  full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
+};
+
 function getClientIp(req: NextRequest): string {
   return (
     req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
@@ -115,19 +122,19 @@ export async function POST(req: NextRequest) {
     const userTier = (spoilerTier === "full" ? "premium" : "free") as keyof typeof RATE_LIMITS; // TODO: check actual user tier from auth
     const limits = RATE_LIMITS[userTier];
 
-    // Check against queries table using the Supabase client
-    const rateLimitDb = createClient(supabaseUrl, supabaseKey);
+    // Single Supabase client for the whole request
+    const supabase = createClient(supabaseUrl, supabaseKey);
     const now = new Date();
     const oneMinuteAgo = new Date(now.getTime() - 60 * 1000).toISOString();
     const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
 
     const [minuteCheck, hourCheck] = await Promise.all([
-      rateLimitDb
+      supabase
         .from("queries")
         .select("id", { count: "exact", head: true })
         .eq("client_ip", clientIp)
         .gte("created_at", oneMinuteAgo),
-      rateLimitDb
+      supabase
         .from("queries")
         .select("id", { count: "exact", head: true })
         .eq("client_ip", clientIp)
@@ -164,8 +171,25 @@ export async function POST(req: NextRequest) {
       });
     }
 
+    // ===== RESPONSE CACHE CHECK =====
+    const tierConfig = TIER_CLAUDE[spoilerTier] || TIER_CLAUDE.guide;
+    const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
+    const { data: cachedQuery } = await supabase
+      .from("queries")
+      .select("response")
+      .eq("question", question)
+      .eq("spoiler_tier", spoilerTier)
+      .gte("created_at", sevenDaysAgo)
+      .not("response", "is", null)
+      .limit(1)
+      .single();
+
+    if (cachedQuery?.response) {
+      console.log("Cache hit — returning cached response");
+      return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true });
+    }
+
     // ===== FULL RAG PIPELINE =====
-    const supabase = createClient(supabaseUrl, supabaseKey);
     let chunks: Record<string, unknown>[] | null = null;
     let searchError: Error | null = null;
 
@@ -201,7 +225,7 @@ export async function POST(req: NextRequest) {
             {
               query_embedding: queryEmbedding,
               match_threshold: 0.5,
-              match_count: 8,
+              match_count: tierConfig.matchCount,
             }
           );
           console.log("Vector search:", data?.length || 0, "results, error:", error?.message || "none");
@@ -299,8 +323,8 @@ export async function POST(req: NextRequest) {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
-        model: "claude-sonnet-4-20250514",
-        max_tokens: 1024,
+        model: tierConfig.model,
+        max_tokens: tierConfig.maxTokens,
         system: systemPrompt,
         messages: [
           {
