@@ -1,6 +1,42 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
+
+type ErrorWindow = "1h" | "24h" | "7d";
+
+interface ErrorLogEntry {
+  id: string;
+  error_type: string;
+  message: string;
+  stack?: string | null;
+  context: Record<string, unknown> | null;
+  client_ip: string | null;
+  created_at: string;
+}
+
+interface ErrorsData {
+  window: ErrorWindow;
+  total: number;
+  byType: Record<string, number>;
+  buckets: { label: string; count: number }[];
+  errors: ErrorLogEntry[];
+}
+
+const ERROR_BADGE: Record<string, string> = {
+  client_render: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
+  api_chat:      "bg-red-500/20 text-red-400 border-red-500/30",
+  voyage:        "bg-purple-500/20 text-purple-400 border-purple-500/30",
+  claude:        "bg-blue-500/20 text-blue-400 border-blue-500/30",
+  unhandled:     "bg-orange-500/20 text-orange-400 border-orange-500/30",
+};
+
+const ERROR_BAR: Record<string, string> = {
+  client_render: "bg-yellow-500",
+  api_chat:      "bg-red-500",
+  voyage:        "bg-purple-500",
+  claude:        "bg-blue-500",
+  unhandled:     "bg-orange-500",
+};
 
 interface StatsData {
   overview: {
@@ -139,6 +175,27 @@ export default function AdminPage() {
   const [error, setError] = useState("");
   const [data, setData] = useState<StatsData | null>(null);
   const [exporting, setExporting] = useState<string | null>(null);
+  const [errorWindow, setErrorWindow] = useState<ErrorWindow>("24h");
+  const [errorsData, setErrorsData] = useState<ErrorsData | null>(null);
+  const [errorsLoading, setErrorsLoading] = useState(false);
+  const [expandedError, setExpandedError] = useState<string | null>(null);
+
+  const fetchErrors = useCallback(async (win: ErrorWindow, sec: string) => {
+    setErrorsLoading(true);
+    try {
+      const res = await fetch(`/api/admin/errors?window=${win}`, {
+        headers: { Authorization: `Bearer ${sec}` },
+      });
+      if (res.ok) setErrorsData(await res.json());
+    } finally {
+      setErrorsLoading(false);
+    }
+  }, []);
+
+  // Auto-fetch errors whenever window or secret changes (after login)
+  useEffect(() => {
+    if (secret) fetchErrors(errorWindow, secret);
+  }, [errorWindow, secret, fetchErrors]);
 
   const handleExport = async (type: "waitlist" | "users") => {
     setExporting(type);
@@ -411,74 +468,185 @@ export default function AdminPage() {
           </div>
         </div>
 
-        {/* Recent errors */}
-        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
-          <h2 className="text-sm font-medium text-gray-300 mb-4">
-            Recent Errors
-            <span className="text-gray-600 font-normal ml-2">(last 30)</span>
-          </h2>
-          <div className="overflow-x-auto">
-            <table className="w-full text-xs">
-              <thead>
-                <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
-                  <th className="pb-2 pr-4 font-medium w-28">Type</th>
-                  <th className="pb-2 pr-4 font-medium">Message</th>
-                  <th className="pb-2 pr-4 font-medium w-36">Context</th>
-                  <th className="pb-2 pr-4 font-medium w-24">IP</th>
-                  <th className="pb-2 font-medium w-20 text-right">When</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(recentErrors ?? []).map((e) => {
-                  const badgeColor: Record<string, string> = {
-                    client_render: "bg-yellow-500/20 text-yellow-400 border-yellow-500/30",
-                    api_chat: "bg-red-500/20 text-red-400 border-red-500/30",
-                    voyage: "bg-purple-500/20 text-purple-400 border-purple-500/30",
-                    claude: "bg-blue-500/20 text-blue-400 border-blue-500/30",
-                    unhandled: "bg-orange-500/20 text-orange-400 border-orange-500/30",
-                  };
-                  const badge = badgeColor[e.error_type] ?? "bg-gray-500/20 text-gray-400 border-gray-500/30";
-                  return (
-                    <tr
-                      key={e.id}
-                      className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/50 transition-colors"
-                    >
-                      <td className="py-2 pr-4">
-                        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-medium ${badge}`}>
-                          {e.error_type}
-                        </span>
-                      </td>
-                      <td className="py-2 pr-4 text-gray-300 max-w-xs">
-                        <span className="line-clamp-1">{e.message}</span>
-                      </td>
-                      <td className="py-2 pr-4 text-gray-500 max-w-[144px]">
-                        {e.context ? (
-                          <span className="font-mono text-[10px] line-clamp-1">
-                            {JSON.stringify(e.context)}
-                          </span>
-                        ) : (
-                          <span className="text-gray-700">—</span>
-                        )}
-                      </td>
-                      <td className="py-2 pr-4 text-gray-600 font-mono">
-                        {e.client_ip ?? "—"}
-                      </td>
-                      <td className="py-2 text-gray-600 text-right whitespace-nowrap">
-                        {timeAgo(e.created_at)}
-                      </td>
-                    </tr>
-                  );
-                })}
-                {(recentErrors ?? []).length === 0 && (
-                  <tr>
-                    <td colSpan={5} className="py-8 text-center text-gray-600">
-                      No errors logged
-                    </td>
-                  </tr>
-                )}
-              </tbody>
-            </table>
+        {/* Error Log Dashboard */}
+        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5 space-y-5">
+          {/* Header + window selector */}
+          <div className="flex items-center justify-between">
+            <h2 className="text-sm font-medium text-gray-300">
+              Error Log
+              {errorsData && (
+                <span className="text-gray-600 font-normal ml-2">
+                  ({errorsData.total} in window)
+                </span>
+              )}
+            </h2>
+            <div className="flex items-center gap-1.5">
+              {(["1h", "24h", "7d"] as ErrorWindow[]).map((w) => (
+                <button
+                  key={w}
+                  onClick={() => setErrorWindow(w)}
+                  disabled={errorsLoading}
+                  className={`text-xs px-3 py-1 rounded-lg border transition-colors disabled:opacity-50 ${
+                    errorWindow === w
+                      ? "bg-red-600/20 border-red-500/50 text-red-400"
+                      : "border-[#2a2a3a] text-gray-500 hover:text-gray-300 hover:border-[#3a3a4a]"
+                  }`}
+                >
+                  {w}
+                </button>
+              ))}
+              <button
+                onClick={() => fetchErrors(errorWindow, secret)}
+                disabled={errorsLoading}
+                className="text-xs px-2 py-1 rounded-lg border border-[#2a2a3a] text-gray-600 hover:text-gray-400 transition-colors disabled:opacity-50 ml-1"
+                title="Refresh"
+              >
+                ↺
+              </button>
+            </div>
           </div>
+
+          {errorsLoading && (
+            <p className="text-xs text-gray-600 text-center py-4">Loading...</p>
+          )}
+
+          {!errorsLoading && errorsData && (
+            <>
+              {/* Sparkline buckets */}
+              {errorsData.buckets.length > 0 && errorsData.total > 0 && (
+                <div>
+                  <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-2">
+                    {errorWindow === "1h" ? "5-min intervals" : errorWindow === "24h" ? "Hourly" : "6-hr intervals"}
+                  </p>
+                  <div className="flex items-end gap-0.5 h-12">
+                    {errorsData.buckets.map((b, i) => {
+                      const max = Math.max(...errorsData.buckets.map(x => x.count), 1);
+                      const h = Math.max((b.count / max) * 100, b.count > 0 ? 8 : 0);
+                      return (
+                        <div key={i} className="flex-1 flex items-end" style={{ height: "100%" }}>
+                          <div
+                            className="w-full rounded-sm bg-red-500/60 transition-all"
+                            style={{ height: `${h}%` }}
+                            title={`${b.count} error${b.count !== 1 ? "s" : ""} at ${new Date(b.label).toLocaleTimeString()}`}
+                          />
+                        </div>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+
+              {/* Type breakdown */}
+              {Object.keys(errorsData.byType).length > 0 && (
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-2">
+                  {Object.entries(errorsData.byType)
+                    .sort(([, a], [, b]) => b - a)
+                    .map(([type, count]) => {
+                      const badge = ERROR_BADGE[type] ?? "bg-gray-500/20 text-gray-400 border-gray-500/30";
+                      const bar   = ERROR_BAR[type]   ?? "bg-gray-500";
+                      const pct   = errorsData.total > 0 ? Math.round((count / errorsData.total) * 100) : 0;
+                      return (
+                        <div key={type} className="bg-[#0e0e16] border border-[#2a2a3a] rounded-lg p-3">
+                          <span className={`inline-block px-1.5 py-0.5 rounded border text-[10px] font-medium mb-2 ${badge}`}>
+                            {type}
+                          </span>
+                          <p className="text-lg font-bold text-gray-100">{count}</p>
+                          <div className="h-1 bg-[#2a2a3a] rounded-full mt-1.5 overflow-hidden">
+                            <div className={`h-full rounded-full ${bar}`} style={{ width: `${pct}%` }} />
+                          </div>
+                        </div>
+                      );
+                    })}
+                </div>
+              )}
+
+              {/* Error table */}
+              <div className="overflow-x-auto">
+                <table className="w-full text-xs">
+                  <thead>
+                    <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
+                      <th className="pb-2 pr-4 font-medium w-28">Type</th>
+                      <th className="pb-2 pr-4 font-medium">Message</th>
+                      <th className="pb-2 pr-4 font-medium w-36 hidden sm:table-cell">Context</th>
+                      <th className="pb-2 pr-4 font-medium w-24 hidden md:table-cell">IP</th>
+                      <th className="pb-2 font-medium w-20 text-right">When</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {errorsData.errors.map((e) => {
+                      const badge = ERROR_BADGE[e.error_type] ?? "bg-gray-500/20 text-gray-400 border-gray-500/30";
+                      const isExpanded = expandedError === e.id;
+                      return (
+                        <>
+                          <tr
+                            key={e.id}
+                            onClick={() => setExpandedError(isExpanded ? null : e.id)}
+                            className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/60 transition-colors cursor-pointer"
+                          >
+                            <td className="py-2 pr-4">
+                              <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-medium ${badge}`}>
+                                {e.error_type}
+                              </span>
+                            </td>
+                            <td className="py-2 pr-4 text-gray-300 max-w-xs">
+                              <span className={isExpanded ? "" : "line-clamp-1"}>{e.message}</span>
+                            </td>
+                            <td className="py-2 pr-4 text-gray-500 max-w-[144px] hidden sm:table-cell">
+                              {e.context ? (
+                                <span className="font-mono text-[10px] line-clamp-1">
+                                  {JSON.stringify(e.context)}
+                                </span>
+                              ) : (
+                                <span className="text-gray-700">—</span>
+                              )}
+                            </td>
+                            <td className="py-2 pr-4 text-gray-600 font-mono hidden md:table-cell">
+                              {e.client_ip ?? "—"}
+                            </td>
+                            <td className="py-2 text-gray-600 text-right whitespace-nowrap">
+                              {timeAgo(e.created_at)}
+                            </td>
+                          </tr>
+                          {isExpanded && (
+                            <tr key={`${e.id}-expanded`} className="bg-[#0e0e16]/80 border-b border-[#1e1e2e]">
+                              <td colSpan={5} className="px-4 py-3 space-y-2">
+                                {e.context && (
+                                  <div>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Context</p>
+                                    <pre className="text-[11px] text-gray-400 font-mono whitespace-pre-wrap break-all bg-[#1a1a24] rounded p-2">
+                                      {JSON.stringify(e.context, null, 2)}
+                                    </pre>
+                                  </div>
+                                )}
+                                {e.stack && (
+                                  <div>
+                                    <p className="text-[10px] text-gray-600 uppercase tracking-wider mb-1">Stack trace</p>
+                                    <pre className="text-[10px] text-gray-600 font-mono whitespace-pre-wrap break-all bg-[#1a1a24] rounded p-2 max-h-48 overflow-y-auto">
+                                      {e.stack}
+                                    </pre>
+                                  </div>
+                                )}
+                                <p className="text-[10px] text-gray-700">
+                                  {new Date(e.created_at).toLocaleString()} · IP: {e.client_ip ?? "unknown"}
+                                </p>
+                              </td>
+                            </tr>
+                          )}
+                        </>
+                      );
+                    })}
+                    {errorsData.errors.length === 0 && (
+                      <tr>
+                        <td colSpan={5} className="py-8 text-center text-gray-600">
+                          No errors in this window 🎉
+                        </td>
+                      </tr>
+                    )}
+                  </tbody>
+                </table>
+              </div>
+            </>
+          )}
         </div>
 
       </main>

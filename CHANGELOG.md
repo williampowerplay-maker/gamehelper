@@ -4,6 +4,20 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.4] - 2026-04-02 (Error Dashboard Time Filters)
+
+### Added
+- **`/api/admin/errors` endpoint**: Dedicated error log API accepting `?window=1h|24h|7d`. Returns filtered error list (up to 200), breakdown by type, and time-series bucketed data (5-min buckets for 1h, 1-hr buckets for 24h, 6-hr buckets for 7d).
+- **Error Dashboard time filter UI** in `/admin`:
+  - **1h / 24h / 7d toggle buttons** — switches window, auto-refetches
+  - **Sparkline bar chart** — shows error frequency over time for selected window using appropriate bucket sizes
+  - **Type breakdown cards** — one card per error type with count, % of total, and colored progress bar
+  - **Expandable error rows** — click any row to expand full context (JSON prettified), stack trace (scrollable), and exact timestamp + IP
+  - **Refresh button** — manual refresh without switching windows
+  - Auto-fetches errors on login and whenever window changes
+
+---
+
 ## [0.5.3] - 2026-04-02 (Error Boundaries & Logging)
 
 ### Added

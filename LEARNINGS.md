@@ -31,6 +31,8 @@ Things discovered during development that are worth remembering across sessions.
 - **React Error Boundaries must be class components**: React's `componentDidCatch` lifecycle is only available in class components — function components cannot be error boundaries. Use `getDerivedStateFromError` for updating state + `componentDidCatch` for side effects (logging).
 - **Next.js `error.tsx` vs React ErrorBoundary**: `error.tsx` in App Router catches errors from Server Components and async route handlers. It does NOT catch errors in client components during render — that still needs a React ErrorBoundary. Use both for full coverage.
 - **`error_logs` context column (jsonb)**: Store structured metadata about the error — `question`, `tier`, `component`, `url`, `digest` etc. Makes it much easier to reproduce issues from the admin dashboard.
+- **Time-bucketed sparklines without a timeseries DB**: Use JS to bucket raw rows into fixed intervals (5-min / 1-hr / 6-hr) client-side. No extra DB query needed — just filter the already-fetched rows. Works fine up to a few thousand rows.
+- **Expandable table rows in React**: Use a `expandedId` state string. Render a second `<tr>` immediately after the main row when `id === expandedId`. Use `<>` fragment as the map return so both rows sit at the same level in the `<tbody>`.
 - **Server-side error logging should be async and non-blocking**: In API routes, log errors with `.then(() => {})` or inside a separate try/catch after returning the response. Don't `await` the log insert before returning 500 — the user is already waiting.
 
 ## RAG Pipeline Design
