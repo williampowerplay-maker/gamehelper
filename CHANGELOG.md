@@ -4,6 +4,28 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.2.0] - 2026-04-01 (Feature Sprint)
+
+### Added
+- **Signup cap + waitlist**: Limits signups to 100 users (configurable via `NEXT_PUBLIC_MAX_USERS`). When full, shows waitlist email form that saves to `waitlist` table in Supabase.
+- **Rate limiting**: IP-based, server-side. Free: 5/min, 20/hr. Premium: 10/min, 60/hr. Friendly messages shown inline in chat. Uses `client_ip` column on `queries` table with index.
+- **Google AdSense integration**: `AdBanner` component (horizontal + rectangle formats), `UpgradeCTA` component. Banner ad after every 3rd response, upgrade CTA every 5th, desktop sidebar ad (300x250). Premium users see zero ads. AdSense script lazy-loaded in layout.
+- **Fextralife wiki ingestion script** (`scripts/ingest-fextralife.ts`): Crawls 12 wiki categories, extracts content, chunks by heading sections, generates Voyage AI embeddings, upserts to Supabase. Supports `--dry-run` and `--category` flags.
+- **Knowledge base seeded**: 1,690 chunks from Fextralife wiki across all categories:
+  - Bosses: 38 | Quests: 222 | Weapons: 389 | Armor: 244
+  - Skills: 165 | Items: 95 | Locations: 191 | Characters: 89
+  - Guides: 1 | Enemies: 12 | Crafting: 30 | Walkthrough: 214
+- **Project tracking files**: PROJECT_STATUS.md, CHANGELOG.md, LEARNINGS.md, TODO_MANUAL.md for cross-machine development.
+- **Supabase migrations**: `waitlist` table, `client_ip` column + index on `queries` table.
+
+### Technical Decisions
+- Used nav-page exclusion set for wiki link extraction to avoid crawling sidebar/header links from every page
+- 1.5s delay between wiki requests to be respectful to Fextralife servers
+- Batch embedding (32) and batch insert (50) for efficient ingestion
+- AdSense only loads when `NEXT_PUBLIC_ADSENSE_ID` env var is set — zero impact when unconfigured
+
+---
+
 ## [0.1.0] - 2026-03-26 (Initial Build)
 
 ### Added

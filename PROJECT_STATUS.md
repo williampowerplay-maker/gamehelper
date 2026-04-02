@@ -46,8 +46,8 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 
 ### What's NOT Built Yet
 
-- [ ] **Knowledge Base Seeding** - No game content has been ingested yet; the `knowledge_chunks` table exists but is empty
-- [ ] **Content Ingestion Pipeline** - No scripts/tools to scrape, chunk, embed, and upload game guide content
+- [x] ~~**Knowledge Base Seeding**~~ - 1,690 chunks ingested from Fextralife wiki (2026-04-01)
+- [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [ ] **Mobile Optimization** - Basic responsive layout but not fully tested/polished
