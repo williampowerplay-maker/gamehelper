@@ -4,6 +4,23 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.3] - 2026-04-02 (Error Boundaries & Logging)
+
+### Added
+- **`error_logs` Supabase table**: Captures `error_type`, `message`, `stack`, `context` (jsonb), `client_ip`, `created_at`. Indexed on `created_at DESC` and `error_type`.
+- **`/api/log-error` endpoint**: POST endpoint receives client-side errors and writes to `error_logs`. Truncates stack to 2000 chars, message to 500 chars. Never throws — designed to be fire-and-forget.
+- **`src/lib/logError.ts`**: Client-side `logClientError()` utility. Wraps the fetch in try/catch so it never crashes the app.
+- **`src/components/ErrorBoundary.tsx`**: React class component (`componentDidCatch`) with a gaming-themed "Something went wrong / Try again" fallback UI. Logs error type, message, stack, component name, and component stack to `error_logs` via `logClientError`.
+- **`src/app/error.tsx`**: Next.js App Router global error page — catches server component failures, logs them on mount, shows a themed error screen with "Try again" button and error digest ref.
+- **Server-side error logging in `/api/chat`**: Outer catch block, Voyage AI errors, and Claude API errors all write to `error_logs` asynchronously (non-blocking).
+- **Admin dashboard — Error Log section**: "Recent Errors (last 30)" table with colored type badges (`client_render`=yellow, `api_chat`=red, `voyage`=purple, `claude`=blue, `unhandled`=orange), message, compact JSON context, IP, and time ago. New "Errors (24h)" stat card in overview grid.
+
+### Modified
+- `src/app/layout.tsx` — wrapped `{children}` in `<ErrorBoundary componentName="RootLayout">` so any render crash shows a graceful fallback instead of a white screen.
+- `src/app/api/admin/stats/route.ts` — added `recentErrors` (last 30 rows) and `errorsLast24h` count to parallel queries and response payload.
+
+---
+
 ## [0.5.2] - 2026-04-02 (Admin CSV Export)
 
 ### Added

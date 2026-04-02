@@ -25,6 +25,14 @@ Things discovered during development that are worth remembering across sessions.
 - **Per-category examples are essential**: The nudge tier prompt needed explicit good/bad examples for each question type (puzzles, items, bosses, mechanics). Without these, the model would sometimes give full answers even when set to "nudge" mode.
 - **Snarky no-info responses**: When the knowledge base has no relevant info, the system returns a random snarky response instead of calling Claude at all. This saves API costs and gives personality. The check happens before the Claude call — if relevance thresholds aren't met, we short-circuit.
 
+## Error Logging Pattern
+
+- **Never let error logging crash the app**: Both the client-side `logClientError()` and the `/api/log-error` endpoint are wrapped in try/catch and swallow all exceptions. Logging is always fire-and-forget.
+- **React Error Boundaries must be class components**: React's `componentDidCatch` lifecycle is only available in class components — function components cannot be error boundaries. Use `getDerivedStateFromError` for updating state + `componentDidCatch` for side effects (logging).
+- **Next.js `error.tsx` vs React ErrorBoundary**: `error.tsx` in App Router catches errors from Server Components and async route handlers. It does NOT catch errors in client components during render — that still needs a React ErrorBoundary. Use both for full coverage.
+- **`error_logs` context column (jsonb)**: Store structured metadata about the error — `question`, `tier`, `component`, `url`, `digest` etc. Makes it much easier to reproduce issues from the admin dashboard.
+- **Server-side error logging should be async and non-blocking**: In API routes, log errors with `.then(() => {})` or inside a separate try/catch after returning the response. Don't `await` the log insert before returning 500 — the user is already waiting.
+
 ## RAG Pipeline Design
 
 - **CI env loading pattern**: Scripts that read `.env.local` via `fs.readFileSync` will throw in CI (no file present). Wrap in try/catch and fall back to `process.env`. GitHub Actions injects secrets as environment variables, so `process.env.VOYAGE_API_KEY` works there. Pattern: `process.env[key] || env[key] || ""`.

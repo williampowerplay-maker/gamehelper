@@ -55,7 +55,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field now always above fold: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
-- [ ] **Error Boundaries** - No React error boundaries for graceful failure
+- [x] **Error Boundaries** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard shows last 30 errors with type badges + 24h error count stat card.
 - [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log. **CSV export buttons** for waitlist emails and all users — download directly from dashboard header.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
