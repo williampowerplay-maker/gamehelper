@@ -6,8 +6,9 @@
  *
  * Usage:
  *   npx tsx scripts/ingest-fextralife.ts                  # Ingest all categories
- *   npx tsx scripts/ingest-fextralife.ts --category bosses # Ingest one category
+ *   npx tsx scripts/ingest-fextralife.ts --category abyss-gear
  *   npx tsx scripts/ingest-fextralife.ts --dry-run         # Preview without inserting
+ *   npx tsx scripts/ingest-fextralife.ts --deep            # Follow links 2 levels deep
  *
  * Requires in .env.local:
  *   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, VOYAGE_API_KEY
@@ -38,7 +39,6 @@ const DELAY_MS = 1500; // Be respectful — 1.5s between requests
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ===== CATEGORY DEFINITIONS =====
-// Each category maps to an index page on the wiki and a content_type for tagging
 interface Category {
   name: string;
   indexPath: string;
@@ -47,22 +47,35 @@ interface Category {
 }
 
 const CATEGORIES: Category[] = [
-  { name: "bosses", indexPath: "/Bosses", contentType: "boss", spoilerLevel: 2 },
-  { name: "quests", indexPath: "/Quests", contentType: "quest", spoilerLevel: 3 },
-  { name: "weapons", indexPath: "/Weapons", contentType: "item", spoilerLevel: 1 },
-  { name: "armor", indexPath: "/Armor", contentType: "item", spoilerLevel: 1 },
-  { name: "skills", indexPath: "/Skills", contentType: "mechanic", spoilerLevel: 1 },
-  { name: "items", indexPath: "/Items", contentType: "item", spoilerLevel: 1 },
-  { name: "locations", indexPath: "/Locations", contentType: "exploration", spoilerLevel: 1 },
-  { name: "characters", indexPath: "/Characters", contentType: "character", spoilerLevel: 2 },
-  { name: "walkthrough", indexPath: "/Walkthrough", contentType: "quest", spoilerLevel: 3 },
-  { name: "guides", indexPath: "/Guides+%26+Walkthrough", contentType: "mechanic", spoilerLevel: 1 },
-  { name: "enemies", indexPath: "/Enemies", contentType: "boss", spoilerLevel: 1 },
-  { name: "crafting", indexPath: "/Crafting+Guide", contentType: "recipe", spoilerLevel: 1 },
+  // Core combat/story content
+  { name: "bosses",      indexPath: "/Bosses",           contentType: "boss",        spoilerLevel: 2 },
+  { name: "enemies",     indexPath: "/Enemies",           contentType: "boss",        spoilerLevel: 1 },
+  { name: "quests",      indexPath: "/Quests",            contentType: "quest",       spoilerLevel: 3 },
+  { name: "walkthrough", indexPath: "/Walkthrough",       contentType: "quest",       spoilerLevel: 3 },
+
+  // Equipment — all sub-types crawled explicitly for completeness
+  { name: "weapons",     indexPath: "/Weapons",           contentType: "item",        spoilerLevel: 1 },
+  { name: "armor",       indexPath: "/Armor",             contentType: "item",        spoilerLevel: 1 },
+  { name: "abyss-gear",  indexPath: "/Abyss+Gear",        contentType: "item",        spoilerLevel: 2 }, // was missing!
+  { name: "accessories", indexPath: "/Accessories",       contentType: "item",        spoilerLevel: 1 },
+
+  // Items
+  { name: "items",       indexPath: "/Items",             contentType: "item",        spoilerLevel: 1 },
+  { name: "collectibles",indexPath: "/Collectibles",      contentType: "item",        spoilerLevel: 1 }, // was missing!
+  { name: "key-items",   indexPath: "/Key+Items",         contentType: "item",        spoilerLevel: 2 }, // was missing!
+
+  // World / characters
+  { name: "locations",   indexPath: "/Locations",         contentType: "exploration", spoilerLevel: 1 },
+  { name: "characters",  indexPath: "/Characters",        contentType: "character",   spoilerLevel: 2 },
+  { name: "npcs",        indexPath: "/NPCs",              contentType: "character",   spoilerLevel: 1 }, // was missing!
+
+  // Systems
+  { name: "skills",      indexPath: "/Skills",            contentType: "mechanic",    spoilerLevel: 1 },
+  { name: "crafting",    indexPath: "/Crafting+Guide",    contentType: "recipe",      spoilerLevel: 1 },
+  { name: "guides",      indexPath: "/Guides+%26+Walkthrough", contentType: "mechanic", spoilerLevel: 1 },
 ];
 
 // ===== HTML PARSING =====
-// We use regex-based parsing to avoid needing cheerio/jsdom dependencies
 
 function stripHtml(html: string): string {
   return html
@@ -87,35 +100,29 @@ function stripHtml(html: string): string {
     .replace(/&quot;/g, '"')
     .replace(/&#039;/g, "'")
     .replace(/&nbsp;/g, " ")
-    // Clean up table formatting noise
-    .replace(/\|[\s|]+\|/g, " ") // collapse empty table cells
+    .replace(/\|[\s|]+\|/g, " ")
     .replace(/\|\s*\|/g, " ")
-    .replace(/^\s*\|\s*/gm, "") // leading pipe on a line
-    .replace(/\s*\|\s*$/gm, "") // trailing pipe on a line
+    .replace(/^\s*\|\s*/gm, "")
+    .replace(/\s*\|\s*$/gm, "")
     .replace(/\n{3,}/g, "\n\n")
     .replace(/[ \t]+/g, " ")
     .trim();
 }
 
 function extractMainContent(html: string): string {
-  // Fextralife wiki content is typically in a div with id "wiki-content-block" or class "wiki-content"
   const contentMatch =
     html.match(/<div[^>]*id="wiki-content-block"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
     html.match(/<div[^>]*class="[^"]*wiki-content[^"]*"[^>]*>([\s\S]*?)<!-- end wiki content -->/i) ||
     html.match(/<div[^>]*id="tagged-pages-container"[^>]*>([\s\S]*?)<\/div>/i) ||
-    // Fallback: grab the main body area
     html.match(/<div[^>]*class="[^"]*col-sm-9[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/i);
 
-  if (contentMatch) {
-    return stripHtml(contentMatch[1]);
-  }
-
-  // Last resort: strip the whole page
+  if (contentMatch) return stripHtml(contentMatch[1]);
   return stripHtml(html);
 }
 
 function extractPageTitle(html: string): string {
-  const titleMatch = html.match(/<h1[^>]*class="[^"]*wiki-title[^"]*"[^>]*>([\s\S]*?)<\/h1>/i) ||
+  const titleMatch =
+    html.match(/<h1[^>]*class="[^"]*wiki-title[^"]*"[^>]*>([\s\S]*?)<\/h1>/i) ||
     html.match(/<title>([\s\S]*?)<\/title>/i);
   if (titleMatch) {
     return stripHtml(titleMatch[1]).replace(/ \| Crimson Desert Wiki/i, "").trim();
@@ -123,11 +130,34 @@ function extractPageTitle(html: string): string {
   return "Unknown";
 }
 
-function extractLinksFromIndex(html: string, basePath: string): string[] {
+// Pages that are pure navigation/index — never crawl as content pages
+const NAV_PAGES = new Set([
+  "/Crimson+Desert+Wiki", "/General+Information", "/DLC", "/Patch+Notes",
+  "/Controls", "/Combat", "/FAQs", "/Character+Information",
+  "/Character+Customization", "/Stats", "/Status+Effects",
+  "/Kliff+Skills", "/Oongka+Skills", "/Damiane+Skills", "/Equipment",
+  "/Projectiles", "/Tools", "/Shields", "/Headgear",
+  "/Gloves", "/Body+Armor", "/Cloaks", "/Footwear",
+  "/Crafting+Manuals", "/Recovery+Items", "/Horse+Items", "/Gatherables",
+  "/Meats+and+Grains", "/Fruits+and+Vegetables", "/Mushrooms+and+Herbs",
+  "/Minerals", "/Crafting+Materials", "/World+Information",
+  "/Greymane+Camp", "/Abyss+Nexus", "/Interactive+Map", "/Factions",
+  "/Vendors", "/Housing+Guide", "/Lore", "/New+Player+Help",
+  "/Game+Progress+Route", "/New+Game+Plus", "/Trophy+%26+Achievement+Guide",
+  "/All+Bell+Locations", "/All+Abyss+Artifact+Locations",
+  "/Kliff", "/Oongka", "/Damiane", "/todo",
+  // Category index pages — we crawl these as entry points but not as content targets
+  "/Bosses", "/Quests", "/Weapons", "/Armor", "/Abyss+Gear",
+  "/Skills", "/Items", "/Locations", "/Characters", "/Walkthrough",
+  "/Guides+%26+Walkthrough", "/Enemies", "/Crafting+Guide",
+  "/NPCs", "/Collectibles", "/Key+Items", "/Accessories",
+]);
+
+function extractLinks(html: string, currentPath: string): string[] {
   const links: string[] = [];
   const seen = new Set<string>();
 
-  // Strip known nav/sidebar/footer sections, then extract links from the rest
+  // Strip nav chrome before scanning for links
   const contentArea = html
     .replace(/<nav[^>]*>[\s\S]*?<\/nav>/gi, "")
     .replace(/<div[^>]*id="sidebar"[^>]*>[\s\S]*?<\/div>\s*<\/div>/gi, "")
@@ -136,44 +166,22 @@ function extractLinksFromIndex(html: string, basePath: string): string[] {
     .replace(/<div[^>]*id="fxt-footer"[^>]*>[\s\S]*?<\/div>/gi, "")
     .replace(/<div[^>]*class="[^"]*navbar[^"]*"[^>]*>[\s\S]*?<\/div>/gi, "");
 
-  // Known nav pages to exclude (these appear in every page's sidebar/header)
-  const navPages = new Set([
-    "/Crimson+Desert+Wiki", "/General+Information", "/DLC", "/Patch+Notes",
-    "/Controls", "/Combat", "/FAQs", "/Character+Information", "/Characters",
-    "/Character+Customization", "/Stats", "/Status+Effects", "/Skills",
-    "/Kliff+Skills", "/Oongka+Skills", "/Damiane+Skills", "/Equipment",
-    "/Weapons", "/Projectiles", "/Tools", "/Shields", "/Armor", "/Headgear",
-    "/Gloves", "/Body+Armor", "/Cloaks", "/Footwear", "/Accessories",
-    "/Abyss+Gear", "/Items", "/Collectibles", "/Crafting+Manuals",
-    "/Key+Items", "/Recovery+Items", "/Horse+Items", "/Gatherables",
-    "/Meats+and+Grains", "/Fruits+and+Vegetables", "/Mushrooms+and+Herbs",
-    "/Minerals", "/Crafting+Materials", "/World+Information", "/Locations",
-    "/Greymane+Camp", "/Abyss+Nexus", "/Interactive+Map", "/Factions",
-    "/Quests", "/NPCs", "/Vendors", "/Housing+Guide", "/Enemies", "/Bosses",
-    "/Lore", "/Guides+%26+Walkthrough", "/New+Player+Help", "/Walkthrough",
-    "/Game+Progress+Route", "/New+Game+Plus", "/Trophy+%26+Achievement+Guide",
-    "/Crafting+Guide", "/All+Bell+Locations", "/All+Abyss+Artifact+Locations",
-    "/Kliff", "/Oongka", "/Damiane", "/todo",
-  ]);
-
-  // Match all internal wiki links
   const linkRegex = /href="(\/[^"]+)"/g;
   let match;
   while ((match = linkRegex.exec(contentArea)) !== null) {
     const href = match[1];
-    // Filter: must be a wiki page, not a file/image/external, not the index page itself
     if (
       href.startsWith("/") &&
-      !href.includes(".") && // no file extensions
+      !href.includes(".") &&
       !href.startsWith("/file") &&
       !href.includes("#") &&
-      href !== basePath &&
+      href !== currentPath &&
       href !== "/" &&
       !href.startsWith("/search") &&
       !href.startsWith("/login") &&
       !href.startsWith("/register") &&
       !href.startsWith("/profile") &&
-      !navPages.has(href) &&
+      !NAV_PAGES.has(href) &&
       !seen.has(href)
     ) {
       seen.add(href);
@@ -185,7 +193,6 @@ function extractLinksFromIndex(html: string, basePath: string): string[] {
 }
 
 // ===== CHUNKING =====
-// Split page content into logical sections based on headings
 
 interface Chunk {
   content: string;
@@ -206,18 +213,15 @@ function chunkPageContent(
   category: Category
 ): Chunk[] {
   const chunks: Chunk[] = [];
-
-  // Split on heading markers (###)
   const sections = text.split(/\n(?=### )/);
 
   if (sections.length <= 1 || text.length < 500) {
-    // Small page or no headings — treat as single chunk
     if (text.length > 50) {
       chunks.push({
         content: `${pageTitle}\n\n${text}`.slice(0, 4000),
         source_url: pageUrl,
         source_type: "fextralife_wiki",
-        quest_name: category.contentType === "quest" || category.contentType === "boss" ? pageTitle : null,
+        quest_name: ["quest", "boss"].includes(category.contentType) ? pageTitle : null,
         content_type: category.contentType,
         character: detectCharacter(text),
         region: detectRegion(text),
@@ -228,19 +232,15 @@ function chunkPageContent(
     return chunks;
   }
 
-  // Multi-section page: create a chunk per meaningful section
   for (const section of sections) {
     const trimmed = section.trim();
-    if (trimmed.length < 50) continue; // Skip tiny sections
-
-    // Prepend page title for context
+    if (trimmed.length < 50) continue;
     const chunkContent = `${pageTitle}\n\n${trimmed}`.slice(0, 4000);
-
     chunks.push({
       content: chunkContent,
       source_url: pageUrl,
       source_type: "fextralife_wiki",
-      quest_name: category.contentType === "quest" || category.contentType === "boss" ? pageTitle : null,
+      quest_name: ["quest", "boss"].includes(category.contentType) ? pageTitle : null,
       content_type: category.contentType,
       character: detectCharacter(trimmed),
       region: detectRegion(trimmed),
@@ -284,7 +284,6 @@ async function generateEmbeddings(texts: string[]): Promise<(number[] | null)[]>
     return texts.map(() => null);
   }
 
-  // Voyage AI supports batches up to 128 inputs
   const batchSize = 32;
   const allEmbeddings: (number[] | null)[] = [];
 
@@ -319,13 +318,13 @@ async function generateEmbeddings(texts: string[]): Promise<(number[] | null)[]>
       allEmbeddings.push(...batch.map(() => null));
     }
 
-    if (i + batchSize < texts.length) await sleep(500); // Rate limit Voyage
+    if (i + batchSize < texts.length) await sleep(500);
   }
 
   return allEmbeddings;
 }
 
-// ===== MAIN INGESTION =====
+// ===== FETCH =====
 
 async function fetchPage(pagePath: string): Promise<string | null> {
   const url = `${BASE_URL}${pagePath}`;
@@ -346,21 +345,27 @@ async function fetchPage(pagePath: string): Promise<string | null> {
   }
 }
 
-async function ingestCategory(category: Category, dryRun: boolean) {
-  console.log(`\n========== ${category.name.toUpperCase()} ==========`);
-  console.log(`Index: ${BASE_URL}${category.indexPath}`);
+// ===== MAIN INGESTION =====
 
-  // Step 1: Fetch the index page to get all sub-page links
+async function ingestCategory(category: Category, dryRun: boolean, deep: boolean) {
+  console.log(`\n========== ${category.name.toUpperCase()} ==========`);
+  console.log(`Index: ${BASE_URL}${category.indexPath}${deep ? " (deep crawl ON)" : ""}`);
+
+  // Step 1: Fetch index page
   const indexHtml = await fetchPage(category.indexPath);
   if (!indexHtml) {
     console.error("  Failed to fetch index page. Skipping.");
     return;
   }
 
-  const pageLinks = extractLinksFromIndex(indexHtml, category.indexPath);
-  console.log(`  Found ${pageLinks.length} linked pages`);
+  // BFS crawl queue — level 1 links come from the index page
+  const level1Links = extractLinks(indexHtml, category.indexPath);
+  console.log(`  Found ${level1Links.length} level-1 pages`);
 
-  // Also chunk the index page itself (often has useful overview content)
+  // Collect all pages to crawl (deduplicated)
+  const allLinks = new Set<string>(level1Links);
+
+  // Chunk the index page itself
   const indexContent = extractMainContent(indexHtml);
   const indexTitle = extractPageTitle(indexHtml);
   const allChunks: Chunk[] = chunkPageContent(
@@ -370,56 +375,100 @@ async function ingestCategory(category: Category, dryRun: boolean) {
     category
   );
 
-  // Step 2: Crawl each linked page
+  // Step 2: Crawl level-1 pages; optionally collect level-2 links
+  const level2Links = new Set<string>();
   let crawled = 0;
-  for (const link of pageLinks) {
+  const level1Array = Array.from(allLinks);
+
+  for (const link of level1Array) {
     await sleep(DELAY_MS);
     crawled++;
-    process.stdout.write(`  [${crawled}/${pageLinks.length}] ${link}...`);
+    process.stdout.write(`  [${crawled}/${level1Array.length}] ${link}...`);
 
     const html = await fetchPage(link);
-    if (!html) {
-      console.log(" FAILED");
-      continue;
-    }
+    if (!html) { console.log(" FAILED"); continue; }
 
     const content = extractMainContent(html);
     const title = extractPageTitle(html);
 
-    if (content.length < 100) {
-      console.log(" too short, skipping");
-      continue;
-    }
+    if (content.length < 100) { console.log(" too short, skipping"); continue; }
 
     const chunks = chunkPageContent(content, title, `${BASE_URL}${link}`, category);
     allChunks.push(...chunks);
-    console.log(` ${chunks.length} chunks`);
+
+    // In deep mode, collect outbound links from this page
+    if (deep) {
+      const outLinks = extractLinks(html, link);
+      let newLinks = 0;
+      for (const ol of outLinks) {
+        if (!allLinks.has(ol)) {
+          allLinks.add(ol);
+          level2Links.add(ol);
+          newLinks++;
+        }
+      }
+      console.log(` ${chunks.length} chunks (+${newLinks} new links)`);
+    } else {
+      console.log(` ${chunks.length} chunks`);
+    }
+  }
+
+  // Step 3: Crawl level-2 pages (deep mode only)
+  if (deep && level2Links.size > 0) {
+    console.log(`\n  --- Level 2: ${level2Links.size} additional pages ---`);
+    const level2Array = Array.from(level2Links);
+    let l2Crawled = 0;
+
+    for (const link of level2Array) {
+      await sleep(DELAY_MS);
+      l2Crawled++;
+      process.stdout.write(`  [L2 ${l2Crawled}/${level2Array.length}] ${link}...`);
+
+      const html = await fetchPage(link);
+      if (!html) { console.log(" FAILED"); continue; }
+
+      const content = extractMainContent(html);
+      const title = extractPageTitle(html);
+
+      if (content.length < 100) { console.log(" too short, skipping"); continue; }
+
+      const chunks = chunkPageContent(content, title, `${BASE_URL}${link}`, category);
+      allChunks.push(...chunks);
+      console.log(` ${chunks.length} chunks`);
+    }
   }
 
   console.log(`\n  Total chunks for ${category.name}: ${allChunks.length}`);
 
   if (dryRun) {
-    console.log("  [DRY RUN] Skipping database insert and embedding generation");
-    // Show a sample
+    console.log("  [DRY RUN] Skipping database insert");
     if (allChunks.length > 0) {
       console.log("\n  --- Sample chunk ---");
-      console.log(`  Title context: ${allChunks[0].content.slice(0, 150)}...`);
-      console.log(`  Content type: ${allChunks[0].content_type}`);
-      console.log(`  Source: ${allChunks[0].source_url}`);
+      console.log(`  ${allChunks[0].content.slice(0, 200)}...`);
+      console.log(`  content_type: ${allChunks[0].content_type}`);
+      console.log(`  source: ${allChunks[0].source_url}`);
     }
     return;
   }
 
-  // Step 3: Generate embeddings
+  // Step 4: Delete existing chunks for this category's URLs (idempotent re-runs)
+  console.log("  Clearing old chunks for this category...");
+  const sourceUrls = [...new Set(allChunks.map(c => c.source_url))];
+  // Delete in batches of 50 URLs
+  for (let i = 0; i < sourceUrls.length; i += 50) {
+    const batch = sourceUrls.slice(i, i + 50);
+    await supabase.from("knowledge_chunks").delete().in("source_url", batch);
+  }
+
+  // Step 5: Generate embeddings
   console.log("  Generating embeddings...");
   const embeddings = await generateEmbeddings(allChunks.map((c) => c.content));
 
-  // Step 4: Upsert into Supabase
-  console.log("  Upserting to Supabase...");
+  // Step 6: Insert in batches of 50
+  console.log("  Inserting to Supabase...");
   let inserted = 0;
   let errors = 0;
 
-  // Insert in batches of 50
   for (let i = 0; i < allChunks.length; i += 50) {
     const batch = allChunks.slice(i, i + 50).map((chunk, j) => ({
       ...chunk,
@@ -443,13 +492,16 @@ async function ingestCategory(category: Category, dryRun: boolean) {
 async function main() {
   const args = process.argv.slice(2);
   const dryRun = args.includes("--dry-run");
+  const deep = args.includes("--deep");
   const categoryFlag = args.indexOf("--category");
   const targetCategory = categoryFlag >= 0 ? args[categoryFlag + 1] : null;
 
   console.log("Fextralife Wiki Ingestion Script");
   console.log(`Mode: ${dryRun ? "DRY RUN" : "LIVE"}`);
+  console.log(`Depth: ${deep ? "2 levels (following in-page links)" : "1 level (index links only)"}`);
   console.log(`Target: ${targetCategory || "ALL categories"}`);
   console.log(`Delay between requests: ${DELAY_MS}ms`);
+  console.log(`\nCategories: ${CATEGORIES.map(c => c.name).join(", ")}`);
 
   const categories = targetCategory
     ? CATEGORIES.filter((c) => c.name === targetCategory)
@@ -462,7 +514,7 @@ async function main() {
   }
 
   for (const category of categories) {
-    await ingestCategory(category, dryRun);
+    await ingestCategory(category, dryRun, deep);
   }
 
   console.log("\n========== COMPLETE ==========");

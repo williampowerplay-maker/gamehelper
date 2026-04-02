@@ -4,6 +4,28 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.0] - 2026-04-02 (Deeper Wiki Ingestion)
+
+### Changed
+- **New categories added**: `abyss-gear` (`/Abyss+Gear`), `npcs` (`/NPCs`), `collectibles` (`/Collectibles`), `key-items` (`/Key+Items`), `accessories` (`/Accessories`) — these were all missing from the ingestion script. Abyss Gear was also in the nav exclusion set, so it was actively blocked.
+- **2-level BFS crawl** (`--deep` flag): Index page → Level-1 pages → Level-2 pages (links found within Level-1 pages). Discovers interconnected content that index pages don't link to directly (e.g., gear obtainable from a quest, crafted from an enemy drop, etc.).
+- **Idempotent re-runs**: Before inserting, the script now deletes existing chunks by `source_url`. Re-running a category cleans and replaces without duplicating.
+- **`extractLinks` / `extractLinksFromIndex` merged**: Single function used for both index and content pages.
+- **NAV_PAGES exclusion updated**: Removed `/Abyss+Gear`, `/NPCs`, `/Collectibles`, `/Key+Items` from exclusion — these are now explicit crawl targets.
+
+### To re-seed the database
+```bash
+# Just the missing categories (fast, targeted)
+npx tsx scripts/ingest-fextralife.ts --category abyss-gear
+npx tsx scripts/ingest-fextralife.ts --category npcs
+npx tsx scripts/ingest-fextralife.ts --category collectibles
+
+# Full re-seed with deep crawl (slow but comprehensive)
+npx tsx scripts/ingest-fextralife.ts --deep
+```
+
+---
+
 ## [0.4.2] - 2026-04-02 (Default Spoiler Tier)
 
 ### Changed
