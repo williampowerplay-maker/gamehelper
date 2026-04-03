@@ -91,6 +91,53 @@ MECHANICS/SYSTEMS: You can be slightly more generous here since there's less to 
 - Include any related tips or things they might miss`,
 };
 
+// ===== CONTENT TYPE CLASSIFIER =====
+// Returns a content_type filter to narrow the vector search, or null if the
+// question is ambiguous and should search across all content types.
+//
+// Content types in DB: boss | quest | item | exploration | character | mechanic | recipe
+//
+// Design rules:
+//  1. Ordered from most-specific to least-specific — first match wins
+//  2. Only filter when confident — ambiguous queries return null (no filter)
+//  3. Item filter is intentionally broad (weapons/armor/abyss-gear/accessories all = "item")
+function classifyContentType(question: string): string | null {
+  const q = question.toLowerCase();
+
+  // BOSS — fight-specific verbs + known boss names
+  const bossNames = [
+    "kailok", "hornsplitter", "hernand", "ludvig", "gregor", "fortain",
+    "gabriel", "lucian", "bastier", "walter", "lanford", "master du",
+    "antumbra", "crimson warden", "crimson nightmare", "hexe marie",
+    "demeniss", "trukan", "delesyia", "pailune", "saigord", "staglord",
+    "reed devil", "blinding flash", "grave walker", "icewalker",
+  ];
+  const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
+  if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
+
+  // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
+  if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
+
+  // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
+  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire)\b/;
+  if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
+
+  // QUEST — story/objective keywords
+  if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
+
+  // EXPLORATION — location/navigation queries (but not "where do I get" item questions — those matched above)
+  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter)\b/.test(q)) return "exploration";
+
+  // MECHANIC/SKILL — systems questions
+  if (/\b(skill|ability|talent|passive|active|skill tree|upgrade|how does|how do|mechanic|system|stamina|stat|attribute|combo|aerial|mount)\b/.test(q)) return "mechanic";
+
+  // CHARACTER/NPC — lore/story character questions
+  if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane)\b/.test(q)) return "character";
+
+  return null; // ambiguous — no filter, full vector search
+}
+
 const BASE_SYSTEM_PROMPT = `You are an expert Crimson Desert game companion AI. You help players with quests, puzzles, bosses, items, mechanics, crafting, and exploration.
 
 Rules:
@@ -193,6 +240,10 @@ export async function POST(req: NextRequest) {
     let chunks: Record<string, unknown>[] | null = null;
     let searchError: Error | null = null;
 
+    // Classify question to narrow vector search to a specific content type
+    const contentTypeFilter = classifyContentType(question);
+    console.log("Content type filter:", contentTypeFilter ?? "none (full search)");
+
     // Step 1: Try vector search if Voyage AI key is available
     console.log("Voyage key present:", !!voyageKey);
     if (voyageKey && voyageKey !== "your-voyage-api-key-here") {
@@ -218,7 +269,7 @@ export async function POST(req: NextRequest) {
           supabase.from("error_logs").insert({
             error_type: "voyage",
             message: `Voyage API ${embeddingRes.status}: ${errText}`,
-            context: { tier: spoilerTier },
+            context: { tier: spoilerTier, contentTypeFilter },
             client_ip: clientIp,
           }).then(() => {});
         }
@@ -227,17 +278,36 @@ export async function POST(req: NextRequest) {
 
         console.log("Query embedding generated:", !!queryEmbedding, "dim:", queryEmbedding?.length);
         if (queryEmbedding) {
-          const { data, error } = await supabase.rpc(
-            "match_knowledge_chunks",
-            {
-              query_embedding: queryEmbedding,
-              match_threshold: 0.5,
-              match_count: tierConfig.matchCount,
-            }
-          );
-          console.log("Vector search:", data?.length || 0, "results, error:", error?.message || "none");
-          chunks = data;
-          if (error) searchError = error as unknown as Error;
+          // First attempt: filtered search (faster, more precise)
+          const rpcParams: Record<string, unknown> = {
+            query_embedding: queryEmbedding,
+            match_threshold: 0.5,
+            match_count: tierConfig.matchCount,
+          };
+          if (contentTypeFilter) rpcParams.content_type_filter = contentTypeFilter;
+
+          const { data, error } = await supabase.rpc("match_knowledge_chunks", rpcParams);
+          console.log("Vector search (filtered):", data?.length || 0, "results, error:", error?.message || "none");
+
+          // Fallback: if filtered search returns nothing, retry without the filter
+          // (e.g. "how to get Crow's Pursuit" classified as item but it's in abyss-gear)
+          if ((!data || data.length === 0) && contentTypeFilter) {
+            console.log("Filtered search empty — retrying without content_type_filter");
+            const { data: unfilteredData, error: unfilteredError } = await supabase.rpc(
+              "match_knowledge_chunks",
+              {
+                query_embedding: queryEmbedding,
+                match_threshold: 0.5,
+                match_count: tierConfig.matchCount,
+              }
+            );
+            console.log("Vector search (unfiltered fallback):", unfilteredData?.length || 0, "results");
+            chunks = unfilteredData;
+            if (unfilteredError) searchError = unfilteredError as unknown as Error;
+          } else {
+            chunks = data;
+            if (error) searchError = error as unknown as Error;
+          }
         }
       } catch (e) {
         console.error("Voyage embedding error:", e);

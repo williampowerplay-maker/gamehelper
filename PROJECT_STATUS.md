@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-02 (session 4)
+**Last updated:** 2026-04-03 (session 5)
 
 ## Overview
 
@@ -27,6 +27,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 
 - [x] **Chat UI** - Dark-themed chat interface with message bubbles, loading animation, sample starter questions
 - [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts controlling response detail level
+- [x] **RAG metadata pre-filtering** — `classifyContentType()` classifier narrows vector search to matching content_type (boss/item/quest/exploration/mechanic/recipe/character). Auto-fallback to unfiltered search if 0 results.
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
   - Voyage AI embedding of user question (`input_type: "document"` — see LEARNINGS.md)
   - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count varies by tier)

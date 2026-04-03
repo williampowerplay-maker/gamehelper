@@ -4,6 +4,20 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.5] - 2026-04-03 (RAG Metadata Pre-filtering)
+
+### Added
+- **`classifyContentType(question)`** in chat route — keyword + regex classifier mapping questions to 7 content types: `boss`, `item`, `quest`, `exploration`, `mechanic`, `recipe`, `character`. Returns `null` for ambiguous questions (no filter applied).
+- **`content_type_filter TEXT DEFAULT NULL`** param in `match_knowledge_chunks` RPC — adds `AND kc.content_type = content_type_filter` to the WHERE clause so pgvector scores only the relevant chunk subset.
+- **Automatic unfiltered fallback** — if filtered search returns 0 results (item living in an unexpected category), route retries without the filter before falling back to keyword search.
+
+### Why it helps
+- Boss fight questions search ~400 chunks instead of 6000+ — faster, less noise to Claude
+- Item questions search ~3000 chunks (all gear types)
+- No regression risk: zero-result filtered searches always fall back to full corpus
+
+---
+
 ## [0.5.4] - 2026-04-02 (Error Dashboard Time Filters)
 
 ### Added
