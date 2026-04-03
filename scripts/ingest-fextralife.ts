@@ -211,6 +211,16 @@ function extractLinks(html: string, currentPath: string): string[] {
 
 // ===== CHUNKING =====
 
+// Chunk size tuning:
+//   CHUNK_SPLIT_AT  — sections longer than this get split into sub-chunks
+//   CHUNK_TARGET    — aim for this many chars per sub-chunk
+//   CHUNK_OVERLAP   — chars carried forward between adjacent sub-chunks (intra-section)
+//   INTER_OVERLAP   — chars from end of previous section prepended to next section's first chunk
+const CHUNK_SPLIT_AT  = 800;
+const CHUNK_TARGET    = 500;
+const CHUNK_OVERLAP   = 150;
+const INTER_OVERLAP   = 120;
+
 interface Chunk {
   content: string;
   source_url: string;
@@ -223,6 +233,94 @@ interface Chunk {
   spoiler_level: number;
 }
 
+/**
+ * Split a long text block into overlapping sub-chunks.
+ * Tries to break at paragraph → sentence → line → word boundaries.
+ */
+function splitWithOverlap(text: string): string[] {
+  const result: string[] = [];
+  let start = 0;
+
+  while (start < text.length) {
+    // Remaining text fits in one chunk
+    if (text.length - start <= CHUNK_SPLIT_AT) {
+      const tail = text.slice(start).trim();
+      if (tail.length >= 50) result.push(tail);
+      break;
+    }
+
+    // Search for a natural break between 50% and 100% of CHUNK_TARGET
+    const searchFrom = start + Math.floor(CHUNK_TARGET * 0.5);
+    const searchTo   = Math.min(start + CHUNK_SPLIT_AT, text.length);
+    const window     = text.slice(searchFrom, searchTo);
+
+    // Priority: paragraph > sentence end > newline > word boundary
+    let breakOffset = -1;
+    const para = window.indexOf("\n\n");
+    if (para >= 0) {
+      breakOffset = para + 2;
+    } else {
+      const sent = window.search(/[.!?]\s/);
+      if (sent >= 0 && sent <= Math.floor(window.length * 0.9)) {
+        breakOffset = sent + 2;
+      } else {
+        const line = window.lastIndexOf("\n");
+        if (line >= 0) {
+          breakOffset = line + 1;
+        } else {
+          const space = window.lastIndexOf(" ");
+          breakOffset = space >= 0 ? space + 1 : window.length;
+        }
+      }
+    }
+
+    const end = searchFrom + breakOffset;
+    const chunk = text.slice(start, end).trim();
+    if (chunk.length >= 50) result.push(chunk);
+
+    // Step back by CHUNK_OVERLAP for the next window (snap to word boundary)
+    const rawNext = end - CHUNK_OVERLAP;
+    const spaceIdx = text.indexOf(" ", rawNext);
+    start = spaceIdx > rawNext && spaceIdx < end ? spaceIdx + 1 : end;
+  }
+
+  return result;
+}
+
+/**
+ * Return the last ~INTER_OVERLAP chars of a section, snapped to a word/sentence
+ * boundary, for use as an inter-section overlap prefix.
+ */
+function sectionTail(text: string): string {
+  if (text.length <= INTER_OVERLAP) return text.trim();
+  const tail = text.slice(-INTER_OVERLAP);
+  // Start at a word boundary so we don't begin mid-word
+  const spaceIdx = tail.indexOf(" ");
+  return (spaceIdx >= 0 && spaceIdx < INTER_OVERLAP * 0.4)
+    ? tail.slice(spaceIdx + 1).trim()
+    : tail.trim();
+}
+
+function makeChunkMeta(
+  content: string,
+  pageTitle: string,
+  pageUrl: string,
+  category: Category,
+  rawText: string
+): Chunk {
+  return {
+    content: `${pageTitle}\n\n${content}`.slice(0, 4000),
+    source_url: pageUrl,
+    source_type: "fextralife_wiki",
+    quest_name: ["quest", "boss"].includes(category.contentType) ? pageTitle : null,
+    content_type: category.contentType,
+    character: detectCharacter(rawText),
+    region: detectRegion(rawText),
+    chapter: null,
+    spoiler_level: category.spoilerLevel,
+  };
+}
+
 function chunkPageContent(
   text: string,
   pageTitle: string,
@@ -230,40 +328,48 @@ function chunkPageContent(
   category: Category
 ): Chunk[] {
   const chunks: Chunk[] = [];
-  const sections = text.split(/\n(?=### )/);
 
-  if (sections.length <= 1 || text.length < 500) {
-    if (text.length > 50) {
-      chunks.push({
-        content: `${pageTitle}\n\n${text}`.slice(0, 4000),
-        source_url: pageUrl,
-        source_type: "fextralife_wiki",
-        quest_name: ["quest", "boss"].includes(category.contentType) ? pageTitle : null,
-        content_type: category.contentType,
-        character: detectCharacter(text),
-        region: detectRegion(text),
-        chapter: null,
-        spoiler_level: category.spoilerLevel,
-      });
+  // Short / unsectioned pages → single chunk (possibly split if large)
+  const sections = text.split(/\n(?=### )/);
+  const isSingleSection = sections.length <= 1;
+
+  if (isSingleSection) {
+    if (text.length < 50) return chunks;
+    if (text.length <= CHUNK_SPLIT_AT) {
+      chunks.push(makeChunkMeta(text, pageTitle, pageUrl, category, text));
+    } else {
+      for (const sub of splitWithOverlap(text)) {
+        chunks.push(makeChunkMeta(sub, pageTitle, pageUrl, category, sub));
+      }
     }
     return chunks;
   }
 
-  for (const section of sections) {
-    const trimmed = section.trim();
-    if (trimmed.length < 50) continue;
-    const chunkContent = `${pageTitle}\n\n${trimmed}`.slice(0, 4000);
-    chunks.push({
-      content: chunkContent,
-      source_url: pageUrl,
-      source_type: "fextralife_wiki",
-      quest_name: ["quest", "boss"].includes(category.contentType) ? pageTitle : null,
-      content_type: category.contentType,
-      character: detectCharacter(trimmed),
-      region: detectRegion(trimmed),
-      chapter: null,
-      spoiler_level: category.spoilerLevel,
-    });
+  // Multi-section pages — process each section, with inter-section overlap
+  let prevTail = "";
+
+  for (let i = 0; i < sections.length; i++) {
+    const section = sections[i].trim();
+    if (section.length < 50) continue;
+
+    // Build the prefix: page title + optional tail from previous section
+    const interOverlapPrefix = prevTail ? `[...] ${prevTail}\n\n` : "";
+
+    if (section.length <= CHUNK_SPLIT_AT) {
+      // Short section — single chunk, prepend inter-overlap on first sub-chunk only
+      const content = `${interOverlapPrefix}${section}`;
+      chunks.push(makeChunkMeta(content, pageTitle, pageUrl, category, section));
+    } else {
+      // Long section — split into overlapping sub-chunks
+      const subChunks = splitWithOverlap(section);
+      for (let j = 0; j < subChunks.length; j++) {
+        // Only the first sub-chunk of a section gets the inter-overlap prefix
+        const content = j === 0 ? `${interOverlapPrefix}${subChunks[j]}` : subChunks[j];
+        chunks.push(makeChunkMeta(content, pageTitle, pageUrl, category, subChunks[j]));
+      }
+    }
+
+    prevTail = sectionTail(section);
   }
 
   return chunks;

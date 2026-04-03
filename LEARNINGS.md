@@ -4,6 +4,15 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: Chunk Splitting & Overlap
+
+- **Target chunk size ~500 chars for voyage-3.5-lite**: Larger chunks (>800 chars) dilute the embedding signal — the vector tries to represent too many concepts at once. Splitting into 500-char sub-chunks gives each embedding a focused meaning.
+- **Intra-section overlap (150 chars)**: When a long section splits, carry the last 150 chars forward as the start of the next sub-chunk. This ensures facts that span the split boundary appear in at least one chunk that contains both sides.
+- **Inter-section overlap (120 chars)**: Prepend the tail of the previous `### Section` to the next section's first chunk. This captures cross-boundary facts — e.g. an item's effect described at the end of "Overview" and referenced in "Stats".
+- **Break at natural boundaries**: When splitting, try paragraph break (`\n\n`) first, then sentence end (`.!?`), then line break (`\n`), then word boundary (` `). Never cut mid-word.
+- **Item pages are the main chunking problem**: avg 666 chars, 303 over 1500 chars. Other content types (boss, quest, exploration) are already short enough at 250-300 avg chars.
+- **Dry-run validate before re-ingesting**: Use `--dry-run --category <name>` to verify chunk counts and sample content before burning Voyage API credits on a full re-ingest.
+
 ## RAG: Metadata Pre-filtering
 
 - **Content type filter pattern**: Add an optional `content_type_filter TEXT DEFAULT NULL` to the RPC. When set, it narrows the cosine similarity search to a single content type — boss questions only scan ~400 chunks instead of 6000+. pgvector's IVFFlat index still applies within the filtered set.

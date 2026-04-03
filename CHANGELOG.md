@@ -4,6 +4,28 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.5.6] - 2026-04-03 (Chunk Splitting & Overlap)
+
+### Changed
+- **`chunkPageContent()`** in `scripts/ingest-fextralife.ts` now uses sliding-window overlap:
+  - `CHUNK_SPLIT_AT = 800` — sections over this are split into sub-chunks
+  - `CHUNK_TARGET = 500` — target chars per sub-chunk
+  - `CHUNK_OVERLAP = 150` — chars carried forward between intra-section sub-chunks so adjacent chunks share context
+  - `INTER_OVERLAP = 120` — last ~120 chars of the previous section prepended to the next section's first chunk
+- Added `splitWithOverlap()` helper — finds natural break points (paragraph → sentence → line → word) before splitting
+- Added `sectionTail()` helper — extracts a clean word-boundary-aligned tail for inter-section overlap prefix
+- Extracted `makeChunkMeta()` to DRY up chunk construction
+
+### Why it matters
+- Item chunks were averaging 666 chars with 303 over 1500 chars — one embedding had to represent a wall of stats
+- After this change, long item pages produce multiple focused sub-chunks each with a specific concept (obtain → craft → stats → notes)
+- Cross-section facts (e.g. a stat mentioned in the notes of the previous section) are now captured in the overlap prefix of the next chunk
+
+### Note
+Requires a full re-ingest to apply to existing chunks. Already-running ingest for remaining categories will use the new chunking automatically.
+
+---
+
 ## [0.5.5] - 2026-04-03 (RAG Metadata Pre-filtering)
 
 ### Added
