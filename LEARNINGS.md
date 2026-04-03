@@ -81,6 +81,21 @@ Things discovered during development that are worth remembering across sessions.
 - **`100vh` vs `100dvh` on mobile**: `h-screen` in Tailwind maps to `height: 100vh`, which on mobile browsers includes the browser chrome (address bar, bottom nav bar). The actual visible area is smaller, so a bottom-anchored input gets pushed just below the fold. Fix: use `h-[100dvh]` (dynamic viewport height) which tracks the true visible area. Safari 15.4+, Chrome 108+, Firefox 101+ support `dvh`.
 - **Lock body scroll for app-shell layouts**: Add `height: 100%` + `overflow: hidden` to `html` and `body` so the flex container owns all scrolling. Without this, the page itself can scroll and break the fixed-input illusion.
 
+## Windows: Running Detached Long-Running Processes
+
+- **Bash background jobs (`&`) die when the shell closes on Windows**: Running `tsx script.ts >> log.log 2>&1 &` in Claude Code's bash tool will get killed the moment the bash session ends (the task completes but the child process is killed). The log gets truncated and nothing is inserted.
+- **Use PowerShell `Start-Process` for truly detached processes**:
+  ```powershell
+  Start-Process -FilePath 'node_modules\.bin\tsx.cmd' -ArgumentList @('scripts/ingest-fextralife.ts', '--deep', '--category', 'accessories') -WorkingDirectory 'C:\path\to\project' -RedirectStandardOutput 'ingest.log' -NoNewWindow -PassThru | Select-Object Id
+  ```
+  This returns a PID and the process keeps running even after the shell closes.
+- **Check ingest progress via Supabase SQL** when the output file is unavailable: `SELECT COUNT(*), MAX(created_at) FROM knowledge_chunks WHERE source_type = 'fextralife_wiki'` — if `MAX(created_at)` is recent and COUNT is growing, it's still running.
+- **If the computer sleeps, in-flight HTTP requests time out**: The node process resumes on wake but any mid-request Voyage API or Fextralife fetches will have errored. Depending on error handling the script may skip that batch and continue, or halt. Check the log file and chunk count after waking to confirm status.
+
+## Default Spoiler Tier
+
+- **Set `nudge` as the default tier** (not `guide`): Nudge uses Haiku (cheapest model, 150 tok, 3 chunks) — ~20x cheaper per query than Sonnet. Most new users haven't chosen their preference yet, so defaulting to the cheapest tier saves significant API cost at scale. Users who want more detail can switch to Guide/Full.
+
 ## Deployment
 
 - **Vercel**: The app is configured for Vercel deployment. `next.config.ts` passes through `ANTHROPIC_API_KEY` and `VOYAGE_API_KEY` via the `env` config. On Vercel, set these in the project's environment variables dashboard.

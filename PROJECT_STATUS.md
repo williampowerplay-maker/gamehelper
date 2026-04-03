@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-03 (session 5)
+**Last updated:** 2026-04-03 (session 6)
 
 ## Overview
 
@@ -26,8 +26,9 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 ### What's Built and Working
 
 - [x] **Chat UI** - Dark-themed chat interface with message bubbles, loading animation, sample starter questions
-- [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts controlling response detail level
-- [x] **RAG metadata pre-filtering** — `classifyContentType()` classifier narrows vector search to matching content_type (boss/item/quest/exploration/mechanic/recipe/character). Auto-fallback to unfiltered search if 0 results.
+- [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts. **Default tier is `nudge`** (cheapest, preserves discovery — changed from `guide`).
+- [x] **RAG metadata pre-filtering** — `classifyContentType()` classifier narrows vector search to matching content_type (boss/item/quest/exploration/mechanic/recipe/character). Auto-fallback to unfiltered search if 0 results. `match_knowledge_chunks` RPC updated with optional `content_type_filter TEXT DEFAULT NULL` param.
+- [x] **Chunk splitting & overlap** — `chunkPageContent()` now splits sections >800 chars into ~500-char sub-chunks with 150-char intra-section overlap and 120-char inter-section overlap prefix. Fixes item chunks that averaged 666 chars (303 over 1500). **Existing ingested chunks pre-date this change — re-ingest needed to apply to all categories.**
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
   - Voyage AI embedding of user question (`input_type: "document"` — see LEARNINGS.md)
   - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count varies by tier)
@@ -50,12 +51,35 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 
 ### What's NOT Built Yet
 
-- [x] ~~**Knowledge Base Seeding**~~ - 1,690 chunks ingested from Fextralife wiki (2026-04-01)
-- [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading.
+- [x] ~~**Knowledge Base Seeding**~~ - 6,382+ chunks ingested from Fextralife wiki as of 2026-04-03. Full reseed in progress with `--deep` (2-level BFS). Re-ingest also needed for chunk overlap update.
+- [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap).
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
+
+#### Ingest status (2026-04-03)
+| Category | Status | Notes |
+|----------|--------|-------|
+| bosses | ✅ Done | Pre-overlap chunking |
+| enemies | ✅ Done | Pre-overlap chunking |
+| quests | ✅ Done | Pre-overlap chunking |
+| walkthrough | ✅ Done | Pre-overlap chunking |
+| weapons | ✅ Done | Pre-overlap chunking |
+| armor | ✅ Done | Pre-overlap chunking |
+| abyss-gear | ✅ Done | Pre-overlap chunking |
+| accessories | 🔄 In progress | PID 38332 (detached PowerShell) |
+| items | ⏳ Pending | — |
+| collectibles | ⏳ Pending | — |
+| key-items | ⏳ Pending | — |
+| locations | ⏳ Pending | — |
+| characters | ⏳ Pending | — |
+| npcs | ⏳ Pending | — |
+| skills | ⏳ Pending | — |
+| crafting | ⏳ Pending | — |
+| guides | ⏳ Pending | — |
+
+**After full reseed completes**: re-run already-done categories (`--category bosses` etc.) to apply new chunk overlap format.
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
-- [x] **Mobile Optimization (partial)** - Input field now always above fold: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
+- [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
 - [x] **Error Boundaries & Error Dashboard** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard has a full error analysis section: **1h / 24h / 7d time filter**, sparkline bar chart, per-type breakdown cards, expandable rows with stack trace + JSON context.
 - [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log. **CSV export buttons** for waitlist emails and all users — download directly from dashboard header.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
@@ -74,7 +98,7 @@ See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and 
 - **`waitlist`** - Email waitlist for when signups are at capacity (id, email unique, created_at)
 
 ### RPC Functions
-- **`match_knowledge_chunks`** - pgvector similarity search (query_embedding, match_threshold, match_count)
+- **`match_knowledge_chunks`** - pgvector similarity search. Params: `query_embedding vector(1024)`, `match_threshold float DEFAULT 0.5`, `match_count int DEFAULT 8`, `content_type_filter text DEFAULT NULL`. Filter param narrows search to a single content_type when set.
 
 ### Content Types
 `puzzle | boss | item | mechanic | recipe | exploration | quest | character`
