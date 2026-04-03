@@ -127,14 +127,57 @@ function stripHtml(html: string): string {
 }
 
 function extractMainContent(html: string): string {
-  const contentMatch =
-    html.match(/<div[^>]*id="wiki-content-block"[^>]*>([\s\S]*?)<\/div>\s*<\/div>/i) ||
-    html.match(/<div[^>]*class="[^"]*wiki-content[^"]*"[^>]*>([\s\S]*?)<!-- end wiki content -->/i) ||
-    html.match(/<div[^>]*id="tagged-pages-container"[^>]*>([\s\S]*?)<\/div>/i) ||
-    html.match(/<div[^>]*class="[^"]*col-sm-9[^"]*"[^>]*>([\s\S]*?)<\/div>\s*<\/div>\s*<\/div>/i);
+  // Strategy: find the start of wiki content, then grab everything until a known end marker.
+  // The old lazy regex ([\s\S]*?) stopped at the first </div></div>, missing sections
+  // like "Where to Find" that come later in the page.
 
-  if (contentMatch) return stripHtml(contentMatch[1]);
-  return stripHtml(html);
+  // Step 1: Find the start of the content block
+  const startMarkers = [
+    /(<div[^>]*id="wiki-content-block"[^>]*>)/i,
+    /(<div[^>]*class="[^"]*wiki-content[^"]*"[^>]*>)/i,
+    /(<div[^>]*id="tagged-pages-container"[^>]*>)/i,
+    /(<div[^>]*class="[^"]*col-sm-9[^"]*"[^>]*>)/i,
+  ];
+
+  let startIdx = -1;
+  for (const marker of startMarkers) {
+    const match = html.match(marker);
+    if (match && match.index !== undefined) {
+      startIdx = match.index + match[0].length;
+      break;
+    }
+  }
+
+  if (startIdx === -1) {
+    // Last resort: strip the whole page
+    return stripHtml(html);
+  }
+
+  // Step 2: Find the end — cut before sidebar, footer, comments, or related pages
+  const endMarkers = [
+    /<!-- end wiki content -->/i,
+    /<div[^>]*class="[^"]*side-bar-right[^"]*"/i,
+    /<div[^>]*id="fxt-footer"/i,
+    /<footer/i,
+    /<div[^>]*class="[^"]*comments-section[^"]*"/i,
+    /<div[^>]*id="wiki-comments"/i,
+    /<div[^>]*class="[^"]*related-pages[^"]*"/i,
+    /<div[^>]*class="[^"]*tagged-pages[^"]*"/i,
+  ];
+
+  let endIdx = html.length;
+  for (const marker of endMarkers) {
+    const match = html.substring(startIdx).match(marker);
+    if (match && match.index !== undefined) {
+      const candidateEnd = startIdx + match.index;
+      if (candidateEnd < endIdx) {
+        endIdx = candidateEnd;
+      }
+    }
+  }
+
+  const contentHtml = html.substring(startIdx, endIdx);
+  return stripHtml(contentHtml);
 }
 
 function extractPageTitle(html: string): string {
@@ -159,7 +202,7 @@ const NAV_PAGES = new Set([
   "/Meats+and+Grains", "/Fruits+and+Vegetables", "/Mushrooms+and+Herbs",
   "/Minerals", "/Crafting+Materials", "/World+Information",
   "/Greymane+Camp", "/Abyss+Nexus", "/Interactive+Map", "/Factions",
-  "/Vendors", "/Housing+Guide", "/Lore", "/New+Player+Help",
+  "/Vendors", "/Lore", "/New+Player+Help",
   "/Game+Progress+Route", "/New+Game+Plus", "/Trophy+%26+Achievement+Guide",
   "/All+Bell+Locations", "/All+Abyss+Artifact+Locations",
   "/Kliff", "/Oongka", "/Damiane", "/todo",
@@ -220,6 +263,7 @@ const CHUNK_SPLIT_AT  = 800;
 const CHUNK_TARGET    = 500;
 const CHUNK_OVERLAP   = 150;
 const INTER_OVERLAP   = 120;
+const MIN_CHUNK_LEN   = 150; // Filter out boilerplate / nav fragments
 
 interface Chunk {
   content: string;
@@ -245,7 +289,7 @@ function splitWithOverlap(text: string): string[] {
     // Remaining text fits in one chunk
     if (text.length - start <= CHUNK_SPLIT_AT) {
       const tail = text.slice(start).trim();
-      if (tail.length >= 50) result.push(tail);
+      if (tail.length >= MIN_CHUNK_LEN) result.push(tail);
       break;
     }
 
@@ -276,7 +320,7 @@ function splitWithOverlap(text: string): string[] {
 
     const end = searchFrom + breakOffset;
     const chunk = text.slice(start, end).trim();
-    if (chunk.length >= 50) result.push(chunk);
+    if (chunk.length >= MIN_CHUNK_LEN) result.push(chunk);
 
     // Step back by CHUNK_OVERLAP for the next window (snap to word boundary)
     const rawNext = end - CHUNK_OVERLAP;
@@ -334,7 +378,7 @@ function chunkPageContent(
   const isSingleSection = sections.length <= 1;
 
   if (isSingleSection) {
-    if (text.length < 50) return chunks;
+    if (text.length < MIN_CHUNK_LEN) return chunks;
     if (text.length <= CHUNK_SPLIT_AT) {
       chunks.push(makeChunkMeta(text, pageTitle, pageUrl, category, text));
     } else {
@@ -350,7 +394,7 @@ function chunkPageContent(
 
   for (let i = 0; i < sections.length; i++) {
     const section = sections[i].trim();
-    if (section.length < 50) continue;
+    if (section.length < MIN_CHUNK_LEN) continue;
 
     // Build the prefix: page title + optional tail from previous section
     const interOverlapPrefix = prevTail ? `[...] ${prevTail}\n\n` : "";

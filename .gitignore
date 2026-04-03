@@ -40,3 +40,6 @@ next-env.d.ts
 
 .vercel
 desktop.ini
+
+# ingestion logs
+ingest-*.log

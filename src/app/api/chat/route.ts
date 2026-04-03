@@ -278,11 +278,12 @@ export async function POST(req: NextRequest) {
 
         console.log("Query embedding generated:", !!queryEmbedding, "dim:", queryEmbedding?.length);
         if (queryEmbedding) {
-          // First attempt: filtered search (faster, more precise)
+          // === HYBRID SEARCH: Vector + Keyword Boost ===
+          // Step A: Vector search with lower threshold to cast a wider net
           const rpcParams: Record<string, unknown> = {
             query_embedding: queryEmbedding,
-            match_threshold: 0.5,
-            match_count: tierConfig.matchCount,
+            match_threshold: 0.25,
+            match_count: tierConfig.matchCount + 4, // fetch extra, we'll re-rank
           };
           if (contentTypeFilter) rpcParams.content_type_filter = contentTypeFilter;
 
@@ -290,15 +291,14 @@ export async function POST(req: NextRequest) {
           console.log("Vector search (filtered):", data?.length || 0, "results, error:", error?.message || "none");
 
           // Fallback: if filtered search returns nothing, retry without the filter
-          // (e.g. "how to get Crow's Pursuit" classified as item but it's in abyss-gear)
           if ((!data || data.length === 0) && contentTypeFilter) {
             console.log("Filtered search empty — retrying without content_type_filter");
             const { data: unfilteredData, error: unfilteredError } = await supabase.rpc(
               "match_knowledge_chunks",
               {
                 query_embedding: queryEmbedding,
-                match_threshold: 0.5,
-                match_count: tierConfig.matchCount,
+                match_threshold: 0.25,
+                match_count: tierConfig.matchCount + 4,
               }
             );
             console.log("Vector search (unfiltered fallback):", unfilteredData?.length || 0, "results");
@@ -307,6 +307,106 @@ export async function POST(req: NextRequest) {
           } else {
             chunks = data;
             if (error) searchError = error as unknown as Error;
+          }
+
+          // Step B: Keyword boost — extract proper nouns / specific terms from the question
+          // and do an ILIKE search to find chunks that mention them exactly
+          const boostKeywords = question
+            .replace(/[^a-zA-Z0-9\s'-]/g, "")
+            .split(/\s+/)
+            .filter((w: string) => w.length > 3 && w[0] === w[0].toUpperCase()) // likely proper nouns
+            .slice(0, 4);
+
+          // Also grab multi-word item/boss names (e.g. "Skyblazer Cloth Helm", "Stoneback Crab")
+          const quotedNames = question.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g) || [];
+          const allBoostTerms = [...new Set([...boostKeywords, ...quotedNames])];
+
+          if (allBoostTerms.length > 0) {
+            console.log("Keyword boost terms:", allBoostTerms);
+
+            // Strategy: first try to find chunks FROM the actual page about this topic
+            // (source_url contains the term), then fall back to content mentions.
+            // URL-encoded wiki URLs use + for spaces, so convert terms accordingly.
+            // Only use multi-word or long terms for URL matching — short single words
+            // like "Crimson" would match the domain name (crimsondesert.wiki...)
+            const urlTerms = allBoostTerms
+              .filter((t: string) => t.includes(" "))
+              .map((t: string) => t.replace(/\s+/g, "+"));
+
+            // Priority 1: chunks from the page whose URL matches (e.g., /Kailok+the+Hornsplitter)
+            let keywordChunks: any[] = [];
+            const { data: urlMatches } = urlTerms.length > 0
+              ? await supabase
+                  .from("knowledge_chunks")
+                  .select("id, content, source_url, source_type, quest_name, content_type")
+                  .or(urlTerms.map((t: string) => `source_url.ilike.%${t}%`).join(","))
+                  .limit(10)
+              : { data: null };
+
+            if (urlMatches && urlMatches.length > 0) {
+              keywordChunks = urlMatches;
+              console.log("URL-match boost:", urlMatches.length, "chunks from matching pages");
+            }
+
+            // Priority 2: if URL match found <4 chunks, also grab content mentions
+            if (keywordChunks.length < 4) {
+              const { data: contentMatches } = await supabase
+                .from("knowledge_chunks")
+                .select("id, content, source_url, source_type, quest_name, content_type")
+                .or(allBoostTerms.map((t: string) => `content.ilike.%${t}%`).join(","))
+                .limit(8);
+              if (contentMatches) {
+                const existingKwIds = new Set(keywordChunks.map((c: any) => c.id));
+                for (const c of contentMatches) {
+                  if (!existingKwIds.has(c.id)) keywordChunks.push(c);
+                }
+              }
+            }
+
+            if (keywordChunks.length > 0) {
+              const existingIds = new Set((chunks || []).map((c: Record<string, unknown>) => c.id));
+              const newKeywordChunks = keywordChunks
+                .filter((c: any) => !existingIds.has(c.id))
+                .map((c: any) => {
+                  // URL matches get higher baseline similarity than content-only matches
+                  const isUrlMatch = urlTerms.some((t: string) =>
+                    String(c.source_url || "").toLowerCase().includes(t.toLowerCase()));
+                  return { ...c, similarity: isUrlMatch ? 0.55 : 0.40, keywordBoost: true };
+                });
+
+              if (newKeywordChunks.length > 0) {
+                console.log("Keyword boost added", newKeywordChunks.length, "extra chunks");
+                chunks = [...(chunks || []), ...newKeywordChunks];
+              }
+            }
+          }
+
+          // Step C: Re-rank — boost chunks that contain exact question terms
+          if (chunks && chunks.length > 0) {
+            const questionTerms = question.toLowerCase().split(/\s+/).filter((w: string) => w.length > 3);
+            const urlTermsForRerank = allBoostTerms.map((t: string) => t.replace(/\s+/g, "+").toLowerCase());
+            chunks = chunks.map((c: Record<string, unknown>) => {
+              const content = String(c.content || "").toLowerCase();
+              const sourceUrl = String(c.source_url || "").toLowerCase();
+              const termHits = questionTerms.filter((t: string) => content.includes(t)).length;
+              const baseSim = Number(c.similarity || 0.3);
+              // Boost per general term match
+              let boost = Math.min(0.10, termHits * 0.02);
+              // Bigger boost if chunk is FROM the page about the topic (URL match)
+              if (urlTermsForRerank.some((t: string) => sourceUrl.includes(t))) {
+                boost += 0.15;
+              }
+              // Medium boost if proper noun appears in content
+              for (const pn of allBoostTerms) {
+                if (content.includes(pn.toLowerCase())) boost += 0.05;
+              }
+              return { ...c, similarity: baseSim + boost, termHits };
+            });
+            chunks.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
+              Number(b.similarity) - Number(a.similarity)
+            );
+            chunks = chunks.slice(0, tierConfig.matchCount);
+            console.log("Re-ranked top chunk similarity:", Number(chunks[0]?.similarity).toFixed(3));
           }
         }
       } catch (e) {
@@ -367,7 +467,7 @@ export async function POST(req: NextRequest) {
     const hasRelevantContext = chunks && chunks.length > 0 && (
       // Vector search results have similarity scores — trust those
       (chunks[0] as Record<string, unknown>).similarity !== undefined
-        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.5
+        ? Number((chunks[0] as Record<string, unknown>).similarity) > 0.3
         // Text search results — check if top result matched most keywords
         : (chunks[0] as Record<string, unknown>).matchCount !== undefined
           ? Number((chunks[0] as Record<string, unknown>).matchCount) >= 2
