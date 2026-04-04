@@ -52,7 +52,7 @@ function hashContent(content: string): string {
 }
 
 // ===== RATE LIMITING =====
-const DELAY_MS = 1500; // Be respectful — 1.5s between requests
+const DELAY_MS = 800; // 800ms between requests — polite but faster than 1.5s
 const sleep = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 // ===== CATEGORY DEFINITIONS =====
