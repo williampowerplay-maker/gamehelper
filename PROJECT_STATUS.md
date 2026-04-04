@@ -85,6 +85,21 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 
+## Future Features (Planned)
+
+### UX Enhancements
+
+- [ ] **Quick Boss Mode** - Instead of typing, players select from a boss/quest list and get instant strategy with phases, weaknesses, and recommended gear. One-tap help while holding a controller.
+- [ ] **Build Planner / Loadout Recommender** - Interactive gear calculator ("I'm level 25, using a spear, what armor?"). Stat comparisons, save/share builds. Creates community engagement + return visits.
+- [ ] **Interactive Map Integration** - Simplified embedded map where users ask "where is X?" and see it pinned. Overlay collectibles, boss locations, quest givers.
+- [ ] **Voice-First Mode (Controller-Friendly)** - Dedicated hands-free UI with larger buttons, auto-read responses, minimal scrolling. Killer differentiator vs wikis for players mid-game.
+
+### Community & Retention
+
+- [ ] **Creator/Streamer Partnerships** - Embeddable guide widget for Twitch streams ("Ask the AI guide" overlay). Revenue share on premium signups via referral links.
+- [ ] **Tip of the Day Push Notifications** - Daily game tip based on where the user is in the game. Keeps users opening the app between play sessions. Drives ad impressions on free tier.
+- [ ] **Community Upvoting on Answers** - Users rate AI responses as helpful/not helpful. Best-rated answers get cached and served faster (saves API costs). Creates feedback loop for quality improvement.
+
 ### Manual Setup Required
 
 See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and configs needed (AdSense, Stripe, Google OAuth, domain, content seeding, legal pages).
