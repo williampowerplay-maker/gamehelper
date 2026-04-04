@@ -191,16 +191,15 @@ function extractPageTitle(html: string): string {
 }
 
 // Pages that are pure navigation/index — never crawl as content pages
+// Only truly empty navigation/index pages that have no useful content
 const NAV_PAGES = new Set([
-  "/Crimson+Desert+Wiki", "/General+Information", "/DLC", "/Patch+Notes",
-  "/Character+Information",
-  "/Character+Customization",
-  "/Equipment", "/World+Information",
-  "/Greymane+Camp", "/Abyss+Nexus", "/Interactive+Map", "/Factions",
-  "/Vendors", "/Lore", "/New+Player+Help",
-  "/Trophy+%26+Achievement+Guide",
-  "/All+Bell+Locations", "/All+Abyss+Artifact+Locations",
-  "/Kliff", "/Oongka", "/Damiane", "/todo",
+  "/Crimson+Desert+Wiki",    // Wiki homepage — just links
+  "/General+Information",    // Pure nav hub
+  "/Equipment",              // Pure index listing sub-categories
+  "/World+Information",      // Pure nav hub
+  "/Character+Information",  // Pure nav hub
+  "/Interactive+Map",        // Embedded widget, not text content
+  "/todo",                   // Internal wiki page
   // Category index pages — we crawl these as entry points but not as content targets
   "/Bosses", "/Quests", "/Weapons", "/Armor", "/Abyss+Gear",
   "/Skills", "/Items", "/Locations", "/Characters", "/Walkthrough",
