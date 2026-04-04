@@ -328,6 +328,154 @@ const TEST_CASES: TestCase[] = [
     expectedKeywords: ["combat", "tip", "dodge", "parry", "attack"],
     description: "Combat tips for beginners",
   },
+
+  // ===========================================================
+  // REAL PLAYER QUESTIONS — sourced from Reddit / Steam / Google
+  // ===========================================================
+
+  // --- Death & Penalties ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "What happens when I die in Crimson Desert?",
+    expectedKeywords: ["death", "die", "penalty", "silver", "durability"],
+    description: "[REAL] Death penalty mechanics",
+  },
+
+  // --- Save System ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "How do I save my game in Crimson Desert?",
+    expectedKeywords: ["save", "auto-save", "mercenary camp", "camp"],
+    description: "[REAL] Save system mechanics",
+  },
+
+  // --- Weather / Hidden Mechanics ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "Does weather affect combat in Crimson Desert?",
+    expectedKeywords: ["weather", "wet", "lightning", "rain"],
+    description: "[REAL] Weather combat effects",
+  },
+
+  // --- Observe Mechanic ---
+  {
+    category: "skills", contentType: "mechanic",
+    question: "How do I unlock new skills by observing?",
+    expectedKeywords: ["observe", "unlock", "skill"],
+    description: "[REAL] Observe mechanic for skills",
+  },
+
+  // --- Boss Strategy: Reed Devil ---
+  {
+    category: "bosses", contentType: "boss",
+    question: "How do I beat the Reed Devil boss?",
+    expectedKeywords: ["reed devil"],
+    description: "[REAL] Reed Devil boss strategy",
+  },
+
+  // --- Healing / Grilled Meat ---
+  {
+    category: "items", contentType: "item",
+    question: "Where do I get grilled meat for healing?",
+    expectedKeywords: ["grilled meat", "meat", "heal"],
+    description: "[REAL] Grilled meat / healing items",
+  },
+
+  // --- Grapple Mechanic ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "How does grappling work in boss fights?",
+    expectedKeywords: ["grapple", "grappling", "stagger"],
+    description: "[REAL] Grapple mechanic in combat",
+  },
+
+  // --- Palmer Pills ---
+  {
+    category: "items", contentType: "item",
+    question: "What do Palmer Pills do?",
+    expectedKeywords: ["palmer pill", "resurrection", "revive"],
+    description: "[REAL] Palmer Pills resurrection item",
+  },
+
+  // --- Stamina in Combat ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "Is stamina important in boss fights?",
+    expectedKeywords: ["stamina", "block", "dodge"],
+    description: "[REAL] Stamina importance in combat",
+  },
+
+  // --- Best Weapons ---
+  {
+    category: "weapons", contentType: "item",
+    question: "What is the best weapon type in Crimson Desert?",
+    expectedKeywords: ["sword", "spear", "greatsword", "weapon"],
+    description: "[REAL] Best weapon type recommendation",
+  },
+
+  // --- Hwando Sword Location ---
+  {
+    category: "weapons", contentType: "item",
+    question: "Where do I find the Hwando Sword?",
+    expectedKeywords: ["hwando", "lioncrest", "lyon"],
+    description: "[REAL] Hwando Sword early game location",
+  },
+
+  // --- Weapon Upgrading ---
+  {
+    category: "guides", contentType: "mechanic",
+    question: "How do I upgrade weapons in Crimson Desert?",
+    expectedKeywords: ["upgrade", "refine", "refining", "weapon"],
+    description: "[REAL] Weapon upgrade/refining system",
+  },
+
+  // --- Abyss Gear Slotting ---
+  {
+    category: "abyss-gear", contentType: "item",
+    question: "How do I slot Abyss Gear into weapons?",
+    expectedKeywords: ["abyss gear", "slot", "elowen", "witch"],
+    description: "[REAL] Abyss Gear slotting via Elowen",
+  },
+
+  // --- Contradiction Quest ---
+  {
+    category: "quests", contentType: "quest",
+    question: "What are the answers for the Contradiction quest?",
+    expectedKeywords: ["contradiction", "weight of knowledge"],
+    description: "[REAL] Contradiction quest answers",
+  },
+
+  // --- Close Threat Quest ---
+  {
+    category: "quests", contentType: "quest",
+    question: "What are the Close Threat quest answers?",
+    expectedKeywords: ["close threat"],
+    description: "[REAL] Close Threat quest answers",
+  },
+
+  // --- Five-Finger Mountain ---
+  {
+    category: "locations", contentType: "exploration",
+    question: "How do I get to Five-Finger Mountain?",
+    expectedKeywords: ["five-finger", "five finger", "mountain"],
+    description: "[REAL] Five-Finger Mountain location",
+  },
+
+  // --- Hernand Town ---
+  {
+    category: "locations", contentType: "exploration",
+    question: "Where is Hernand and what can I do there?",
+    expectedKeywords: ["hernand"],
+    description: "[REAL] Hernand town info",
+  },
+
+  // --- Nature's Grasp Skill ---
+  {
+    category: "skills", contentType: "mechanic",
+    question: "What does Nature's Grasp do in combat?",
+    expectedKeywords: ["nature's grasp", "natures grasp", "grasp"],
+    description: "[REAL] Nature's Grasp skill usage",
+  },
 ];
 
 // ===== EMBEDDING =====
