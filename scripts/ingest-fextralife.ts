@@ -193,8 +193,8 @@ function extractPageTitle(html: string): string {
 // Pages that are pure navigation/index — never crawl as content pages
 const NAV_PAGES = new Set([
   "/Crimson+Desert+Wiki", "/General+Information", "/DLC", "/Patch+Notes",
-  "/Controls", "/Combat", "/FAQs", "/Character+Information",
-  "/Character+Customization", "/Stats", "/Status+Effects",
+  "/Character+Information",
+  "/Character+Customization",
   "/Kliff+Skills", "/Oongka+Skills", "/Damiane+Skills", "/Equipment",
   "/Projectiles", "/Tools", "/Shields", "/Headgear",
   "/Gloves", "/Body+Armor", "/Cloaks", "/Footwear",
@@ -203,7 +203,7 @@ const NAV_PAGES = new Set([
   "/Minerals", "/Crafting+Materials", "/World+Information",
   "/Greymane+Camp", "/Abyss+Nexus", "/Interactive+Map", "/Factions",
   "/Vendors", "/Lore", "/New+Player+Help",
-  "/Game+Progress+Route", "/New+Game+Plus", "/Trophy+%26+Achievement+Guide",
+  "/Trophy+%26+Achievement+Guide",
   "/All+Bell+Locations", "/All+Abyss+Artifact+Locations",
   "/Kliff", "/Oongka", "/Damiane", "/todo",
   // Category index pages — we crawl these as entry points but not as content targets
