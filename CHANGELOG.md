@@ -20,14 +20,12 @@ All 4 starter questions now retrieve the correct page in the top-5 with similari
 - "Where is the Saint's Necklace?" — was returning **Crossroads Necklace (wrong item!)**, now returns Saint's Necklace (sim 1.13)
 - "How does the Abyss Artifact system work?" — already worked; now hits the dedicated `/Abyss+Artifact` page instead of the `/Sealed+Abyss+Artifacts` spillover page
 
-### Known issue (DB admin task, not in this commit)
-**Duplicate `match_knowledge_chunks` RPC in Supabase** — the old 3-arg function and the new 4-arg function (with `content_type_filter`) both exist. PostgREST can't pick one when called with exactly 3 args:
-> `Could not choose the best candidate function between: public.match_knowledge_chunks(vector, float, int), public.match_knowledge_chunks(vector, float, int, text)`
-
-This silently breaks (a) the unfiltered-retry fallback path when a filtered search returns 0 results, and (b) any question where the classifier returns `null`. Does NOT affect the 4 starter questions (they all get a non-null classifier). **Fix** (run in Supabase SQL editor):
+### DB admin task completed (2026-04-04)
+Dropped the duplicate `match_knowledge_chunks` RPC overload. Ran in Supabase SQL editor:
 ```sql
-DROP FUNCTION public.match_knowledge_chunks(vector(1024), float, int);
+DROP FUNCTION public.match_knowledge_chunks(vector, double precision, integer);
 ```
+Note: the actual stored signature uses `vector` without an explicit dimension (per `pg_proc.pg_get_function_identity_arguments`), not `vector(1024)` — had to match the stored form exactly. Verified via re-query of `pg_proc` — only the 4-arg version (with `content_type_filter text`) remains. The unfiltered-retry fallback path and `null`-classifier path now work cleanly — no more `Could not choose the best candidate function` errors from PostgREST.
 
 ### Regression check
 Re-ran `scripts/test-rag-quality.ts` full suite after fixes: **42/59 (71.2%)**, avg sim 0.774 — identical pass rate to pre-fix baseline. No regressions. The starter-question fixes target URL-explicit proper-noun queries, which aren't in the test suite.

@@ -101,7 +101,7 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - URL-match boost `quotedNames` regex fixed to handle possessive apostrophes — "Saint's Necklace" now matches as a multi-word term (was silently returning Crossroads Necklace).
 - URL-match baseline similarity raised 0.55 → 0.88, rerank boost 0.15 → 0.25. When user explicitly names a page, that page now dominates the top 5.
 
-**DB admin task still open**: `DROP FUNCTION public.match_knowledge_chunks(vector(1024), float, int);` needs to be run in Supabase SQL editor — the old 3-arg version coexists with the 4-arg version and breaks the unfiltered-retry path plus any question where the classifier returns `null`. See CHANGELOG v0.6.1 Known Issue.
+**DB admin task completed (2026-04-04)**: Dropped the duplicate 3-arg `match_knowledge_chunks` overload via `DROP FUNCTION public.match_knowledge_chunks(vector, double precision, integer);` in Supabase SQL editor. Verified with `pg_proc` query — only the 4-arg version (with `content_type_filter`) remains. The unfiltered-retry path and `null`-classifier path now work cleanly.
 
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
