@@ -48,7 +48,7 @@ interface StatsData {
     totalTokens: number;
     errorsLast24h: number;
   };
-  tierBreakdown: { nudge: number; guide: number; full: number };
+  tierBreakdown: { nudge: number; full: number };
   last7Days: { date: string; count: number }[];
   recentQueries: {
     id: string;
@@ -73,13 +73,13 @@ interface StatsData {
 
 const TIER_COLORS: Record<string, string> = {
   nudge: "text-yellow-400",
-  guide: "text-blue-400",
   full: "text-red-400",
+  // "guide" kept for historical query rows still in the DB
+  guide: "text-blue-400",
 };
 
 const TIER_BAR_COLORS: Record<string, string> = {
   nudge: "bg-yellow-500",
-  guide: "bg-blue-500",
   full: "bg-red-500",
 };
 
@@ -289,7 +289,7 @@ export default function AdminPage() {
 
   // -- Dashboard --
   const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors } = data;
-  const totalTier = tierBreakdown.nudge + tierBreakdown.guide + tierBreakdown.full;
+  const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
 
@@ -379,7 +379,7 @@ export default function AdminPage() {
           <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
             <h2 className="text-sm font-medium text-gray-300 mb-4">Spoiler Tier Usage</h2>
             <div className="space-y-3">
-              {(["guide", "full", "nudge"] as const).map((tier) => (
+              {(["full", "nudge"] as const).map((tier) => (
                 <HorizontalBar
                   key={tier}
                   label={tier}

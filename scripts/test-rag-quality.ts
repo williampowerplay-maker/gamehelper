@@ -514,7 +514,7 @@ let rpcWarningShown = false;
 
 async function queryChunks(embedding: number[], question: string): Promise<ChunkResult[]> {
   // 1. Vector search via RPC
-  const { data, error } = await supabase.rpc("match_chunks", {
+  const { data, error } = await supabase.rpc("match_knowledge_chunks", {
     query_embedding: embedding,
     match_threshold: 0.25,
     match_count: 12,

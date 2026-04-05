@@ -7,19 +7,13 @@ const tiers: { id: SpoilerTier; label: string; desc: string; icon: string }[] =
     {
       id: "nudge",
       label: "Nudge",
-      desc: "A gentle hint",
+      desc: "A gentle hint — preserves discovery",
       icon: "\u{1F441}",
     },
     {
-      id: "guide",
-      label: "Guide",
-      desc: "Step-by-step help",
-      icon: "\u{1F4D6}",
-    },
-    {
       id: "full",
-      label: "Full Solution",
-      desc: "Complete answer",
+      label: "Solution",
+      desc: "Complete answer — tell me everything",
       icon: "\u{1F4A1}",
     },
   ];

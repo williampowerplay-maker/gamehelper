@@ -71,11 +71,12 @@ export async function GET(req: NextRequest) {
     supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", oneDayAgo),
   ]);
 
-  // Tier breakdown
-  const tierCounts = { nudge: 0, guide: 0, full: 0 };
+  // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
+  const tierCounts = { nudge: 0, full: 0 };
   for (const row of tierBreakdownRes.data ?? []) {
-    const t = row.spoiler_tier as keyof typeof tierCounts;
-    if (t in tierCounts) tierCounts[t]++;
+    const t = row.spoiler_tier as string;
+    if (t === "nudge") tierCounts.nudge++;
+    else if (t === "full" || t === "guide") tierCounts.full++;
   }
 
   // Last 7 days

@@ -17,8 +17,16 @@ Things discovered during development that are worth remembering across sessions.
 
 - **Content type filter pattern**: Add an optional `content_type_filter TEXT DEFAULT NULL` to the RPC. When set, it narrows the cosine similarity search to a single content type — boss questions only scan ~400 chunks instead of 6000+. pgvector's IVFFlat index still applies within the filtered set.
 - **Always add an unfiltered fallback**: If the filtered RPC returns 0 results, retry without the filter before giving up. Some items live in unexpected categories (e.g. Crow's Pursuit is `abyss-gear` not generic `item`).
-- **Classifier ordering matters**: Check boss names/verbs first (very specific), then recipe (before item, since "how to craft" could match item too), then item, then quest, etc. First match wins — ambiguous questions should return `null`.
+- **Classifier ordering matters — specific before generic**: Check boss names/verbs first (very specific), then recipe (before item, since "how to craft" could match item too), then item, then quest, etc. First match wins — ambiguous questions should return `null`. **Specifically: put exploration ABOVE mechanic.** A bare `\bhow do\b` in the mechanic regex will happily match "How do I solve the Azure Moon Labyrinth?" and misroute to mechanic. Either put exploration first so `labyrinth` catches it, or remove the bare catch-alls from mechanic and keep only specific phrasings like `how does .+ work`.
+- **Beware catch-all verb phrases in specific regexes**: A `/how do/` or `/how does/` token inside a topic-specific regex will swallow questions that are about specific items/locations/bosses. Prefer specific companion terms (`how does the .+ work`, `how do i (solve|get|reach)`) over bare verb fragments.
 - **`character` is a reserved word in PostgreSQL**: Quoting as `"character"` is required in both the RETURNS TABLE and SELECT inside the function body.
+- **Don't create overloaded RPC functions via `CREATE OR REPLACE FUNCTION` with different signatures**: Supabase's `CREATE OR REPLACE` only replaces the exact signature — if you add a new parameter, the old version stays in the DB as a second function. PostgREST then can't decide which to call when the caller passes N arguments and errors: `Could not choose the best candidate function`. Fix: explicitly `DROP FUNCTION ... (old signature)` before creating the new signature.
+
+## RAG: URL-Match Keyword Boost
+
+- **When the user names a page, that page should dominate**: The URL-match boost finds chunks whose `source_url` contains a multi-word proper noun from the question (e.g. "Azure Moon Labyrinth" → `ilike %Azure+Moon+Labyrinth%`). Baseline similarity for URL matches must be high enough to beat typical filtered-vector scores on unrelated-but-semantically-near pages. Previous values (0.55 baseline + 0.15 rerank boost = 0.70 final) lost to 0.78–0.90 filtered vector results about wrong pages. Bumped to 0.88 baseline + 0.25 rerank = 1.13 final — URL matches now reliably win.
+- **Possessive apostrophes break naive multi-word regexes**: `/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g` fails on "Saint's Necklace" because `'s` isn't `\s+[A-Z]`. Fix: `/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g`. This single character blocked all URL-match boosts for possessive-form item/boss names. Very easy to miss because vector search still returns *something*, just the wrong thing (Crossroads Necklace instead of Saint's Necklace).
+- **URL encoding for Fextralife wiki**: spaces become `+`, but apostrophes stay literal (`/Saint's+Necklace`). The `ilike` pattern has to preserve the apostrophe verbatim.
 
 ## Next.js 16 + Node 24
 
@@ -39,7 +47,9 @@ Things discovered during development that are worth remembering across sessions.
 ## Spoiler Tier Prompt Engineering
 
 - **Per-category examples are essential**: The nudge tier prompt needed explicit good/bad examples for each question type (puzzles, items, bosses, mechanics). Without these, the model would sometimes give full answers even when set to "nudge" mode.
-- **Snarky no-info responses**: When the knowledge base has no relevant info, the system returns a random snarky response instead of calling Claude at all. This saves API costs and gives personality. The check happens before the Claude call — if relevance thresholds aren't met, we short-circuit.
+- **Snarky no-info responses + scope explainer**: When the knowledge base has no relevant info, the system returns a snarky line followed by a structured "What I'm built for" block — bulleted examples of questions the app IS good at (boss strategies, weapon/armor stats, skill details, NPC info, region directions) and a note that broad overview queries are not well supported. This aligns user expectations with the current KB strengths instead of leaving them at a dead end. Applied both in the API short-circuit (before Claude call) and inside `BASE_SYSTEM_PROMPT` so Claude emits the same block when it falls back. The check happens before the Claude call for the short-circuit path — if relevance thresholds aren't met, we return the snarky+explainer string immediately and skip Claude entirely.
+- **Two tiers beat three for this product**: Originally had Nudge / Guide / Full. In practice Guide and Full produced nearly identical output — both were walkthroughs at different token budgets, and users couldn't distinguish them. Collapsed to Nudge (hint, Haiku) + Solution/Full (complete answer, Sonnet). Simpler mental model ("hint me" vs "tell me"), cleaner paywall split, one less prompt to maintain. Lesson: if two tiers in a UX ladder don't produce visibly different outputs, they're the same tier.
+- **Legacy tier values in DB**: When collapsing tiers, don't migrate historical data — accept legacy values at read time. Admin stats folds `guide` rows into `full`; chat API silently maps incoming `spoilerTier="guide"` requests to `"full"`. Zero-downtime, zero migration risk.
 
 ## Error Logging Pattern
 
@@ -63,7 +73,7 @@ Things discovered during development that are worth remembering across sessions.
 - **Relevance gating**: Similarity threshold for vector results is 0.5 (with `input_type: "document"` embeddings, relevant chunks typically score 0.6–0.85 and unrelated chunks score < 0.4). Text search fallback requires >= 2 keyword matches. Without these gates, Claude would hallucinate from tangentially related chunks.
 - **Keyword extraction**: Stop words list includes game-generic terms ("crimson", "desert") that would match everything and dilute search quality.
 - **Response caching**: Before calling Voyage/Claude, check `queries` table for exact `question` + `spoiler_tier` match within 7 days. Returns cached `response` immediately, skipping all API calls. Only kicks in for identical question strings — not fuzzy.
-- **Per-tier Claude config**: `TIER_CLAUDE` constant maps each tier to a model, maxTokens, and matchCount. Nudge uses Haiku (150 tokens, 3 chunks) — ~20x cheaper per query. Guide/Full use Sonnet. Wire via `tierConfig = TIER_CLAUDE[spoilerTier]`.
+- **Per-tier Claude config**: `TIER_CLAUDE` constant maps each tier to a model, maxTokens, and matchCount. Nudge uses Haiku (150 tokens, 3 chunks) — ~20x cheaper per query. Full/Solution uses Sonnet (1024 tokens, 8 chunks). Wire via `tierConfig = TIER_CLAUDE[spoilerTier]`.
 - **Single Supabase client**: One `createClient()` call per request, used for rate limiting, cache check, vector search, and query logging. Avoids creating multiple TCP connections.
 
 ## Auth

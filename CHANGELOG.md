@@ -4,6 +4,74 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.6.1] - 2026-04-04 (Starter Question Retrieval Fixes)
+
+### Fixed
+Four homepage starter questions were not returning correct results. Root causes found via `scripts/debug-starters-full-pipeline.ts`:
+
+- **Classifier misroute on "how do I solve X"** — `/how do/` in the mechanic regex was swallowing location/exploration questions. Azure Moon Labyrinth was routed to `mechanic` → filter missed the page entirely (top 5 became unrelated "Challenges" chunks). **Fix**: moved exploration regex *above* mechanic; added `labyrinth|ruin|tower|temple|crypt|catacomb|sanctum|dungeon|cave` and `how do i (solve|complete|clear|finish)` keywords to exploration; removed bare `how do`/`how does` from mechanic (kept the more specific `how does .+ work` phrasing).
+- **Possessive-apostrophe regex bug in URL-match boost** — `quotedNames = /[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g` couldn't match "Saint's Necklace" or "Kailok's Lair" because the `'s` broke the second-word boundary. URL boost never fired for these questions; vector search returned semantically near-but-wrong items (Crossroads Necklace instead of Saint's Necklace). **Fix**: regex now tolerates possessive `'s`: `/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g`.
+- **URL-match boost too weak** — baseline similarity 0.55 + 0.15 rerank boost = 0.70 final. Filtered vector searches often return unrelated results at sim 0.78–0.90 (semantic near-misses), so URL-matched chunks from the *actually-named page* would lose the rerank. **Fix**: baseline 0.55 → **0.88**, rerank boost 0.15 → **0.25**. When the user explicitly names a page in their question, that page now dominates over any semantic drift.
+
+### Results (measured via `scripts/debug-starters-full-pipeline.ts`)
+All 4 starter questions now retrieve the correct page in the top-5 with similarity ≥ 1.0:
+- "How do I solve the Azure Moon Labyrinth?" — was returning "Challenges" page, now returns Azure Moon Labyrinth (sim 1.13)
+- "Best strategy for Kailok the Hornsplitter?" — already worked; slightly better (now Kailok wiki page 1.01 instead of YouTube transcripts)
+- "Where is the Saint's Necklace?" — was returning **Crossroads Necklace (wrong item!)**, now returns Saint's Necklace (sim 1.13)
+- "How does the Abyss Artifact system work?" — already worked; now hits the dedicated `/Abyss+Artifact` page instead of the `/Sealed+Abyss+Artifacts` spillover page
+
+### Known issue (DB admin task, not in this commit)
+**Duplicate `match_knowledge_chunks` RPC in Supabase** — the old 3-arg function and the new 4-arg function (with `content_type_filter`) both exist. PostgREST can't pick one when called with exactly 3 args:
+> `Could not choose the best candidate function between: public.match_knowledge_chunks(vector, float, int), public.match_knowledge_chunks(vector, float, int, text)`
+
+This silently breaks (a) the unfiltered-retry fallback path when a filtered search returns 0 results, and (b) any question where the classifier returns `null`. Does NOT affect the 4 starter questions (they all get a non-null classifier). **Fix** (run in Supabase SQL editor):
+```sql
+DROP FUNCTION public.match_knowledge_chunks(vector(1024), float, int);
+```
+
+### Regression check
+Re-ran `scripts/test-rag-quality.ts` full suite after fixes: **42/59 (71.2%)**, avg sim 0.774 — identical pass rate to pre-fix baseline. No regressions. The starter-question fixes target URL-explicit proper-noun queries, which aren't in the test suite.
+
+---
+
+## [0.6.0] - 2026-04-04 (Two-Tier Spoiler System + No-Info Scope Explainer)
+
+### Changed
+- **Collapsed spoiler tiers from 3 to 2**: `nudge` (gentle hint, Haiku) + `full` (complete answer, Sonnet). Dropped the middle `guide` tier — its step-by-step formatting guidance was merged into the new `full` prompt.
+  - `SpoilerTierSelector` now renders two buttons: "Nudge" and "Solution" (formerly "Full Solution"). The "Guide 📖" option is gone.
+  - `SpoilerTier` type in `src/lib/supabase.ts` narrowed to `"nudge" | "full"`.
+  - `TIER_CLAUDE` map in `src/app/api/chat/route.ts` has 2 entries. `SPOILER_INSTRUCTIONS` has 2 prompts. Full prompt absorbed Guide's mobile-scannable formatting (bold key actions, numbered steps, no filler).
+  - Chat API default tier changed from `"guide"` to `"nudge"` (cheapest, preserves discovery).
+  - Legacy compatibility: incoming requests with `spoilerTier="guide"` are silently mapped to `"full"` at the top of the POST handler so cached clients don't break.
+- **Admin dashboard** folds legacy `guide` query rows into the `full` count. Tier breakdown chart now shows 2 bars (Solution, Nudge). `/api/admin/stats` returns `{ nudge, full }` instead of `{ nudge, guide, full }`.
+- **`ChatMessage` tier badge** map updated — 2 entries only.
+
+### Added
+- **Scope explainer in no-info fallback responses**: when retrieval returns nothing relevant (or Claude judges context irrelevant), the snarky line is now followed by a structured "What I'm built for" block explaining the app's strengths (boss strategies, weapon/armor stats, skill details, NPC info, region directions) with 4 example queries and a note about broad-overview question limitations. Applied in both the API short-circuit (`SCOPE_EXPLAINER` constant) and the `BASE_SYSTEM_PROMPT` / nudge `SPOILER_INSTRUCTIONS` so Claude emits the same block when it decides to fall back.
+
+### Rationale
+The Guide and Full tiers were producing nearly indistinguishable output in practice — both were walkthroughs at slightly different token budgets. Users couldn't tell which to pick. Collapsing to Nudge (hint) + Solution (answer) gives a clearer mental model and cleaner free→premium paywall split, and removes a prompt to maintain.
+
+### Migration
+- **DB**: no schema change. Historical `queries.spoiler_tier = 'guide'` rows are preserved; they're treated as `full` at read time.
+- **Type/prompt files**: `route.ts`, `supabase.ts`, `SpoilerTierSelector.tsx`, `ChatMessage.tsx`, `admin/page.tsx`, `admin/stats/route.ts` all updated. Typecheck passes.
+
+---
+
+## [0.5.7] - 2026-04-04 (Full Reseed Complete + RAG Quality Baseline)
+
+### Completed
+- **Full knowledge base reseed** across all 17 categories using `--deep` 2-level BFS + chunk-overlap format. Total: **82,312 chunks**. All categories ingested between 2026-04-03 16:47 and 17:46 UTC.
+- Per-content-type avg chunk lengths confirm overlap format applied: boss 429, quest 280, item 519 (down from pre-overlap 666), exploration 458, mechanic 482, recipe 468, character 299.
+
+### Measured
+- **RAG quality baseline**: 42/59 test cases pass (71.2%), avg similarity 0.777. Strong (100%) in bosses, enemies, armor, abyss-gear, accessories, collectibles, locations, characters, npcs. Weak: items (25%), walkthrough (33%), guides (33% — category has only 2 chunks, crawler issue).
+
+### Fixed
+- **`scripts/test-rag-quality.ts`**: was calling the old `match_chunks` RPC instead of `match_knowledge_chunks` — the test suite couldn't run at all until fixed.
+
+---
+
 ## [0.5.6] - 2026-04-03 (Chunk Splitting & Overlap)
 
 ### Changed

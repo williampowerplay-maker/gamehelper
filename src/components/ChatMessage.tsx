@@ -12,8 +12,7 @@ interface Message {
 
 const tierBadge: Record<SpoilerTier, { label: string; color: string }> = {
   nudge: { label: "Nudge", color: "bg-green-500/20 text-green-400" },
-  guide: { label: "Guide", color: "bg-amber-500/20 text-amber-400" },
-  full: { label: "Full Solution", color: "bg-red-500/20 text-red-400" },
+  full: { label: "Solution", color: "bg-red-500/20 text-red-400" },
 };
 
 export default function ChatMessage({ message }: { message: Message }) {

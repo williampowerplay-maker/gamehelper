@@ -6,7 +6,9 @@ const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Types matching our Supabase schema
-export type SpoilerTier = "nudge" | "guide" | "full";
+// "guide" is a legacy tier still present in historical queries rows.
+// New queries only use "nudge" | "full".
+export type SpoilerTier = "nudge" | "full";
 export type ContentType =
   | "puzzle"
   | "boss"

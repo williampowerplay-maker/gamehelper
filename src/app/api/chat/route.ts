@@ -33,10 +33,12 @@ const RATE_LIMITS = {
   premium: { perMinute: 10, perHour: 60 },
 };
 
-// Per-tier Claude settings — nudge uses Haiku (~20x cheaper), guide/full use Sonnet
+// Per-tier Claude settings — nudge uses Haiku (~20x cheaper), full uses Sonnet.
+// Two-tier system (collapsed from 3). Legacy "guide" rows exist in the DB but
+// are no longer a selectable tier; if a request arrives with spoilerTier="guide"
+// (cached client, old API consumer) we map it to "full" at read time below.
 const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
   nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 150,  matchCount: 3 },
-  guide: { model: "claude-sonnet-4-20250514",  maxTokens: 600,  matchCount: 6 },
   full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
 };
 
@@ -57,7 +59,7 @@ General rules:
 - Use encouraging language
 - NEVER reveal exact solutions, codes, sequences, or specific numbers
 - NEVER name the exact item, weapon, or reward they'll get
-- If the context doesn't directly answer their question, pick ONE snarky gamer response like "I haven't been trained on that yet... maybe just man up and figure it out yourself" or "No clue. Skill issue." Say NOTHING else. No partial matches, no suggestions, no follow-up questions.
+- If the context doesn't directly answer their question, follow the base fallback rule: pick one snarky line AND then output the scope-explainer block exactly as specified in the base rules. Do not add partial matches, suggestions, or follow-up questions beyond those two parts.
 
 Adapt your nudge based on the type of question:
 
@@ -77,18 +79,12 @@ MECHANICS/SYSTEMS: You can be slightly more generous here since there's less to 
   Good: "There's a skill tree that directly affects how long you can stay airborne — worth investing in early."
   Bad: "Put 4 points into the stamina blue tree to get 200 stamina for aerial maneuver" (too specific)`,
 
-  guide: `You are a Crimson Desert game guide. The player wants a GUIDE — a step-by-step walkthrough.
-- Provide clear, actionable steps to solve their problem
-- Use bold for key actions (wrap in **)
-- Be specific but don't over-explain (e.g., "Shoot a fire arrow at the vines on the 2nd floor door")
-- Keep it concise — 3-5 steps max
-- Mention relevant items or abilities they might need`,
-
-  full: `You are a Crimson Desert game guide. The player wants the FULL SOLUTION — complete detailed answer.
-- Provide the complete, detailed answer with nothing held back
-- Include item locations, exact strategies, boss move patterns, video timestamps if available
-- Format for easy scanning: short paragraphs, bold key info
-- Include any related tips or things they might miss`,
+  full: `You are a Crimson Desert game guide. The player wants the SOLUTION — a complete, specific answer with nothing held back.
+- Provide the complete answer: item locations, exact boss strategies and move patterns, quest objectives, skill effects, stats
+- Format for quick mobile scanning: short paragraphs, bold key actions/items/numbers (wrap in **), numbered steps when sequence matters
+- Be specific but don't pad with filler (e.g., "Shoot a fire arrow at the vines on the 2nd floor door" not "You might want to consider using some kind of fire-based attack on the plant-like obstacles")
+- Include related tips or easily-missed details when they're in the context
+- Do NOT invent details that aren't in the provided context`,
 };
 
 // ===== CONTENT TYPE CLASSIFIER =====
@@ -123,14 +119,18 @@ function classifyContentType(question: string): string | null {
   const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
+  // EXPLORATION — location/navigation queries (BEFORE mechanic so "how do I solve the X Labyrinth"
+  // routes to exploration, not mechanic via a bare "how do" match). Also catches dungeon-style
+  // level names (labyrinth/ruin/tower) regardless of how the sentence is phrased.
+  if (/\b(where is|how do i get to|how to reach|how do i (solve|complete|clear|finish)|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|ruin|ruins|tower|temple|crypt|catacomb|sanctum)\b/.test(q)) return "exploration";
+
   // QUEST — story/objective keywords
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
 
-  // EXPLORATION — location/navigation queries (but not "where do I get" item questions — those matched above)
-  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter)\b/.test(q)) return "exploration";
-
-  // MECHANIC/SKILL — systems questions
-  if (/\b(skill|ability|talent|passive|active|skill tree|upgrade|how does|how do|mechanic|system|stamina|stat|attribute|combo|aerial|mount)\b/.test(q)) return "mechanic";
+  // MECHANIC/SKILL — systems questions. Removed bare "how do" / "how does" catch-all —
+  // it was misrouting specific-topic questions ("how do I solve X?", "how do I get Y?")
+  // to mechanic. Keep "how does the X work" since that phrasing is genuinely systems-y.
+  if (/\b(skill|ability|talent|passive|active|skill tree|upgrade|mechanic|system|stamina|stat|attribute|combo|aerial|mount|how does the .+ work|how does .+ work)\b/.test(q)) return "mechanic";
 
   // CHARACTER/NPC — lore/story character questions
   if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane)\b/.test(q)) return "character";
@@ -141,13 +141,25 @@ function classifyContentType(question: string): string | null {
 const BASE_SYSTEM_PROMPT = `You are an expert Crimson Desert game companion AI. You help players with quests, puzzles, bosses, items, mechanics, crafting, and exploration.
 
 Rules:
-- ONLY answer based on the provided context. If the context doesn't directly answer the question, pick ONE of these responses at random and say NOTHING else:
+- ONLY answer based on the provided context. If the context doesn't directly answer the question, pick ONE of these snarky lines at random, then follow it immediately with the scope-explainer block below. Output NOTHING else beyond those two parts.
+  Snarky lines:
   "I haven't been trained on that yet... maybe you should just man up and figure it out yourself."
   "No clue on that one. Skill issue."
   "My database is empty on this. You're on your own, adventurer."
   "Haven't learned that one yet. Just don't die, I guess."
   "I got nothing. Sounds like a you problem."
-  Do NOT add anything after the line. No partial matches, no suggestions, no follow-ups.
+
+  Scope-explainer block (output exactly this after the snarky line, including the separator):
+
+  ---
+
+  **What I'm built for:** I'm your Crimson Desert companion for specific in-game questions — boss strategies, enemy weaknesses, weapon/armor/accessory stats and locations, skill details, quest objectives, NPC info, and region/landmark directions. Try asking something like:
+  - *"How do I beat Reed Devil?"*
+  - *"Where do I find the Hwando Sword?"*
+  - *"What does the Focused Shot skill do?"*
+  - *"How do I get to Greymane Camp?"*
+
+  I'm not great at broad overview questions yet ("list all recovery items", "general combat tips"). Ask about a specific thing and I've got you.
 - Use game-specific terminology (Abyss Artifacts, Pywel, Greymane, etc.)
 - Format for quick mobile scanning: short paragraphs, bold key actions
 - Never spoil content beyond what the player asks about
@@ -155,7 +167,12 @@ Rules:
 
 export async function POST(req: NextRequest) {
   try {
-    const { question, spoilerTier = "guide" } = await req.json();
+    const rawBody = await req.json();
+    const question = rawBody.question;
+    // Default to "nudge" (cheapest, preserves discovery). Map legacy "guide" → "full".
+    let spoilerTier: string = rawBody.spoilerTier || "nudge";
+    if (spoilerTier === "guide") spoilerTier = "full";
+    if (spoilerTier !== "nudge" && spoilerTier !== "full") spoilerTier = "nudge";
 
     if (!question || typeof question !== "string") {
       return NextResponse.json(
@@ -219,7 +236,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ===== RESPONSE CACHE CHECK =====
-    const tierConfig = TIER_CLAUDE[spoilerTier] || TIER_CLAUDE.guide;
+    const tierConfig = TIER_CLAUDE[spoilerTier] || TIER_CLAUDE.nudge;
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data: cachedQuery } = await supabase
       .from("queries")
@@ -317,8 +334,10 @@ export async function POST(req: NextRequest) {
             .filter((w: string) => w.length > 3 && w[0] === w[0].toUpperCase()) // likely proper nouns
             .slice(0, 4);
 
-          // Also grab multi-word item/boss names (e.g. "Skyblazer Cloth Helm", "Stoneback Crab")
-          const quotedNames = question.match(/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g) || [];
+          // Also grab multi-word item/boss names. The `(?:'s)?` tolerates possessive
+          // apostrophes so "Saint's Necklace" and "Kailok's Lair" are captured as a
+          // single multi-word term (was previously broken — apostrophe split the match).
+          const quotedNames = question.match(/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g) || [];
           const allBoostTerms = [...new Set([...boostKeywords, ...quotedNames])];
 
           if (allBoostTerms.length > 0) {
@@ -329,6 +348,10 @@ export async function POST(req: NextRequest) {
             // URL-encoded wiki URLs use + for spaces, so convert terms accordingly.
             // Only use multi-word or long terms for URL matching — short single words
             // like "Crimson" would match the domain name (crimsondesert.wiki...)
+            // URL-encoded wiki URLs: spaces → +, apostrophes stay literal (Fextralife
+            // URLs like /Saint's+Necklace keep the apostrophe). Only multi-word terms
+            // are used for URL matching — single words like "Crimson" would match the
+            // domain name (crimsondesert.wiki...).
             const urlTerms = allBoostTerms
               .filter((t: string) => t.includes(" "))
               .map((t: string) => t.replace(/\s+/g, "+"));
@@ -368,10 +391,14 @@ export async function POST(req: NextRequest) {
               const newKeywordChunks = keywordChunks
                 .filter((c: any) => !existingIds.has(c.id))
                 .map((c: any) => {
-                  // URL matches get higher baseline similarity than content-only matches
+                  // URL matches are strong signal — user named the page, so the page
+                  // should dominate over any semantically-near-but-wrong vector hits.
+                  // Previous baseline (0.55) lost the rerank to 0.79+ filtered vector
+                  // results about unrelated pages. 0.88 puts URL matches above typical
+                  // vector scores for wrong-topic content.
                   const isUrlMatch = urlTerms.some((t: string) =>
                     String(c.source_url || "").toLowerCase().includes(t.toLowerCase()));
-                  return { ...c, similarity: isUrlMatch ? 0.55 : 0.40, keywordBoost: true };
+                  return { ...c, similarity: isUrlMatch ? 0.88 : 0.40, keywordBoost: true };
                 });
 
               if (newKeywordChunks.length > 0) {
@@ -392,9 +419,11 @@ export async function POST(req: NextRequest) {
               const baseSim = Number(c.similarity || 0.3);
               // Boost per general term match
               let boost = Math.min(0.10, termHits * 0.02);
-              // Bigger boost if chunk is FROM the page about the topic (URL match)
+              // Bigger boost if chunk is FROM the page about the topic (URL match).
+              // Raised from 0.15 → 0.25 so URL matches win the rerank over unrelated
+              // filtered-vector results in the 0.78–0.90 sim range.
               if (urlTermsForRerank.some((t: string) => sourceUrl.includes(t))) {
-                boost += 0.15;
+                boost += 0.25;
               }
               // Medium boost if proper noun appears in content
               for (const pn of allBoostTerms) {
@@ -461,7 +490,12 @@ export async function POST(req: NextRequest) {
       "Haven't learned that one yet. Just don't die, I guess.",
       "I got nothing. Sounds like a you problem.",
     ];
-    const randomNoInfo = () => NO_INFO_RESPONSES[Math.floor(Math.random() * NO_INFO_RESPONSES.length)];
+    // Appended to every no-info response so users understand what the app IS good at.
+    // Keeps expectations aligned with the current knowledge base strengths.
+    const SCOPE_EXPLAINER =
+      "\n\n---\n\n**What I'm built for:** I'm your Crimson Desert companion for specific in-game questions — boss strategies, enemy weaknesses, weapon/armor/accessory stats and locations, skill details, quest objectives, NPC info, and region/landmark directions. Try asking something like:\n- *\"How do I beat Reed Devil?\"*\n- *\"Where do I find the Hwando Sword?\"*\n- *\"What does the Focused Shot skill do?\"*\n- *\"How do I get to Greymane Camp?\"*\n\nI'm not great at broad overview questions yet (\"list all recovery items\", \"general combat tips\"). Ask about a specific thing and I've got you.";
+    const randomNoInfo = () =>
+      NO_INFO_RESPONSES[Math.floor(Math.random() * NO_INFO_RESPONSES.length)] + SCOPE_EXPLAINER;
 
     // Check if we have genuinely relevant results (not just partial keyword matches)
     const hasRelevantContext = chunks && chunks.length > 0 && (
@@ -490,7 +524,7 @@ export async function POST(req: NextRequest) {
         })) || [];
 
     // Step 3: Call Claude
-    const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${SPOILER_INSTRUCTIONS[spoilerTier] || SPOILER_INSTRUCTIONS.guide}`;
+    const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${SPOILER_INSTRUCTIONS[spoilerTier] || SPOILER_INSTRUCTIONS.full}`;
 
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -574,14 +608,10 @@ function getDemoResponse(question: string, tier: string): string {
     return "That's a great question! Explore the area more carefully — the answer is closer than you think.";
   }
 
-  if (tier === "guide") {
-    if (q.includes("labyrinth") || q.includes("puzzle"))
-      return "**1.** Enter the labyrinth and take the left path at the first fork.\n**2.** Look for the glowing rune on the north wall — interact with it.\n**3.** This opens a hidden passage. Follow it to the central chamber.\n**4.** In the central chamber, activate the three pillars in order: left, right, center.";
-    if (q.includes("boss") || q.includes("kailok") || q.includes("hornsplitter"))
-      return "**Phase 1:** Stay at mid-range. Dodge his charge attack by rolling to the right.\n**Phase 2:** When he glows red, he's about to do an AoE — back away.\n**Phase 3:** Use fire-based attacks for extra damage. His weak point is his back legs.\n\n**Tip:** Bring at least 5 healing potions.";
-    return "I'd love to help with that! This is a **demo response** — connect your Claude API key in `.env.local` to get real AI-powered answers from the knowledge base.";
-  }
-
-  // Full solution
-  return `This is a **demo response** showing how the full solution tier works.\n\nTo get real answers powered by AI:\n1. Get a Claude API key from **console.anthropic.com**\n2. Add it to \`.env.local\` as \`ANTHROPIC_API_KEY\`\n3. Add an OpenAI key for embeddings as \`OPENAI_API_KEY\`\n4. Seed the knowledge base with game content\n\nOnce connected, this tier provides complete detailed walkthroughs with sources.`;
+  // Solution tier (full)
+  if (q.includes("labyrinth") || q.includes("puzzle"))
+    return "**1.** Enter the labyrinth and take the left path at the first fork.\n**2.** Look for the glowing rune on the north wall — interact with it.\n**3.** This opens a hidden passage. Follow it to the central chamber.\n**4.** In the central chamber, activate the three pillars in order: left, right, center.";
+  if (q.includes("boss") || q.includes("kailok") || q.includes("hornsplitter"))
+    return "**Phase 1:** Stay at mid-range. Dodge his charge attack by rolling to the right.\n**Phase 2:** When he glows red, he's about to do an AoE — back away.\n**Phase 3:** Use fire-based attacks for extra damage. His weak point is his back legs.\n\n**Tip:** Bring at least 5 healing potions.";
+  return `This is a **demo response**. To get real AI-powered answers:\n1. Get a Claude API key from **console.anthropic.com** → \`ANTHROPIC_API_KEY\`\n2. Get a Voyage AI key from **dash.voyageai.com** → \`VOYAGE_API_KEY\`\n3. Add both to \`.env.local\`\n4. Seed the knowledge base via \`scripts/ingest-fextralife.ts\``;
 }

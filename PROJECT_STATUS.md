@@ -1,10 +1,10 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-03 (session 6)
+**Last updated:** 2026-04-04 (session 8)
 
 ## Overview
 
-AI-powered game companion for Crimson Desert. Players ask questions about quests, puzzles, bosses, items, and mechanics, and get answers filtered through a spoiler-tier system (Nudge / Guide / Full Solution).
+AI-powered game companion for Crimson Desert. Players ask questions about quests, puzzles, bosses, items, and mechanics, and get answers filtered through a two-tier spoiler system (Nudge / Solution).
 
 ## Tech Stack
 
@@ -26,7 +26,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 ### What's Built and Working
 
 - [x] **Chat UI** - Dark-themed chat interface with message bubbles, loading animation, sample starter questions
-- [x] **Spoiler Tier System** - Three tiers (Nudge/Guide/Full) with distinct system prompts. **Default tier is `nudge`** (cheapest, preserves discovery — changed from `guide`).
+- [x] **Spoiler Tier System** - **Two tiers** (Nudge / Solution) with distinct system prompts. Collapsed from 3 tiers in v0.6.0 — the old middle "Guide" tier was indistinguishable from "Full" in practice. Default tier is `nudge` (cheapest, preserves discovery). Legacy `guide` values in DB are folded into `full` at read time.
 - [x] **RAG metadata pre-filtering** — `classifyContentType()` classifier narrows vector search to matching content_type (boss/item/quest/exploration/mechanic/recipe/character). Auto-fallback to unfiltered search if 0 results. `match_knowledge_chunks` RPC updated with optional `content_type_filter TEXT DEFAULT NULL` param.
 - [x] **Chunk splitting & overlap** — `chunkPageContent()` now splits sections >800 chars into ~500-char sub-chunks with 150-char intra-section overlap and 120-char inter-section overlap prefix. Fixes item chunks that averaged 666 chars (303 over 1500). **Existing ingested chunks pre-date this change — re-ingest needed to apply to all categories.**
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
@@ -35,7 +35,8 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
   - Text-search fallback with keyword ranking when vector search returns no results
   - Relevance threshold checks (similarity > 0.5 for vector, >= 2 keyword matches for text)
   - **Response caching**: checks `queries` table for identical question+tier in last 7 days before calling any AI API
-  - **Per-tier Claude config**: Nudge→Haiku (150 tok, 3 chunks), Guide→Sonnet (600 tok, 6 chunks), Full→Sonnet (1024 tok, 8 chunks)
+  - **Per-tier Claude config**: Nudge→Haiku (150 tok, 3 chunks), Full/Solution→Sonnet (1024 tok, 8 chunks)
+  - **No-info fallback scope explainer**: when retrieval returns nothing relevant, the snarky line is followed by a structured "What I'm built for" block with 4 example queries, redirecting users toward the app's strengths (bosses, weapons, skills, NPCs, locations)
   - **Single Supabase client** per request (was two separate clients)
   - **Bug fixed**: `match_knowledge_chunks` parameter changed from `vector` to `vector(1024)` — untyped vector caused silent corruption of query embeddings through PostgREST
 - [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
@@ -55,28 +56,53 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap).
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
 
-#### Ingest status (2026-04-03)
-| Category | Status | Notes |
-|----------|--------|-------|
-| bosses | ✅ Done | Pre-overlap chunking |
-| enemies | ✅ Done | Pre-overlap chunking |
-| quests | ✅ Done | Pre-overlap chunking |
-| walkthrough | ✅ Done | Pre-overlap chunking |
-| weapons | ✅ Done | Pre-overlap chunking |
-| armor | ✅ Done | Pre-overlap chunking |
-| abyss-gear | ✅ Done | Pre-overlap chunking |
-| accessories | 🔄 In progress | PID 38332 (detached PowerShell) |
-| items | ⏳ Pending | — |
-| collectibles | ⏳ Pending | — |
-| key-items | ⏳ Pending | — |
-| locations | ⏳ Pending | — |
-| characters | ⏳ Pending | — |
-| npcs | ⏳ Pending | — |
-| skills | ⏳ Pending | — |
-| crafting | ⏳ Pending | — |
-| guides | ⏳ Pending | — |
+#### Ingest status (2026-04-04) — full reseed COMPLETE
+All 17 categories ingested with the new chunk-overlap format. Total: **82,312 chunks**.
 
-**After full reseed completes**: re-run already-done categories (`--category bosses` etc.) to apply new chunk overlap format.
+| Category | Chunks (approx) | Pages |
+|----------|----------------|-------|
+| bosses | ✅ | 47 |
+| enemies | ✅ | 7 |
+| quests | ✅ | 247 |
+| walkthrough | ✅ | 228 |
+| weapons | ✅ | 460 |
+| armor | ✅ | 243 |
+| abyss-gear | ✅ | 166 |
+| accessories | ✅ | 75 |
+| items | ✅ | 351 |
+| collectibles | ✅ | 58 |
+| key-items | ✅ | 63 |
+| locations | 1677 | 195 |
+| characters | 863 | 85 |
+| npcs | 1523 | 168 |
+| skills | 1365 | 159 |
+| crafting | 607 | 36 |
+| guides | 2 | — |
+
+Avg chunk length by content_type (all under the 800-char split threshold, confirms overlap format applied): boss 429, quest 280, item 519 (down from pre-overlap 666), exploration 458, mechanic 482, recipe 468, character 299.
+
+#### RAG quality baseline (2026-04-04, post-reseed)
+Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42/59 passed (71.2%)**, avg similarity 0.777.
+
+Strong (100% pass): bosses, enemies, armor, abyss-gear, accessories, collectibles, locations, characters, npcs.
+
+Weak categories needing attention:
+- **items** 25% (3 fail) — "recovery items list", "crafting materials info", "grilled meat / healing items" all return no chunks
+- **walkthrough** 33% (2 fail) — "game progress route overview", "main quest order"
+- **guides** 33% (6 fail) — mostly "no chunks" for generic guide queries (new player tips, housing, combat tips, grapple, stamina, upgrade/refining). Note: `guides` only has 2 chunks — the category is essentially empty
+- **key-items** 50% (1 fail), **crafting** 50% (1 fail), **quests** 60% (2 fail)
+- **weapons** 80%, **skills** 80% (1 fail each)
+
+**Action items**: (1) `guides` category returned only 2 chunks — ingest crawler isn't finding guide pages; needs investigation. (2) `items` failures are around generic category queries that don't match specific item pages — may need a "category overview" synthesized chunk. (3) Most "weapons/skills" passes came via URL-match boost rather than pure semantic sim.
+
+#### Starter question retrieval fixes (2026-04-04, session 8, v0.6.1)
+All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 and `scripts/debug-starters-full-pipeline.ts`):
+- Classifier now routes "how do I solve the X Labyrinth" → `exploration` (was `mechanic` via bare `how do` match). Exploration regex moved above mechanic; added labyrinth/ruin/tower/dungeon keywords.
+- URL-match boost `quotedNames` regex fixed to handle possessive apostrophes — "Saint's Necklace" now matches as a multi-word term (was silently returning Crossroads Necklace).
+- URL-match baseline similarity raised 0.55 → 0.88, rerank boost 0.15 → 0.25. When user explicitly names a page, that page now dominates the top 5.
+
+**DB admin task still open**: `DROP FUNCTION public.match_knowledge_chunks(vector(1024), float, int);` needs to be run in Supabase SQL editor — the old 3-arg version coexists with the 4-arg version and breaks the unfiltered-retry path plus any question where the classifier returns `null`. See CHANGELOG v0.6.1 Known Issue.
+
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
