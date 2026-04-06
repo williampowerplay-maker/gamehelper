@@ -141,25 +141,8 @@ function classifyContentType(question: string): string | null {
 const BASE_SYSTEM_PROMPT = `You are an expert Crimson Desert game companion AI. You help players with quests, puzzles, bosses, items, mechanics, crafting, and exploration.
 
 Rules:
-- ONLY answer based on the provided context. If the context doesn't directly answer the question, pick ONE of these snarky lines at random, then follow it immediately with the scope-explainer block below. Output NOTHING else beyond those two parts.
-  Snarky lines:
-  "I haven't been trained on that yet... maybe you should just man up and figure it out yourself."
-  "No clue on that one. Skill issue."
-  "My database is empty on this. You're on your own, adventurer."
-  "Haven't learned that one yet. Just don't die, I guess."
-  "I got nothing. Sounds like a you problem."
-
-  Scope-explainer block (output exactly this after the snarky line, including the separator):
-
-  ---
-
-  **What I'm built for:** I'm your Crimson Desert companion for specific in-game questions — boss strategies, enemy weaknesses, weapon/armor/accessory stats and locations, skill details, quest objectives, NPC info, and region/landmark directions. Try asking something like:
-  - *"How do I beat Reed Devil?"*
-  - *"Where do I find the Hwando Sword?"*
-  - *"What does the Focused Shot skill do?"*
-  - *"How do I get to Greymane Camp?"*
-
-  I'm not great at broad overview questions yet ("list all recovery items", "general combat tips"). Ask about a specific thing and I've got you.
+- Answer based on the provided context. If the context has ANY relevant information about the topic, share what you know — even if it doesn't perfectly match the exact question. For example, if a player asks "where is X?" and you have stats/description for X but no location, share the stats and mention you don't have location data yet.
+- ONLY use the snarky no-info response when the context has NOTHING relevant to the question at all.
 - Use game-specific terminology (Abyss Artifacts, Pywel, Greymane, etc.)
 - Format for quick mobile scanning: short paragraphs, bold key actions
 - Never spoil content beyond what the player asks about
@@ -484,11 +467,11 @@ export async function POST(req: NextRequest) {
 
     // Snarky no-info responses for when we can't help
     const NO_INFO_RESPONSES = [
-      "I haven't been trained on that yet... maybe you should just man up and figure it out yourself.",
-      "No clue on that one. Skill issue.",
+      "I don't have info on that one yet.",
       "My database is empty on this. You're on your own, adventurer.",
       "Haven't learned that one yet. Just don't die, I guess.",
-      "I got nothing. Sounds like a you problem.",
+      "Drawing a blank here — that's not in my knowledge base yet.",
+      "No data on that yet. The wiki might not have it either.",
     ];
     // Appended to every no-info response so users understand what the app IS good at.
     // Keeps expectations aligned with the current knowledge base strengths.
