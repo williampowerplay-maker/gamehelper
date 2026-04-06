@@ -52,37 +52,28 @@ function getClientIp(req: NextRequest): string {
 
 // Spoiler tier system prompt instructions
 const SPOILER_INSTRUCTIONS: Record<string, string> = {
-  nudge: `You are a Crimson Desert game guide. The player wants a NUDGE — a gentle directional hint that preserves the satisfaction of figuring it out themselves.
+  nudge: `The player wants a NUDGE — a gentle hint that preserves discovery.
 
-General rules:
-- Keep it to 1-2 sentences maximum. HARD LIMIT.
-- Use encouraging language
-- NEVER reveal exact solutions, codes, sequences, or specific numbers
-- NEVER name the exact item, weapon, or reward they'll get
-- If the context doesn't directly answer their question, follow the base fallback rule: pick one snarky line AND then output the scope-explainer block exactly as specified in the base rules. Do not add partial matches, suggestions, or follow-up questions beyond those two parts.
+Rules:
+- 2-3 sentences max. Be concise.
+- Point them in the right direction without giving the answer
+- Share factual details from the context (stats, location names, descriptions) — those aren't spoilers
+- Only withhold step-by-step solutions, exact sequences, and boss cheese strats
+- If the context has useful info, always share it — even a nudge should be helpful, not vague
 
-Adapt your nudge based on the type of question:
+By question type:
+PUZZLES: Name the mechanic or ability involved, not the exact sequence.
+ITEMS: Name the area or how to obtain, not step-by-step directions.
+BOSSES: Give one key insight (weakness, phase trigger, prep tip), not the full strategy.
+MECHANICS: Be generous — game systems aren't spoilers. Explain how it works.
+EXPLORATION: Share the location description and nearby landmarks from the context.`,
 
-PUZZLES: Hint at the mechanic or tool involved, never the sequence or solution.
-  Good: "Have you tried interacting with the environment using one of your force abilities?"
-  Bad: "Use Force Push on walls 2 and 3 on the left" (that's the answer)
+  full: `The player wants the FULL SOLUTION — complete, specific, nothing held back.
 
-ITEM/GEAR LOCATIONS: Name the general area or landmark, never the exact building, room, or container.
-  Good: "One of the manors on the north side of Hernand has something special hidden upstairs."
-  Bad: "Go to Lion Crest Manor barracks, climb the window, open the chest" (that's a walkthrough)
-
-BOSS FIGHTS: Give one defensive or preparation tip, never the full strategy or cheese method.
-  Good: "This boss punishes aggression — focus on learning when it's safe to attack after his combos."
-  Bad: "Hide behind the pillar and hit him after his spear throw" (that's the strategy)
-
-MECHANICS/SYSTEMS: You can be slightly more generous here since there's less to spoil, but still keep it brief.
-  Good: "There's a skill tree that directly affects how long you can stay airborne — worth investing in early."
-  Bad: "Put 4 points into the stamina blue tree to get 200 stamina for aerial maneuver" (too specific)`,
-
-  full: `You are a Crimson Desert game guide. The player wants the SOLUTION — a complete, specific answer with nothing held back.
-- Provide the complete answer: item locations, exact boss strategies and move patterns, quest objectives, skill effects, stats
-- Format for quick mobile scanning: short paragraphs, bold key actions/items/numbers (wrap in **), numbered steps when sequence matters
-- Be specific but don't pad with filler (e.g., "Shoot a fire arrow at the vines on the 2nd floor door" not "You might want to consider using some kind of fire-based attack on the plant-like obstacles")
+Rules:
+- Provide everything: exact locations, full boss strategies with phase breakdowns, quest steps, stats, skill effects
+- Format for mobile: short paragraphs, **bold key info**, numbered steps when order matters
+- Be direct — "Shoot a fire arrow at the 2nd floor vines" not "You might want to consider using fire-based attacks"
 - Include related tips or easily-missed details when they're in the context
 - Do NOT invent details that aren't in the provided context`,
 };
@@ -101,12 +92,14 @@ function classifyContentType(question: string): string | null {
   const q = question.toLowerCase();
 
   // BOSS — fight-specific verbs + known boss names
+  // Must come before mechanic/skill since "how do I beat X" is a boss question
   const bossNames = [
     "kailok", "hornsplitter", "hernand", "ludvig", "gregor", "fortain",
     "gabriel", "lucian", "bastier", "walter", "lanford", "master du",
     "antumbra", "crimson warden", "crimson nightmare", "hexe marie",
     "demeniss", "trukan", "delesyia", "pailune", "saigord", "staglord",
     "reed devil", "blinding flash", "grave walker", "icewalker",
+    "white horn", "stoneback crab", "taming dragon",
   ];
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
@@ -114,39 +107,38 @@ function classifyContentType(question: string): string | null {
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
   if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
 
+  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions
+  // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
+
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
   const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
-  // EXPLORATION — location/navigation queries (BEFORE mechanic so "how do I solve the X Labyrinth"
-  // routes to exploration, not mechanic via a bare "how do" match). Also catches dungeon-style
-  // level names (labyrinth/ruin/tower) regardless of how the sentence is phrased.
-  if (/\b(where is|how do i get to|how to reach|how do i (solve|complete|clear|finish)|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|ruin|ruins|tower|temple|crypt|catacomb|sanctum)\b/.test(q)) return "exploration";
+  // EXPLORATION — location/navigation/dungeon queries
+  // Catches "how do I get to X", dungeon names, and navigation questions
+  if (/\b(where is|how do i get to|how to reach|how do i (solve|complete|clear|finish)|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|ruin|ruins|tower|temple|crypt|catacomb|sanctum|camp|ranch|gate|basin|falls|grotto|ridge|beacon)\b/.test(q)) return "exploration";
 
   // QUEST — story/objective keywords
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
 
-  // MECHANIC/SKILL — systems questions. Removed bare "how do" / "how does" catch-all —
-  // it was misrouting specific-topic questions ("how do I solve X?", "how do I get Y?")
-  // to mechanic. Keep "how does the X work" since that phrasing is genuinely systems-y.
-  if (/\b(skill|ability|talent|passive|active|skill tree|upgrade|mechanic|system|stamina|stat|attribute|combo|aerial|mount|how does the .+ work|how does .+ work)\b/.test(q)) return "mechanic";
-
   // CHARACTER/NPC — lore/story character questions
-  if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane)\b/.test(q)) return "character";
+  if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
 
   return null; // ambiguous — no filter, full vector search
 }
 
-const BASE_SYSTEM_PROMPT = `You are an expert Crimson Desert game companion AI. You help players with quests, puzzles, bosses, items, mechanics, crafting, and exploration.
+const BASE_SYSTEM_PROMPT = `You are an expert companion AI for Crimson Desert, an open-world action-adventure RPG set on the continent of Pywel. The player controls Kliff, a member of the Greymanes faction, rebuilding after an ambush by the Black Bears. The game emphasizes creative combat (weapon skills, grappling, elemental buffs, mount combat), exploration across 5 regions (Pailune, Hernand, Demenis, Delesyia, and the Crimson Desert), skill learning through observation and Abyss Artifacts, and camp management at Greymane Camp.
 
 Rules:
-- Answer based on the provided context. If the context has ANY relevant information about the topic, share what you know — even if it doesn't perfectly match the exact question. For example, if a player asks "where is X?" and you have stats/description for X but no location, share the stats and mention you don't have location data yet.
-- ONLY use the snarky no-info response when the context has NOTHING relevant to the question at all.
-- Use game-specific terminology (Abyss Artifacts, Pywel, Greymane, etc.)
-- Format for quick mobile scanning: short paragraphs, bold key actions
-- Never spoil content beyond what the player asks about
-- Be warm and encouraging — the player is stuck and needs help`;
+- Answer based on the provided context. Extract and share EVERY useful detail — locations mentioned in descriptions, stats, related quests, NPC connections, nearby landmarks. If a description says "hidden beneath the ruins of X", that IS location info — surface it.
+- If the context has relevant information but doesn't fully answer the question, share what you have and clearly say what's missing. Never discard partial matches.
+- ONLY use the no-info fallback when the context has absolutely NOTHING relevant.
+- Do NOT invent details that aren't in the context. If you're unsure, say so.
+- Use game terminology naturally (Abyss Artifacts, Pywel, Greymane Camp, etc.)
+- Format for quick mobile scanning: short paragraphs, **bold key info** (locations, item names, stats, actions)
+- Never spoil story content beyond what the player asks about`;
 
 export async function POST(req: NextRequest) {
   try {
@@ -467,11 +459,11 @@ export async function POST(req: NextRequest) {
 
     // Snarky no-info responses for when we can't help
     const NO_INFO_RESPONSES = [
-      "I don't have info on that one yet.",
-      "My database is empty on this. You're on your own, adventurer.",
-      "Haven't learned that one yet. Just don't die, I guess.",
-      "Drawing a blank here — that's not in my knowledge base yet.",
-      "No data on that yet. The wiki might not have it either.",
+      "I don't have info on that one yet — the wiki may not have it documented.",
+      "That's not in my knowledge base yet. Try rephrasing or asking about something more specific.",
+      "Drawing a blank here. My knowledge covers bosses, items, quests, and locations — but not everything is documented yet.",
+      "Haven't learned that one yet. The Crimson Desert wiki is still growing!",
+      "No data on that yet. Try asking about a specific boss, item, skill, or location.",
     ];
     // Appended to every no-info response so users understand what the app IS good at.
     // Keeps expectations aligned with the current knowledge base strengths.
@@ -496,7 +488,11 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ answer: randomNoInfo(), sources: [] });
     }
 
-    const context = chunks!.map((c) => String(c.content || "")).join("\n\n---\n\n");
+    const context = chunks!.map((c) => {
+      const url = String(c.source_url || "");
+      const pageName = decodeURIComponent(url.split("/").pop() || "").replace(/\+/g, " ");
+      return `[Source: ${pageName}]\n${String(c.content || "")}`;
+    }).join("\n\n---\n\n");
 
     const sources =
       chunks
