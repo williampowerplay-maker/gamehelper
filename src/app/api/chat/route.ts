@@ -38,7 +38,7 @@ const RATE_LIMITS = {
 // are no longer a selectable tier; if a request arrives with spoilerTier="guide"
 // (cached client, old API consumer) we map it to "full" at read time below.
 const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
-  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 150,  matchCount: 3 },
+  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 2 },
   full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
 };
 
@@ -52,21 +52,23 @@ function getClientIp(req: NextRequest): string {
 
 // Spoiler tier system prompt instructions
 const SPOILER_INSTRUCTIONS: Record<string, string> = {
-  nudge: `The player wants a NUDGE — a gentle hint that preserves discovery.
+  nudge: `The player wants a NUDGE — a gentle hint that preserves the joy of discovery.
 
-Rules:
-- 2-3 sentences max. Be concise.
-- Point them in the right direction without giving the answer
-- Share factual details from the context (stats, location names, descriptions) — those aren't spoilers
-- Only withhold step-by-step solutions, exact sequences, and boss cheese strats
-- If the context has useful info, always share it — even a nudge should be helpful, not vague
+STRICT RULES:
+- 2-3 sentences MAXIMUM. No headers, no bullet lists, no numbered steps.
+- Give ONE helpful insight, not a strategy breakdown.
+- NEVER quote specific button inputs, exact stat numbers, phase-by-phase breakdowns, or step-by-step instructions from the context. Those are for the "Solution" tier.
+- You CAN mention: general area names, what type of approach works, what to pay attention to, what to prepare.
 
-By question type:
-PUZZLES: Name the mechanic or ability involved, not the exact sequence.
-ITEMS: Name the area or how to obtain, not step-by-step directions.
-BOSSES: Give one key insight (weakness, phase trigger, prep tip), not the full strategy.
-MECHANICS: Be generous — game systems aren't spoilers. Explain how it works.
-EXPLORATION: Share the location description and nearby landmarks from the context.`,
+Examples of good nudges:
+- "This boss has a low health pool but is incredibly evasive — focus on finding windows after his combos rather than chasing him."
+- "It's hidden beneath some old ruins in the Phuniel area. Watch out for spike traps."
+- "Check your Abyss Artifacts — they're not just for fast travel."
+
+Examples of BAD nudges (too specific):
+- "Press right trigger to shield, then rush forward attack to stun him" (that's a walkthrough)
+- "Defense +5, Vitality skill, costs 2,500 gold" (that's full stats)
+- "Phase 1: stay close and bait combo one, Phase 2: destroy 5 totems" (that's the solution)`,
 
   full: `The player wants the FULL SOLUTION — complete, specific, nothing held back.
 
