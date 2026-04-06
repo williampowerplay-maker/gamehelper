@@ -4,6 +4,44 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.7.0] - 2026-04-05 (Prompt Tuning, DB Cleanup, Item Location Supplement)
+
+### Database Cleanup
+- **Removed 72,702 duplicate chunks** (same source_url + same content from multiple ingest runs). DB went from 99,045 → 26,343 unique chunks.
+- **Removed 9,527 nav-list junk chunks** (sidebar `♦ item1 ♦ item2...` lists). DB went from 26,343 → 16,816 real content chunks.
+- **Added 529 "How to Obtain / Where to Find" chunks** for items via new `scripts/supplement-item-locations.ts`. Captures location, vendor, crafting, and boss-drop acquisition methods that the main crawler missed.
+
+### Prompt Tuning (Full Pass)
+- **System prompt rewritten** with game world context (Pywel, Kliff, Greymanes, 5 regions, combat systems). Claude now sounds knowledgeable about Crimson Desert instead of generic.
+- **Key instruction**: "Extract and share EVERY useful detail — locations mentioned in descriptions, stats, related quests. If a description says 'hidden beneath the ruins of X', that IS location info — surface it."
+- **Partial match handling**: "If context has relevant info but doesn't fully answer, share what you have and say what's missing" — prevents Claude from discarding useful partial context.
+- **Context now includes `[Source: PageName]` metadata** per chunk so Claude knows where info came from.
+
+### Nudge Tier Tightened
+- Explicit rules: no button inputs, no phase breakdowns, no step-by-step instructions, no exact stat numbers
+- Good/bad examples added to calibrate Claude's output
+- Reduced from 3 chunks + 150 tokens to 2 chunks + 100 tokens (less context = less temptation to over-share)
+
+### No-Info Responses Rewritten
+- Removed "man up and figure it out yourself" and "Skill issue" — replaced with helpful suggestions to rephrase or try specific topics
+- Scope explainer updated
+
+### Classifier Fixes
+- Moved skill/mechanic check BEFORE item — "Focused Shot skill" now routes to mechanic (was boss)
+- Added location nouns to exploration regex: camp, ranch, gate, basin, falls, grotto, ridge, beacon — "How do I get to Greymane Camp?" now routes to exploration (was null)
+- Added boss names: White Horn, Stoneback Crab, Taming Dragon
+- Added NPC names: Matthias, Shakatu, Myurdin, Naira, Yann, Grundir
+- Added grapple, observation, abyss artifact to mechanic keywords
+
+### Voyage Embedding Fix
+- Changed query embedding `input_type` from `"document"` to `"query"` — correct vector space for search queries
+
+### Deployment Fixes
+- Fixed Vercel deploy failures: Node.js 24.x → 20.x, reconnected git repo from `crimson-guide` to `gamehelper`
+- Vercel Hobby plan doesn't support git-triggered deploys from collaborators; use `npx vercel --prod` from CLI
+
+---
+
 ## [0.6.1] - 2026-04-04 (Starter Question Retrieval Fixes)
 
 ### Fixed

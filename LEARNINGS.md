@@ -42,7 +42,7 @@ Things discovered during development that are worth remembering across sessions.
 ## Voyage AI
 
 - **Model choice**: Using `voyage-3.5-lite` for embeddings. It's the lightweight model — good balance of cost and quality for a game guide use case.
-- **Use `input_type: "document"` for query embeddings too**: Despite Voyage's docs recommending `input_type: "query"` for retrieval queries, this type's embeddings get corrupted when cast through PostgREST's JSON→`vector(1024)` conversion. Using `input_type: "document"` for both queries and stored chunks gives consistent, correct cosine similarity scores (Kailok query → Kailok chunks score 0.85 vs ~0.33 for unrelated content).
+- **Use `input_type: "query"` for search queries, `"document"` for ingestion**: The earlier note about `"query"` being corrupted was actually a different bug (untyped `vector` parameter). With the `vector(1024)` fix in place, using the correct input types (query for search, document for storage) gives the best similarity scores.
 
 ## Spoiler Tier Prompt Engineering
 
@@ -106,7 +106,24 @@ Things discovered during development that are worth remembering across sessions.
 
 - **Set `nudge` as the default tier** (not `guide`): Nudge uses Haiku (cheapest model, 150 tok, 3 chunks) — ~20x cheaper per query than Sonnet. Most new users haven't chosen their preference yet, so defaulting to the cheapest tier saves significant API cost at scale. Users who want more detail can switch to Guide/Full.
 
+## Database Maintenance
+
+- **Duplicate chunks from multiple ingest runs**: The ingest script does delete-before-insert per URL, but if run multiple times or across different category flags, the same URL can end up with multiple sets of chunks. Fix: deduplicate with `DELETE WHERE id NOT IN (SELECT DISTINCT ON (source_url, md5(content)) id ... ORDER BY created_at DESC)`. Session 9 removed 72,702 dupes (73% of DB).
+- **Nav-list junk chunks**: Fextralife wiki pages have sidebar navigation lists (`♦ item1 ♦ item2 ♦ item3...`) that get captured as chunks. These are pure noise — they contain no useful information about the page topic but compete in vector search results. Fix: `DELETE WHERE content LIKE '%♦%♦%♦%'`. Session 9 removed 9,527 junk chunks (36% of remaining).
+- **Clear query cache after changes**: The `queries` table caches responses for 7 days. After any prompt, DB, or classifier change, `DELETE FROM queries` is required or users will get stale cached responses. Easy to forget.
+- **Supplemental scraping pattern**: When the main crawler misses specific sections (e.g., "How to Obtain" on item pages), build a targeted supplemental scraper that: (1) queries existing URLs from the DB, (2) re-fetches each page, (3) extracts only the missing section, (4) inserts as a new chunk with embedding. Make it idempotent by checking for existing supplemented chunks. This is faster and cheaper than re-crawling everything.
+
+## Prompt Engineering (RAG-specific)
+
+- **Include game world context in system prompt**: Claude produces much better responses when the system prompt includes game-specific knowledge (world name, protagonist, factions, regions, combat systems). Without this, Claude sounds generic and misses connections between chunks.
+- **"Share what you know" beats "only answer if directly relevant"**: An overly strict prompt ("If context doesn't directly answer, say you don't know") causes Claude to discard partially-relevant context. Better: "Share EVERY useful detail from the context, even if it doesn't perfectly match the question. Say what's missing."
+- **Source metadata in context helps**: Prefixing each chunk with `[Source: PageName]` helps Claude identify where info comes from and prioritize.
+- **Nudge tier needs explicit anti-leak rules**: When context contains detailed strategies (button inputs, phase breakdowns), Claude will leak them into nudge responses unless explicitly told not to. Good/bad examples in the prompt are essential. Also: fewer chunks (2 vs 3) and lower max tokens (100 vs 150) help.
+- **Wiki section header variants break extraction**: Fextralife uses "How to Get", "How to Obtain", "How to Craft", "Where to Find" inconsistently across pages. Any regex-based extractor must account for all variants.
+
 ## Deployment
 
-- **Vercel**: The app is configured for Vercel deployment. `next.config.ts` passes through `ANTHROPIC_API_KEY` and `VOYAGE_API_KEY` via the `env` config. On Vercel, set these in the project's environment variables dashboard.
+- **Vercel Hobby plan**: Does not support git-triggered deploys from collaborators. The git author's email must match the Vercel account owner. Fix: deploy via CLI (`npx vercel --prod`) instead of git integration.
+- **Node.js 24.x breaks Vercel builds**: Next.js 16 doesn't support Node 24 yet. Set Node.js version to 20.x in Vercel Settings → General.
+- **Vercel project config can break when changing git connections**: Disconnecting/reconnecting a git repo can corrupt project settings, causing 0ms build failures with no error message. Fix: redeploy a known-good deployment from the dashboard, then use CLI deploys going forward.
 - **`.env.local` manual loader**: The `loadEnv()` function in the API route checks `process.env.VERCEL` to skip file-based env loading in production — Vercel provides env vars directly via `process.env`.

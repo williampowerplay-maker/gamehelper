@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-04 (session 8)
+**Last updated:** 2026-04-05 (session 9)
 
 ## Overview
 
@@ -30,12 +30,12 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] **RAG metadata pre-filtering** — `classifyContentType()` classifier narrows vector search to matching content_type (boss/item/quest/exploration/mechanic/recipe/character). Auto-fallback to unfiltered search if 0 results. `match_knowledge_chunks` RPC updated with optional `content_type_filter TEXT DEFAULT NULL` param.
 - [x] **Chunk splitting & overlap** — `chunkPageContent()` now splits sections >800 chars into ~500-char sub-chunks with 150-char intra-section overlap and 120-char inter-section overlap prefix. Fixes item chunks that averaged 666 chars (303 over 1500). **Existing ingested chunks pre-date this change — re-ingest needed to apply to all categories.**
 - [x] **RAG Pipeline** (`/api/chat/route.ts`)
-  - Voyage AI embedding of user question (`input_type: "document"` — see LEARNINGS.md)
+  - Voyage AI embedding of user question (`input_type: "query"` for searches, `"document"` for ingestion)
   - Supabase pgvector similarity search (`match_knowledge_chunks` RPC, threshold 0.5, count varies by tier)
   - Text-search fallback with keyword ranking when vector search returns no results
   - Relevance threshold checks (similarity > 0.5 for vector, >= 2 keyword matches for text)
   - **Response caching**: checks `queries` table for identical question+tier in last 7 days before calling any AI API
-  - **Per-tier Claude config**: Nudge→Haiku (150 tok, 3 chunks), Full/Solution→Sonnet (1024 tok, 8 chunks)
+  - **Per-tier Claude config**: Nudge→Haiku (100 tok, 2 chunks), Full/Solution→Sonnet (1024 tok, 8 chunks)
   - **No-info fallback scope explainer**: when retrieval returns nothing relevant, the snarky line is followed by a structured "What I'm built for" block with 4 example queries, redirecting users toward the app's strengths (bosses, weapons, skills, NPCs, locations)
   - **Single Supabase client** per request (was two separate clients)
   - **Bug fixed**: `match_knowledge_chunks` parameter changed from `vector` to `vector(1024)` — untyped vector caused silent corruption of query embeddings through PostgREST
@@ -56,8 +56,13 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap).
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
 
-#### Ingest status (2026-04-04) — full reseed COMPLETE
-All 17 categories ingested with the new chunk-overlap format. Total: **82,312 chunks**.
+#### Ingest status (2026-04-05) — cleaned + supplemented
+Original: 82,312 chunks → deduplicated to 26,343 → nav-list junk removed to 16,816 → supplemented with 529 item location chunks = **~17,345 chunks**.
+
+Cleanup performed in session 9:
+- Removed 72,702 duplicates (same source_url + content from multiple ingest runs)
+- Removed 9,527 nav-list junk chunks (sidebar `♦ item ♦ item` lists that wasted vector search slots)
+- Added 529 "How to Obtain / Where to Find" chunks for items via `scripts/supplement-item-locations.ts`
 
 | Category | Chunks (approx) | Pages |
 |----------|----------------|-------|
@@ -79,21 +84,14 @@ All 17 categories ingested with the new chunk-overlap format. Total: **82,312 ch
 | crafting | 607 | 36 |
 | guides | 2 | — |
 
-Avg chunk length by content_type (all under the 800-char split threshold, confirms overlap format applied): boss 429, quest 280, item 519 (down from pre-overlap 666), exploration 458, mechanic 482, recipe 468, character 299.
+#### RAG quality baseline (2026-04-04, post-reseed, pre-cleanup)
+Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42/59 passed (71.2%)**, avg similarity 0.777. Note: this was measured before the session 9 DB cleanup and prompt tuning — actual quality should be significantly better now.
 
-#### RAG quality baseline (2026-04-04, post-reseed)
-Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42/59 passed (71.2%)**, avg similarity 0.777.
-
-Strong (100% pass): bosses, enemies, armor, abyss-gear, accessories, collectibles, locations, characters, npcs.
-
-Weak categories needing attention:
-- **items** 25% (3 fail) — "recovery items list", "crafting materials info", "grilled meat / healing items" all return no chunks
-- **walkthrough** 33% (2 fail) — "game progress route overview", "main quest order"
-- **guides** 33% (6 fail) — mostly "no chunks" for generic guide queries (new player tips, housing, combat tips, grapple, stamina, upgrade/refining). Note: `guides` only has 2 chunks — the category is essentially empty
-- **key-items** 50% (1 fail), **crafting** 50% (1 fail), **quests** 60% (2 fail)
-- **weapons** 80%, **skills** 80% (1 fail each)
-
-**Action items**: (1) `guides` category returned only 2 chunks — ingest crawler isn't finding guide pages; needs investigation. (2) `items` failures are around generic category queries that don't match specific item pages — may need a "category overview" synthesized chunk. (3) Most "weapons/skills" passes came via URL-match boost rather than pure semantic sim.
+#### Prompt tuning test (2026-04-05, session 9)
+10 diverse questions tested via `scripts/prompt-tuning-test.ts` after DB cleanup + classifier fixes:
+- 9/10 returned relevant chunks
+- 1 fail: "Where do I find the Hwando Sword?" — page doesn't exist on wiki (404)
+- Classifier fixes verified: "Focused Shot" → mechanic (was boss), "Greymane Camp" → exploration (was null)
 
 #### Starter question retrieval fixes (2026-04-04, session 8, v0.6.1)
 All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 and `scripts/debug-starters-full-pipeline.ts`):
