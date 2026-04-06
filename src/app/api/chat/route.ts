@@ -276,7 +276,7 @@ export async function POST(req: NextRequest) {
             body: JSON.stringify({
               model: "voyage-3.5-lite",
               input: [question],
-              input_type: "document",  // "query" type loses precision through PostgREST JSON→vector cast
+              input_type: "query",
             }),
           }
         );
