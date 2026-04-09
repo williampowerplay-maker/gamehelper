@@ -43,3 +43,6 @@ desktop.ini
 
 # ingestion logs
 ingest-*.log
+
+# local wiki cache (crawl-wiki.ts output — do not commit, can be large)
+wiki-cache/
