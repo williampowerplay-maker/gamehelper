@@ -317,7 +317,7 @@ export async function POST(req: NextRequest) {
           // Multi-word proper noun sequences (capitalised questions).
           // The `(?:'s)?` tolerates possessive apostrophes so "Saint's Necklace"
           // and "Kailok's Lair" are captured as a single multi-word term.
-          const quotedNames = question.match(/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g) || [];
+          const quotedNames: string[] = question.match(/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g) || [];
 
           // Also extract multi-word topic phrases from lowercase questions by stripping
           // common question prefixes and generic trailing words to isolate the topic name.
