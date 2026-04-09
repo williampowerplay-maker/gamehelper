@@ -109,9 +109,9 @@ function classifyContentType(question: string): string | null {
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
   if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
 
-  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions
+  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
@@ -304,17 +304,36 @@ export async function POST(req: NextRequest) {
           }
 
           // Step B: Keyword boost — extract proper nouns / specific terms from the question
-          // and do an ILIKE search to find chunks that mention them exactly
+          // and do an ILIKE search to find chunks that mention them exactly.
+          // Uses a stop-word filter instead of uppercase-first check so lowercase
+          // questions like "feather of the earth challenge" are handled correctly.
+          const boostStopWords = new Set(["how", "what", "where", "when", "why", "who", "which", "does", "the", "and", "for", "are", "but", "not", "you", "this", "that", "with", "have", "from", "they", "will", "just", "than", "then", "here", "some", "there", "about", "into", "can", "could", "would", "should", "did"]);
           const boostKeywords = question
             .replace(/[^a-zA-Z0-9\s'-]/g, "")
             .split(/\s+/)
-            .filter((w: string) => w.length > 3 && w[0] === w[0].toUpperCase()) // likely proper nouns
-            .slice(0, 4);
+            .filter((w: string) => w.length > 3 && !boostStopWords.has(w.toLowerCase()))
+            .slice(0, 6);
 
-          // Also grab multi-word item/boss names. The `(?:'s)?` tolerates possessive
-          // apostrophes so "Saint's Necklace" and "Kailok's Lair" are captured as a
-          // single multi-word term (was previously broken — apostrophe split the match).
+          // Multi-word proper noun sequences (capitalised questions).
+          // The `(?:'s)?` tolerates possessive apostrophes so "Saint's Necklace"
+          // and "Kailok's Lair" are captured as a single multi-word term.
           const quotedNames = question.match(/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g) || [];
+
+          // Also extract multi-word topic phrases from lowercase questions by stripping
+          // common question prefixes and generic trailing words to isolate the topic name.
+          // e.g. "how to do feather of the earth challenge" → "feather of the earth"
+          const cleanedForPhrase = question
+            .replace(/^(how (to do|to get|to reach|to complete|to find|to unlock|to|do i|does|can i)|where (is|can i find|do i find)|what (is|are|does)|who is|when is|tell me about|explain)\s+/i, "")
+            .replace(/^(the|a|an|do|my)\s+/i, "")
+            .replace(/\s+(challenge|challenges|quest|mission|boss|fight|item|skill|location|area|region|guide|help|tips?|strategy|strategies|ruins?|dungeon)s?\s*$/i, "")
+            .trim();
+          if (
+            cleanedForPhrase.split(/\s+/).length >= 2 &&
+            !quotedNames.some((n) => n.toLowerCase() === cleanedForPhrase.toLowerCase())
+          ) {
+            quotedNames.push(cleanedForPhrase);
+          }
+
           const allBoostTerms = [...new Set([...boostKeywords, ...quotedNames])];
 
           if (allBoostTerms.length > 0) {
