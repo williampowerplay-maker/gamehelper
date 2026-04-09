@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-05 (session 9)
+**Last updated:** 2026-04-09 (session 10)
 
 ## Overview
 
@@ -53,7 +53,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 ### What's NOT Built Yet
 
 - [x] ~~**Knowledge Base Seeding**~~ - 6,382+ chunks ingested from Fextralife wiki as of 2026-04-03. Full reseed in progress with `--deep` (2-level BFS). Re-ingest also needed for chunk overlap update.
-- [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap).
+- [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap). **v5 (2026-04-09)**: Split into 2-phase pipeline — `crawl-wiki.ts` saves wiki pages to local `wiki-cache/`, `ingest-from-cache.ts` chunks+embeds+upserts from cache. Re-chunking or re-embedding no longer requires re-crawling the site. `ingest-state.json` tracks what's been embedded so `--changed-only` skips already-ingested unchanged pages.
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
 
 #### Ingest status (2026-04-05) — cleaned + supplemented
@@ -83,6 +83,7 @@ Cleanup performed in session 9:
 | skills | 1365 | 159 |
 | crafting | 607 | 36 |
 | guides | 2 | — |
+| challenges | ✅ | ~78 |
 
 #### RAG quality baseline (2026-04-04, post-reseed, pre-cleanup)
 Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42/59 passed (71.2%)**, avg similarity 0.777. Note: this was measured before the session 9 DB cleanup and prompt tuning — actual quality should be significantly better now.
@@ -92,6 +93,13 @@ Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42
 - 9/10 returned relevant chunks
 - 1 fail: "Where do I find the Hwando Sword?" — page doesn't exist on wiki (404)
 - Classifier fixes verified: "Focused Shot" → mechanic (was boss), "Greymane Camp" → exploration (was null)
+
+#### Session 10 retrieval fixes (2026-04-09, v0.8.0)
+- **Classifier**: Added `challenge|challenges|mastery|minigame|mini-game` to mechanic regex — challenge questions were returning null classifier (unfiltered search), causing poor retrieval.
+- **URL-match boost case-insensitive**: Replaced uppercase-first filter with stop-word filter. Lowercase questions like "how to do feather of the earth challenge" now generate boost keywords correctly.
+- **cleanedForPhrase extraction**: Strips question prefixes/suffixes to extract the core topic name for URL-match. "how to do feather of the earth challenge" → extracts "feather of the earth" → URL boost fires against correct page.
+- **TypeScript fix**: `quotedNames` explicitly typed as `string[]` to fix Vercel build failure (was inferred as `RegExpMatchArray` → push had type `never`).
+- Verified on production: "how to feather of the earth challenge" returns correct Karin Quarry location + Sealed Abyss Artifact + carry 5 birds objective.
 
 #### Starter question retrieval fixes (2026-04-04, session 8, v0.6.1)
 All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 and `scripts/debug-starters-full-pipeline.ts`):

@@ -4,6 +4,31 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.8.0] - 2026-04-09 (Challenges Ingestion, Retrieval Fixes, 2-Phase Pipeline)
+
+### Content
+- **Challenges category added** — Crawled and ingested the Fextralife Challenges page (`/Challenges`) with all 5 tabs: Exploration, Mastery, Combat, Life, Minigame. ~78 individual challenge pages ingested (e.g. Feather of the Earth, location, unlock method, objective, reward).
+- Added `challenges` to `CATEGORIES` in `scripts/ingest-fextralife.ts` with `contentType: "mechanic"`, `spoilerLevel: 2`, and `/Challenges` to `NAV_PAGES`.
+
+### RAG Retrieval Fixes (`src/app/api/chat/route.ts`)
+- **Classifier — challenge keywords**: Added `challenge|challenges|mastery|minigame|mini-game` to the mechanic regex in `classifyContentType()`. Challenge questions were previously falling through to a null classifier (no content_type filter), causing weak unfiltered vector search.
+- **URL-match boost — case-insensitive for lowercase questions**: Replaced the uppercase-first letter filter on `boostKeywords` with a stop-word filter (`Set` of common English stop words). Previously, a question like "how to do feather of the earth challenge" produced zero boost keywords because none started with a capital letter, falling back to pure vector search. Now any word >3 chars not in the stop list is used as a boost term.
+- **URL-match boost — `cleanedForPhrase` extraction**: Added logic to strip common question prefixes ("how to do", "where is", "what is", etc.) and topic suffixes ("challenge", "quest", "boss", etc.) from the raw question to extract the core multi-word topic name. "how to do feather of the earth challenge" → "feather of the earth" → URL-match fires correctly against `/Feather+of+the+Earth`.
+- **TypeScript fix**: Explicitly typed `quotedNames` as `string[]` (was inferred as `RegExpMatchArray` which has a `readonly`-like `push` type of `never`). Caused a Vercel build failure on the first deploy of the above fix. Fix: `const quotedNames: string[] = question.match(...) || [];`
+
+### Infrastructure
+- **2-phase crawl+ingest pipeline**: Split the monolithic `ingest-fextralife.ts` into two scripts:
+  - `scripts/crawl-wiki.ts` — crawls Fextralife wiki, saves extracted text as JSON to `wiki-cache/pages/{category}/` with a `manifest.json` index. Supports `--deep`, `--changed-only`, `--category`, `--dry-run`.
+  - `scripts/ingest-from-cache.ts` — reads from `wiki-cache/`, chunks, generates Voyage AI embeddings, upserts to Supabase. Maintains `wiki-cache/ingest-state.json` to track what's already been embedded. Supports `--changed-only`.
+  - `wiki-cache/` added to `.gitignore`.
+  - Full deep crawl of all categories kicked off (PID 30320) — results will populate `wiki-cache/` for future re-ingests without re-crawling.
+
+### Deployment
+- Deployed via `git push origin main` (Vercel git integration). Vercel CLI token was expired; git integration works reliably.
+- Build confirmed READY at commit `ae2364c` (retrieval fixes) and `0c544f4` (pipeline scripts).
+
+---
+
 ## [0.7.0] - 2026-04-05 (Prompt Tuning, DB Cleanup, Item Location Supplement)
 
 ### Database Cleanup

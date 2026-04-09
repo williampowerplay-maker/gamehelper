@@ -22,11 +22,19 @@ Things discovered during development that are worth remembering across sessions.
 - **`character` is a reserved word in PostgreSQL**: Quoting as `"character"` is required in both the RETURNS TABLE and SELECT inside the function body.
 - **Don't create overloaded RPC functions via `CREATE OR REPLACE FUNCTION` with different signatures**: Supabase's `CREATE OR REPLACE` only replaces the exact signature — if you add a new parameter, the old version stays in the DB as a second function. PostgREST then can't decide which to call when the caller passes N arguments and errors: `Could not choose the best candidate function`. Fix: explicitly `DROP FUNCTION ... (old signature)` before creating the new signature.
 
+## RAG: Classifier Keyword Coverage
+
+- **Add new content category keywords to the classifier immediately**: When a new wiki category is ingested (e.g. "challenges"), add its keywords to `classifyContentType()` at the same time. If the classifier doesn't recognize "challenge" as a mechanic question, it returns `null` and the search runs unfiltered across all 17,000+ chunks — correct chunks rarely win.
+- **"challenge" questions belong in the mechanic content type**: Challenges in Crimson Desert are game mechanics (life skills, exploration tasks, minigames). Classifier regex: `challenge|challenges|mastery|minigame|mini-game` added to mechanic regex.
+
 ## RAG: URL-Match Keyword Boost
 
 - **When the user names a page, that page should dominate**: The URL-match boost finds chunks whose `source_url` contains a multi-word proper noun from the question (e.g. "Azure Moon Labyrinth" → `ilike %Azure+Moon+Labyrinth%`). Baseline similarity for URL matches must be high enough to beat typical filtered-vector scores on unrelated-but-semantically-near pages. Previous values (0.55 baseline + 0.15 rerank boost = 0.70 final) lost to 0.78–0.90 filtered vector results about wrong pages. Bumped to 0.88 baseline + 0.25 rerank = 1.13 final — URL matches now reliably win.
 - **Possessive apostrophes break naive multi-word regexes**: `/[A-Z][a-z]+(?:\s+[A-Z][a-z]+)+/g` fails on "Saint's Necklace" because `'s` isn't `\s+[A-Z]`. Fix: `/[A-Z][a-z]+(?:'s)?(?:\s+[A-Z][a-z]+(?:'s)?)+/g`. This single character blocked all URL-match boosts for possessive-form item/boss names. Very easy to miss because vector search still returns *something*, just the wrong thing (Crossroads Necklace instead of Saint's Necklace).
 - **URL encoding for Fextralife wiki**: spaces become `+`, but apostrophes stay literal (`/Saint's+Necklace`). The `ilike` pattern has to preserve the apostrophe verbatim.
+- **All-lowercase questions get zero boost keywords if you filter by uppercase-first**: The original `boostKeywords` filter kept only words starting with a capital letter (to find proper nouns). A question like "how to do feather of the earth challenge" has no capital letters → zero boost terms → falls back to pure vector search → wrong page wins. Fix: replace the uppercase-first filter with a stop-word Set. Any word >3 chars not in the stop list is a boost candidate, regardless of case.
+- **Strip question boilerplate to extract the core topic name**: After removing stop words, also strip common question prefixes ("how to do/get/find/complete", "where is", "what is") and topic suffixes ("challenge", "quest", "boss", "fight", "location") from the raw question string. The remaining phrase ("feather of the earth") is the actual page name and can be used for URL-match `ilike` lookup. Without this stripping, the full phrase "how to do feather of the earth challenge" doesn't match the URL `/Feather+of+the+Earth`.
+- **TypeScript: `RegExpMatchArray` is not assignable to `string[]` for push**: `const x = str.match(/regex/g) || []` infers `x` as `RegExpMatchArray | never[]`, which TS narrows to `RegExpMatchArray`. That type has a readonly-like push signature of `(item: never) => number` — pushing any string causes a type error. Fix: explicitly annotate: `const x: string[] = str.match(/regex/g) || [];`
 
 ## Next.js 16 + Node 24
 
@@ -68,6 +76,13 @@ Things discovered during development that are worth remembering across sessions.
 - **Wiki nav exclusion list can hide entire sub-categories**: `/Abyss+Gear` was in the `navPages` exclusion set, so the ingestion script never crawled it and never followed links to it. When adding new wiki categories, check the exclusion set and remove any that should be crawled. The correct pattern: nav-only pages (index pages, UI pages) go in the exclusion set; content pages do not.
 - **1-level crawl misses interconnected content**: The original script crawled Index → linked pages and stopped. Pages like Crow's Pursuit (linked from Abyss Gear, not from Items index) were invisible. Fix: BFS `--deep` mode follows links within level-1 pages to discover level-2 content.
 - **Idempotent ingestion**: Use delete-by-source-url before inserting to safely re-run categories without duplicating chunks. Supabase `knowledge_chunks` has no unique constraint on `source_url`, so without this, re-runs multiply the data.
+- **2-phase crawl+ingest pipeline (added 2026-04-09)**: Split the monolithic crawl→chunk→embed→upsert script into two separate scripts to avoid unnecessary re-crawling:
+  - `scripts/crawl-wiki.ts` — fetches Fextralife wiki pages, saves extracted text + metadata to `wiki-cache/pages/{category}/{slug}.json` with a `manifest.json` index. Supports `--deep`, `--changed-only`, `--category`, `--dry-run`.
+  - `scripts/ingest-from-cache.ts` — reads from `wiki-cache/`, chunks, embeds via Voyage AI, upserts to Supabase. Maintains `wiki-cache/ingest-state.json` to track what's been embedded. Supports `--changed-only` (re-embeds only pages whose cached content hash changed since last ingest).
+  - **When to re-crawl**: Only when wiki content changes. Use `crawl-wiki.ts --changed-only` to fetch only updated pages.
+  - **When to skip re-crawling**: Changing chunking logic, fixing extraction, or adjusting metadata — just run `ingest-from-cache.ts` directly from the existing cache (no wiki hits, no 800ms/page wait).
+  - `wiki-cache/` is gitignored. Re-populate with a full crawl if it gets deleted.
+  - Workflow: `crawl-wiki.ts` (once, or on wiki updates) → `ingest-from-cache.ts` (anytime after)
 
 - **Dual search strategy**: Vector search is primary, text search is fallback. This handles cases where embeddings miss something that simple keyword matching would catch.
 - **Relevance gating**: Similarity threshold for vector results is 0.5 (with `input_type: "document"` embeddings, relevant chunks typically score 0.6–0.85 and unrelated chunks score < 0.4). Text search fallback requires >= 2 keyword matches. Without these gates, Claude would hallucinate from tangentially related chunks.
