@@ -38,7 +38,7 @@ const RATE_LIMITS = {
 // are no longer a selectable tier; if a request arrives with spoilerTier="guide"
 // (cached client, old API consumer) we map it to "full" at read time below.
 const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
-  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 2 },
+  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 4 },
   full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
 };
 
