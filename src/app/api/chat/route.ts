@@ -109,13 +109,13 @@ function classifyContentType(question: string): string | null {
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
   if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
 
-  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges
+  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
 
-  // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
-  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
-  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire)\b/;
+  // ITEM — gear/equipment/drop/currency questions (weapons, armor, abyss-gear, accessories all stored as "item")
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance|gold bar|gold bars|silver|currency)\b/;
+  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire|best (weapon|armor|armour|gear|build|loadout))\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
   // EXPLORATION — location/navigation/dungeon queries

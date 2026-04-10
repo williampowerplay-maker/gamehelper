@@ -90,6 +90,14 @@ const CATEGORIES: Category[] = [
   { name: "skills",      indexPath: "/Skills",            contentType: "mechanic",    spoilerLevel: 1 },
   { name: "crafting",    indexPath: "/Crafting+Guide",    contentType: "recipe",      spoilerLevel: 1 },
   { name: "guides",      indexPath: "/Guides+%26+Walkthrough", contentType: "mechanic", spoilerLevel: 1 },
+
+  // Challenges — 5 tabs (Exploration, Mastery, Combat, Life, Minigame), 78 challenge pages
+  { name: "challenges",  indexPath: "/Challenges",        contentType: "mechanic",    spoilerLevel: 2 },
+
+  // Beginner / mechanic guide pages — high-value for common player questions
+  { name: "beginner-guides", indexPath: "/New+Player+Help",      contentType: "mechanic", spoilerLevel: 1 },
+  { name: "grappling",       indexPath: "/Grappling",            contentType: "mechanic", spoilerLevel: 1 },
+  { name: "game-progress",   indexPath: "/Game+Progress+Route",  contentType: "mechanic", spoilerLevel: 2 },
 ];
 
 // ===== HTML PARSING =====
@@ -205,6 +213,9 @@ const NAV_PAGES = new Set([
   "/Skills", "/Items", "/Locations", "/Characters", "/Walkthrough",
   "/Guides+%26+Walkthrough", "/Enemies", "/Crafting+Guide",
   "/NPCs", "/Collectibles", "/Key+Items", "/Accessories",
+  "/Challenges",
+  // Note: /Grappling, /New+Player+Help, /Game+Progress+Route are NOT excluded —
+  // they are real content pages added as beginner-guides/grappling/game-progress categories
 ]);
 
 function extractLinks(html: string, currentPath: string): string[] {
