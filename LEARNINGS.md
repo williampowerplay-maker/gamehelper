@@ -22,6 +22,17 @@ Things discovered during development that are worth remembering across sessions.
 - **`character` is a reserved word in PostgreSQL**: Quoting as `"character"` is required in both the RETURNS TABLE and SELECT inside the function body.
 - **Don't create overloaded RPC functions via `CREATE OR REPLACE FUNCTION` with different signatures**: Supabase's `CREATE OR REPLACE` only replaces the exact signature — if you add a new parameter, the old version stays in the DB as a second function. PostgREST then can't decide which to call when the caller passes N arguments and errors: `Could not choose the best candidate function`. Fix: explicitly `DROP FUNCTION ... (old signature)` before creating the new signature.
 
+## RAG: Nudge Tier Chunk Count Scaling
+
+- **As the DB grows, Nudge chunk count needs to grow too**: Started at 2 chunks for Nudge tier when the DB had ~17k chunks. Fine then — 2 top results were reliably correct. After adding 21k more chunks (38k total), 2 chunks became too narrow: grappling and fast travel queries ranked their answer 3rd or 4th and got cut off. Raised to 4. Lesson: **revisit chunk counts whenever the DB roughly doubles in size**.
+- **Cache can mask newly ingested content**: If a query was cached before new content was added, the stale "I don't know" response gets served for 7 days even though the answer is now in the DB. When ingesting new categories that fix known retrieval gaps, **always clear the cache for those specific failing queries** via `DELETE FROM queries WHERE question = '...'` in Supabase.
+- **Nudge token budget doesn't need to grow with chunk count**: Increasing from 2→4 chunks doesn't require increasing `maxTokens` — Claude Haiku is still capped at 100 tokens and will synthesize from whichever chunks are most relevant. More chunks = more retrieval candidates, not necessarily more output.
+
+## RAG: Wiki Domain Fragmentation
+
+- **Fextralife wiki has two subdomains**: `crimsondesert.wiki.fextralife.com` (original, most content) and `crimsondesertgame.wiki.fextralife.com` (newer migration). Some pages redirect across domains — e.g. `/Grappling` on the original domain 301s to the new domain. The ingest script uses a fixed `BASE_URL` and may not follow cross-domain redirects, resulting in sparse or empty chunk extraction for those pages. Workaround: the linked skill pages (Restrain, Throw, Lariat etc.) are crawled via BFS from the redirect target and do get ingested correctly. The overview page itself may be thin.
+- **Check for redirects when a category produces unexpectedly few chunks**: If an index page returns far fewer chunks than expected, fetch it manually in Node and check for a 301 response with a `Location` header pointing to a different domain.
+
 ## RAG: Classifier Keyword Coverage
 
 - **Add new content category keywords to the classifier immediately**: When a new wiki category is ingested (e.g. "challenges"), add its keywords to `classifyContentType()` at the same time. If the classifier doesn't recognize "challenge" as a mechanic question, it returns `null` and the search runs unfiltered across all 17,000+ chunks — correct chunks rarely win.

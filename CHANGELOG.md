@@ -4,6 +4,35 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.9.0] - 2026-04-10 (Guides Ingestion, Retrieval Quality Pass)
+
+### Content
+- **3 new categories ingested** — 21,276 chunks total:
+  - `beginner-guides` (`/New+Player+Help`, deep crawl) — 16,238 chunks from 1,154 pages. Covers fast travel, early-game gear, consumables, ruins, New Game+, trophy guide, inventory slots, and hundreds of location/NPC/quest pages discovered via deep BFS.
+  - `grappling` (`/Grappling`) — 1,608 chunks from 110 skill pages. Full grappling move set: Restrain, Throw, Lariat, Giant Swing, Aerial Grapple, Screwdriver, Back Hang, plus all Kliff combat skills and the Blinding Flash skill page.
+  - `game-progress` (`/Game+Progress+Route`) — 3,430 chunks from 212 pages. Includes Abyss Nexus (101 chunks, fast travel), New Player Help (64 chunks), Game Progress Route (166 chunks), How to Get More Inventory Slots, New Game Plus, Trophy and Achievement Guide.
+
+### RAG Retrieval Fixes (`src/app/api/chat/route.ts`)
+- **Nudge tier chunk count raised 2→4**: With 38,000+ chunks in the DB, 2 chunks was too narrow a retrieval window. 4 chunks gives grappling, fast travel, and mechanic queries enough candidate slots to surface the right content. Token budget unchanged (100 max tokens, Haiku model).
+- **Mechanic classifier additions**: Added `fast travel`, `fast-travel`, `travel point`, `abyss nexus`, `traces of the abyss` — "how do I unlock fast travel" now routes to mechanic correctly.
+- **Item classifier additions**: Added `gold bar`, `gold bars`, `silver`, `currency` keywords. Added `best (weapon|armor|gear|build|loadout)` to `getItemPhrases` — "best armor for early game" now routes to item correctly.
+
+### Cache Maintenance
+- Cleared 6 stale bad cached responses from `queries` table: `how does grappling work`, `explain the grappling system`, `how do i get gold bars`, `best armor for early game`, `how do i unlock fast travel`, `what does blinding flash do`. These were cached before the new content was ingested and would have returned wrong answers for 7 days.
+
+### Reddit/Real-World Query Testing
+Ran 10 real player queries against production. Results before fixes: 3/10 pass, 3/10 partial, 4/10 fail. Key findings:
+- ✅ Boss queries (Lucian Bastier, Reed Devil) worked reliably with lowercase informal phrasing
+- ✅ Abyss Artifact location query worked well
+- ❌ Gold bars, grappling, fast travel, best armor all failed — missing content
+- ⚠️ "Best weapon" and vague queries ("how do puzzles work") retrieved wrong/generic content
+- ⚠️ "What does Blinding Flash do" hit the wrong page (boss move vs skill)
+
+### Infrastructure Note
+- `/Grappling` wiki page redirects to `crimsondesertgame.wiki.fextralife.com` (different subdomain) — the overview page produces sparse chunks. Individual grappling skill pages (via BFS from the redirect) are correctly ingested.
+
+---
+
 ## [0.8.0] - 2026-04-09 (Challenges Ingestion, Retrieval Fixes, 2-Phase Pipeline)
 
 ### Content

@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-09 (session 10)
+**Last updated:** 2026-04-10 (session 11)
 
 ## Overview
 
@@ -56,6 +56,11 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap). **v5 (2026-04-09)**: Split into 2-phase pipeline — `crawl-wiki.ts` saves wiki pages to local `wiki-cache/`, `ingest-from-cache.ts` chunks+embeds+upserts from cache. Re-chunking or re-embedding no longer requires re-crawling the site. `ingest-state.json` tracks what's been embedded so `--changed-only` skips already-ingested unchanged pages.
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
 
+#### Ingest status (2026-04-10) — session 11
+Previous total ~17,345 chunks + 21,276 new chunks from session 11 = **~38,600+ chunks total**.
+
+New categories added in session 11: grappling (1,608), game-progress (3,430), beginner-guides (16,238).
+
 #### Ingest status (2026-04-05) — cleaned + supplemented
 Original: 82,312 chunks → deduplicated to 26,343 → nav-list junk removed to 16,816 → supplemented with 529 item location chunks = **~17,345 chunks**.
 
@@ -84,6 +89,9 @@ Cleanup performed in session 9:
 | crafting | 607 | 36 |
 | guides | 2 | — |
 | challenges | ✅ | ~78 |
+| grappling | ✅ (1,608 chunks) | 110 |
+| game-progress | ✅ (3,430 chunks) | 212 |
+| beginner-guides | ✅ (16,238 chunks) | 1,154 |
 
 #### RAG quality baseline (2026-04-04, post-reseed, pre-cleanup)
 Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42/59 passed (71.2%)**, avg similarity 0.777. Note: this was measured before the session 9 DB cleanup and prompt tuning — actual quality should be significantly better now.
@@ -93,6 +101,13 @@ Ran `scripts/test-rag-quality.ts` (59 tests across 17 categories). **Overall: 42
 - 9/10 returned relevant chunks
 - 1 fail: "Where do I find the Hwando Sword?" — page doesn't exist on wiki (404)
 - Classifier fixes verified: "Focused Shot" → mechanic (was boss), "Greymane Camp" → exploration (was null)
+
+#### Session 11 retrieval fixes (2026-04-10, v0.9.0)
+- **Nudge chunk count raised 2→4**: With 38k+ chunks, 2 was too narrow to reliably surface the right content for mechanic/guide queries.
+- **Mechanic classifier**: Added `fast travel`, `fast-travel`, `travel point`, `abyss nexus`, `traces of the abyss`.
+- **Item classifier**: Added `gold bar`, `gold bars`, `silver`, `currency`; added `best (weapon|armor|gear|build|loadout)` to getItemPhrases.
+- **Cache cleared**: 6 stale bad cached responses removed from `queries` table after ingesting new content.
+- **Reddit query test (10 queries)**: 3/10 pass before fixes. Boss queries (Lucian Bastier, Reed Devil) and Abyss Artifact queries worked. Grappling, fast travel, gold bars, best armor all failed due to missing content — now addressed.
 
 #### Session 10 retrieval fixes (2026-04-09, v0.8.0)
 - **Classifier**: Added `challenge|challenges|mastery|minigame|mini-game` to mechanic regex — challenge questions were returning null classifier (unfiltered search), causing poor retrieval.
