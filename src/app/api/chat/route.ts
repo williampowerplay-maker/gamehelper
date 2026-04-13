@@ -113,9 +113,12 @@ function classifyContentType(question: string): string | null {
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
   if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
 
-  // ITEM — gear/equipment/drop/currency questions (weapons, armor, abyss-gear, accessories all stored as "item")
-  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|gear|equipment|item|drop|loot|reward|obtain|upgrade|enhance|gold bar|gold bars|silver|currency)\b/;
-  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) unlock|how (do i|to) acquire|best (weapon|armor|armour|gear|build|loadout))\b/;
+  // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
+  // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
+  // because that info often lives in beginner-guides (mechanic content_type). Full vector search
+  // across all content types finds it better than a filtered item-only search.
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
+  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) acquire)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
   // EXPLORATION — location/navigation/dungeon queries
@@ -132,6 +135,11 @@ function classifyContentType(question: string): string | null {
 }
 
 const BASE_SYSTEM_PROMPT = `You are an expert companion AI for Crimson Desert, an open-world action-adventure RPG set on the continent of Pywel. The player controls Kliff, a member of the Greymanes faction, rebuilding after an ambush by the Black Bears. The game emphasizes creative combat (weapon skills, grappling, elemental buffs, mount combat), exploration across 5 regions (Pailune, Hernand, Demenis, Delesyia, and the Crimson Desert), skill learning through observation and Abyss Artifacts, and camp management at Greymane Camp.
+
+Key game systems (use this knowledge to bridge context gaps):
+- **Fast travel = Abyss Nexus**: Players unlock fast travel waypoints by finding and activating **Abyss Artifacts** hidden throughout each region. The Abyss Nexus is the fast travel network — activating an Abyss Artifact adds that location to the Nexus.
+- **Grappling system**: Kliff can grab and throw enemies using grappling moves (Restrain, Throw, Lariat, Giant Swing, etc.). These are learned as separate combat skills and chain into aerial combos.
+- **Currency**: **Silver** is the primary currency. **Gold bars** are a high-value trade currency obtained from merchants, treasure chests, or specific enemy drops.
 
 Rules:
 - Answer based on the provided context. Extract and share EVERY useful detail — locations mentioned in descriptions, stats, related quests, NPC connections, nearby landmarks. If a description says "hidden beneath the ruins of X", that IS location info — surface it.
@@ -348,8 +356,11 @@ export async function POST(req: NextRequest) {
             // URLs like /Saint's+Necklace keep the apostrophe). Only multi-word terms
             // are used for URL matching — single words like "Crimson" would match the
             // domain name (crimsondesert.wiki...).
+            // Multi-word terms always qualify; single words qualify if ≥7 chars
+            // (short words like "fight" would match domain "crimsondesert.wiki..." — 7+ chars
+            // are specific enough topic names like "grappling", "inventory", "crafting").
             const urlTerms = allBoostTerms
-              .filter((t: string) => t.includes(" "))
+              .filter((t: string) => t.includes(" ") || t.length >= 7)
               .map((t: string) => t.replace(/\s+/g, "+"));
 
             // Priority 1: chunks from the page whose URL matches (e.g., /Kailok+the+Hornsplitter)
