@@ -13,7 +13,8 @@
  *   npx tsx scripts/ingest-fextralife.ts --deep --changed-only  # Deep + skip unchanged
  *
  * Requires env vars (from .env.local locally, or process.env in CI):
- *   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, VOYAGE_API_KEY
+ *   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VOYAGE_API_KEY
+ *   (Uses service role key — anon key cannot write to knowledge_chunks per RLS)
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -39,9 +40,11 @@ function getEnv(key: string): string {
   return process.env[key] || env[key] || "";
 }
 
+// SECURITY: Ingest scripts must use the service role key — anon key cannot
+// INSERT/DELETE on knowledge_chunks (RLS restricts writes to service_role).
 const supabase = createClient(
   getEnv("NEXT_PUBLIC_SUPABASE_URL"),
-  getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+  getEnv("SUPABASE_SERVICE_ROLE_KEY")
 );
 const VOYAGE_KEY = getEnv("VOYAGE_API_KEY");
 const BASE_URL = "https://crimsondesert.wiki.fextralife.com";

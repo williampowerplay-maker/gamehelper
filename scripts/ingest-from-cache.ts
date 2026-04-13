@@ -19,7 +19,8 @@
  *   npx tsx scripts/ingest-from-cache.ts --dry-run --category weapons
  *
  * Requires env vars:
- *   NEXT_PUBLIC_SUPABASE_URL, NEXT_PUBLIC_SUPABASE_ANON_KEY, VOYAGE_API_KEY
+ *   NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, VOYAGE_API_KEY
+ *   (Uses service role key — anon key cannot write to knowledge_chunks per RLS)
  */
 
 import { createClient } from "@supabase/supabase-js";
@@ -44,9 +45,12 @@ function getEnv(key: string): string {
   return process.env[key] || env[key] || "";
 }
 
+// SECURITY: Ingest scripts must use the service role key — anon key cannot
+// INSERT/DELETE on knowledge_chunks (RLS restricts writes to service_role).
+// SUPABASE_SERVICE_ROLE_KEY is in .env.local and never committed.
 const supabase = createClient(
   getEnv("NEXT_PUBLIC_SUPABASE_URL"),
-  getEnv("NEXT_PUBLIC_SUPABASE_ANON_KEY")
+  getEnv("SUPABASE_SERVICE_ROLE_KEY")
 );
 const VOYAGE_KEY = getEnv("VOYAGE_API_KEY");
 
