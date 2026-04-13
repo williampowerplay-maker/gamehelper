@@ -25,14 +25,34 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PU
 
 function getClientIp(req: NextRequest): string {
   return (
-    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     req.headers.get("x-real-ip") ||
+    req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
     "unknown"
   );
 }
 
+// Simple rate limit: max 10 error log submissions per IP per minute
+// Prevents DB flooding via this unauthenticated endpoint
+const logRateMap: Map<string, { count: number; resetAt: number }> = new Map();
+
+function isLogRateLimited(ip: string): boolean {
+  const now = Date.now();
+  const record = logRateMap.get(ip);
+  if (!record || now >= record.resetAt) {
+    logRateMap.set(ip, { count: 1, resetAt: now + 60_000 });
+    return false;
+  }
+  record.count++;
+  return record.count > 10;
+}
+
 export async function POST(req: NextRequest) {
   try {
+    const ip = getClientIp(req);
+    if (isLogRateLimited(ip)) {
+      return NextResponse.json({ ok: true }); // Silently drop — don't reveal the limit
+    }
+
     const body = await req.json();
     const { errorType, message, stack, context } = body;
 

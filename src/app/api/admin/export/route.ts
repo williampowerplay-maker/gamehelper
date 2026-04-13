@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 function loadEnv(): Record<string, string> {
   try {
@@ -24,6 +25,37 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || envVars.ADMIN_SECRET || "";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
+// Failed-attempt throttle: max 5 failures per IP per 15 minutes
+const failedAttempts: Map<string, { count: number; resetAt: number }> = new Map();
+const MAX_FAILS = 5;
+const FAIL_WINDOW_MS = 15 * 60 * 1000;
+
+function getClientIp(req: NextRequest): string {
+  return req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+}
+
+function checkAdminAuth(req: NextRequest): { ok: boolean; response?: NextResponse } {
+  const ip = getClientIp(req);
+  const now = Date.now();
+  const record = failedAttempts.get(ip);
+  if (record && now < record.resetAt && record.count >= MAX_FAILS) {
+    return { ok: false, response: NextResponse.json({ error: "Too many failed attempts. Try again later." }, { status: 429 }) };
+  }
+  const token = (req.headers.get("authorization") ?? "").replace("Bearer ", "").trim();
+  let authorized = false;
+  if (ADMIN_SECRET && token.length === ADMIN_SECRET.length) {
+    try { authorized = crypto.timingSafeEqual(Buffer.from(token), Buffer.from(ADMIN_SECRET)); } catch { authorized = false; }
+  }
+  if (!ADMIN_SECRET || !authorized) {
+    const existing = failedAttempts.get(ip);
+    if (!existing || now >= existing.resetAt) failedAttempts.set(ip, { count: 1, resetAt: now + FAIL_WINDOW_MS });
+    else existing.count++;
+    return { ok: false, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+  failedAttempts.delete(ip);
+  return { ok: true };
+}
+
 function escapeCSV(val: string | null | undefined): string {
   if (val == null) return "";
   const str = String(val);
@@ -33,15 +65,19 @@ function escapeCSV(val: string | null | undefined): string {
   return str;
 }
 
+const ALLOWED_EXPORT_TYPES = ["waitlist", "users"] as const;
+
 export async function GET(req: NextRequest) {
-  // Auth check
-  const authHeader = req.headers.get("authorization");
-  if (!ADMIN_SECRET || authHeader !== `Bearer ${ADMIN_SECRET}`) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
-  }
+  const auth = checkAdminAuth(req);
+  if (!auth.ok) return auth.response!;
 
   const { searchParams } = new URL(req.url);
-  const type = searchParams.get("type"); // "waitlist" | "users"
+  const type = searchParams.get("type");
+
+  // Explicit allowlist — reject unknown export types
+  if (!type || !ALLOWED_EXPORT_TYPES.includes(type as typeof ALLOWED_EXPORT_TYPES[number])) {
+    return NextResponse.json({ error: "Invalid ?type= param. Use type=waitlist or type=users" }, { status: 400 });
+  }
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
@@ -103,8 +139,4 @@ export async function GET(req: NextRequest) {
     });
   }
 
-  return NextResponse.json(
-    { error: 'Missing ?type= param. Use type=waitlist or type=users' },
-    { status: 400 }
-  );
 }

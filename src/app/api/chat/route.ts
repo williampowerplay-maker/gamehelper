@@ -166,9 +166,22 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Input length guard — prevents prompt-stuffing and inflated Voyage embedding costs
+    if (question.length > 500) {
+      return NextResponse.json(
+        { error: "Question too long. Please keep questions under 500 characters." },
+        { status: 400 }
+      );
+    }
+
     // ===== RATE LIMITING =====
     const clientIp = getClientIp(req);
-    const userTier = (spoilerTier === "full" ? "premium" : "free") as keyof typeof RATE_LIMITS; // TODO: check actual user tier from auth
+    // SECURITY: Rate limit tier is always "free" for unauthenticated requests.
+    // Do NOT derive it from the client-controlled `spoilerTier` body param —
+    // that would let anyone pass spoilerTier:"full" to get 60/hr premium limits
+    // and force Sonnet usage on every query, multiplying API costs ~10x.
+    // TODO: once auth is wired, read the real user tier from their DB record.
+    const userTier: keyof typeof RATE_LIMITS = "free";
     const limits = RATE_LIMITS[userTier];
 
     // Single Supabase client for the whole request

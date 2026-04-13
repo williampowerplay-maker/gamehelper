@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import crypto from "crypto";
 
 // Load .env.local manually for local dev (Next.js 16 / Node 24 workaround)
 function loadEnv(): Record<string, string> {
@@ -26,13 +27,57 @@ const ADMIN_SECRET = process.env.ADMIN_SECRET || envVars.ADMIN_SECRET || "";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL || "";
 const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
 
-export async function GET(req: NextRequest) {
-  const authHeader = req.headers.get("authorization");
-  const token = authHeader?.replace("Bearer ", "").trim();
+// Failed-attempt throttle: max 5 failures per IP per 15 minutes
+// Prevents brute-forcing the admin secret
+const failedAttempts: Map<string, { count: number; resetAt: number }> = new Map();
+const MAX_FAILS = 5;
+const FAIL_WINDOW_MS = 15 * 60 * 1000;
 
-  if (!ADMIN_SECRET || token !== ADMIN_SECRET) {
-    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+function getClientIp(req: NextRequest): string {
+  return req.headers.get("x-real-ip") || req.headers.get("x-forwarded-for")?.split(",")[0]?.trim() || "unknown";
+}
+
+function checkAdminAuth(req: NextRequest): { ok: boolean; response?: NextResponse } {
+  const ip = getClientIp(req);
+  const now = Date.now();
+  const record = failedAttempts.get(ip);
+
+  // Check if IP is throttled
+  if (record && now < record.resetAt && record.count >= MAX_FAILS) {
+    return { ok: false, response: NextResponse.json({ error: "Too many failed attempts. Try again later." }, { status: 429 }) };
   }
+
+  const authHeader = req.headers.get("authorization") ?? "";
+  const token = authHeader.replace("Bearer ", "").trim();
+
+  // Timing-safe comparison — prevents timing attacks that could leak the secret
+  // character-by-character by measuring microsecond response time differences
+  let authorized = false;
+  if (ADMIN_SECRET && token.length === ADMIN_SECRET.length) {
+    try {
+      authorized = crypto.timingSafeEqual(Buffer.from(token), Buffer.from(ADMIN_SECRET));
+    } catch { authorized = false; }
+  }
+
+  if (!ADMIN_SECRET || !authorized) {
+    // Record failed attempt
+    const existing = failedAttempts.get(ip);
+    if (!existing || now >= existing.resetAt) {
+      failedAttempts.set(ip, { count: 1, resetAt: now + FAIL_WINDOW_MS });
+    } else {
+      existing.count++;
+    }
+    return { ok: false, response: NextResponse.json({ error: "Unauthorized" }, { status: 401 }) };
+  }
+
+  // Clear failed attempts on successful auth
+  failedAttempts.delete(ip);
+  return { ok: true };
+}
+
+export async function GET(req: NextRequest) {
+  const auth = checkAdminAuth(req);
+  if (!auth.ok) return auth.response!;
 
   const supabase = createClient(supabaseUrl, supabaseKey);
 
