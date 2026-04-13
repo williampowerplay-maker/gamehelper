@@ -4,6 +4,30 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.10.0] - 2026-04-13 (Security Hardening + Retrieval Fixes)
+
+### Security (session 12)
+- **CRITICAL FIX — API key exposure**: Removed `ANTHROPIC_API_KEY` and `VOYAGE_API_KEY` from Next.js `env` block in `next.config.ts`. The `env` block statically inlines values into the client-side JS bundle — these keys were visible to anyone reading page source. Server API routes access them via `process.env` (Vercel) and `loadEnv()` (local dev).
+- **Security headers**: Added `X-Frame-Options: DENY`, `Strict-Transport-Security` (2yr), `X-Content-Type-Options: nosniff`, `Referrer-Policy: strict-origin-when-cross-origin`, and `Permissions-Policy` to all routes via `next.config.ts`.
+- **Rate limiting tier bypass fix**: Rate limits were derived from client-controlled `spoilerTier` body param — anyone could pass `spoilerTier:"full"` to get premium rate limits (60/hr Sonnet). Now hardcoded to `"free"` for all unauthenticated requests.
+- **Input length guard**: Questions capped at 500 chars — prevents prompt stuffing and inflated Voyage embedding costs on large inputs.
+- **Admin auth hardening** (all 3 admin routes): Replaced `!==` with `crypto.timingSafeEqual()` to prevent timing attacks. Added failed-attempt throttle: max 5 failures per IP per 15 minutes.
+- **Admin export type allowlist**: Explicit `["waitlist", "users"]` allowlist — rejects unknown `?type=` params.
+- **`/api/log-error` rate limit**: 10 submissions/IP/min to prevent DB flooding via this unauthenticated endpoint.
+- **Supabase RLS policies updated**:
+  - `error_logs`: Added INSERT policy — logging was silently failing (RLS enabled with no policies = all writes denied)
+  - `queries SELECT`: Removed `user_id IS NULL` branch — anonymous query history was publicly readable
+  - `knowledge_chunks`: Restricted INSERT/UPDATE/DELETE to `service_role` only — anon key can no longer inject fake content
+  - `page_hashes`: Restricted all operations to `service_role` only
+- **Ingest scripts**: Switched from `NEXT_PUBLIC_SUPABASE_ANON_KEY` to `SUPABASE_SERVICE_ROLE_KEY` — required after knowledge_chunks RLS tightening
+
+### RAG Retrieval Fixes (session 12)
+- **Query pass rate**: 10/12 (83%) on Reddit-style test set, up from 3/10 (30%) at session start
+- **Grappling retrieval**: Fixed — URL-match boost now fires on single words ≥7 chars (e.g. `grappling`) not just multi-word phrases; grappling skill pages now score 0.88 similarity floor
+- **Fast travel retrieval**: Fixed — system prompt now explicitly documents Abyss Nexus = fast travel system
+- **System prompt game systems block**: Added key mechanic bridging notes (fast travel = Abyss Nexus, grappling move list, silver/gold bar currency) so Claude answers correctly when chunk text doesn't use exact query phrasing
+- **Classifier**: Removed `gold bar/silver/currency` and `best X` patterns from `item` filter — these queries now do full unfiltered search since the info lives in `beginner-guides` (mechanic content_type), not item chunks
+
 ## [0.9.0] - 2026-04-10 (Guides Ingestion, Retrieval Quality Pass)
 
 ### Content

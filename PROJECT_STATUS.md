@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-10 (session 11)
+**Last updated:** 2026-04-13 (session 12)
 
 ## Overview
 
@@ -18,6 +18,18 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | AI (Embeddings) | Voyage AI | voyage-3.5-lite |
 | Auth | Supabase Auth (Email + Google OAuth) | via supabase-js |
 | Deployment | Vercel | - |
+
+## Current Status: MVP Functional + Security Hardened
+
+### Session 12 Security Fixes (2026-04-13)
+- **API key exposure patched**: Removed ANTHROPIC/VOYAGE keys from `next.config.ts` `env` block (were being bundled client-side)
+- **Security headers added**: X-Frame-Options, HSTS 2yr, nosniff, Referrer-Policy, Permissions-Policy
+- **Rate limit tier bypass fixed**: Was using client-controlled `spoilerTier` body param to determine limits; now hardcoded to free tier for all unauthenticated requests
+- **Input guard**: Questions capped at 500 chars
+- **Admin auth**: `crypto.timingSafeEqual()` + failed-attempt throttle (5 fails / 15 min / IP)
+- **Supabase RLS**: Fixed silent error logging failure; restricted knowledge_chunks writes to service_role; tightened queries SELECT; locked page_hashes to service_role
+- **Ingest scripts**: Now use `SUPABASE_SERVICE_ROLE_KEY` (add to .env.local from Supabase dashboard → Settings → API)
+- **RAG pass rate**: 10/12 (83%) on Reddit-style test queries (was 3/10 = 30% at session start)
 
 ## Current Status: MVP Functional
 
