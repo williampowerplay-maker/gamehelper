@@ -114,7 +114,7 @@ function classifyContentType(question: string): string | null {
 
   // PUZZLE — specific puzzle/solution queries → content_type "puzzle" (game8 puzzle guide chunks)
   // Must come before mechanic and exploration so puzzle queries don't get diluted
-  if (/\b(puzzle|strongbox|ancient ruins|sealed gate|disc puzzle|spire.*puzzle|sanctum.*puzzle|maze.*puzzle|ruins.*puzzle|how (do i|to) solve|how (do i|to) open the|puzzle solution)\b/.test(q)) return "puzzle";
+  if (/\b(puzzles?|strongbox|ancient ruins|sealed gate|disc puzzle|spire.{0,15}puzzle|sanctum.{0,15}puzzle|maze.{0,15}puzzle|ruins.{0,15}puzzle|how (do i|to) solve|puzzle solution)\b/.test(q)) return "puzzle";
 
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
   if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
