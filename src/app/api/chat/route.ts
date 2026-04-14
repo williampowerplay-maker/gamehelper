@@ -384,18 +384,34 @@ export async function POST(req: NextRequest) {
             // Multi-word terms always qualify; single words qualify if ≥7 chars
             // (short words like "fight" would match domain "crimsondesert.wiki..." — 7+ chars
             // are specific enough topic names like "grappling", "inventory", "crafting").
-            const urlTerms = allBoostTerms
-              .filter((t: string) => t.includes(" ") || t.length >= 7)
+            //
+            // Fix: Prefer multi-word phrases for URL matching (more specific than single words).
+            // "white lion necklace" targets the exact page; "necklace" matches every necklace page
+            // and the limit(10) could return 10 unrelated necklace chunks, missing the target.
+            const multiWordUrlTerms = allBoostTerms
+              .filter((t: string) => t.includes(" "))
               .map((t: string) => t.replace(/\s+/g, "+"));
+            const singleWordUrlTerms = allBoostTerms
+              .filter((t: string) => !t.includes(" ") && t.length >= 7);
+            // If multi-word terms exist, they're more specific — don't dilute with single words
+            const urlTerms = multiWordUrlTerms.length > 0 ? multiWordUrlTerms : singleWordUrlTerms;
 
             // Priority 1: chunks from the page whose URL matches (e.g., /Kailok+the+Hornsplitter)
+            // Apply the same content_type filter as the vector search — prevents wrong-type chunks
+            // (e.g., fextralife "Ancient Ruins" exploration chunks) from outscoring correct
+            // vector-search results (e.g., game8 puzzle solution chunks at sim=0.67).
             let keywordChunks: any[] = [];
-            const { data: urlMatches } = urlTerms.length > 0
-              ? await supabase
+            let urlQueryBuilder: any = urlTerms.length > 0
+              ? supabase
                   .from("knowledge_chunks")
                   .select("id, content, source_url, source_type, quest_name, content_type")
                   .or(urlTerms.map((t: string) => `source_url.ilike.%${t}%`).join(","))
-                  .limit(10)
+              : null;
+            if (urlQueryBuilder && contentTypeFilter) {
+              urlQueryBuilder = urlQueryBuilder.eq("content_type", contentTypeFilter);
+            }
+            const { data: urlMatches } = urlQueryBuilder
+              ? await urlQueryBuilder.limit(10)
               : { data: null };
 
             if (urlMatches && urlMatches.length > 0) {
@@ -404,12 +420,16 @@ export async function POST(req: NextRequest) {
             }
 
             // Priority 2: if URL match found <4 chunks, also grab content mentions
+            // Also apply content_type filter here to stay in the same semantic space.
             if (keywordChunks.length < 4) {
-              const { data: contentMatches } = await supabase
+              let contentQueryBuilder: any = supabase
                 .from("knowledge_chunks")
                 .select("id, content, source_url, source_type, quest_name, content_type")
-                .or(allBoostTerms.map((t: string) => `content.ilike.%${t}%`).join(","))
-                .limit(8);
+                .or(allBoostTerms.map((t: string) => `content.ilike.%${t}%`).join(","));
+              if (contentTypeFilter) {
+                contentQueryBuilder = contentQueryBuilder.eq("content_type", contentTypeFilter);
+              }
+              const { data: contentMatches } = await contentQueryBuilder.limit(8);
               if (contentMatches) {
                 const existingKwIds = new Set(keywordChunks.map((c: any) => c.id));
                 for (const c of contentMatches) {
