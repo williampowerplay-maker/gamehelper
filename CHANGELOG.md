@@ -4,6 +4,19 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.11.0] - 2026-04-14 (Retrieval Bug Fixes — 87% Query Pass Rate)
+
+### RAG Retrieval Fixes (session 13)
+- **Query pass rate**: 13/15 (87%) on test battery, up from 6/15 (40%) at session start
+- **Root cause 1 — Stale cache poisoning**: "No info" responses cached before game8 ingestion were being served for 7 days. Cleared 14 stale cache entries via SQL DELETE. Going forward: clear negative-response cache after major content ingestions.
+- **Root cause 2 — Keyword boost too broad**: URL-match boost searched with single-word terms (e.g. "necklace") that matched every necklace page; `limit(10)` returned 10 wrong-necklace chunks at synthetic sim=0.88, outscoring correct White Lion Necklace vector results at sim=0.575. Fix: when multi-word phrases are available, use ONLY those for URL matching.
+- **Root cause 3 — Keyword boost ignoring content_type filter**: Fextralife exploration/quest chunks (containing "ancient ruins") were added to puzzle search results at synthetic sim=0.88, outscoring correct game8 puzzle chunks at real sim=0.67. Fix: apply same `content_type` filter to all keyword boost queries (URL-match and content-ILIKE).
+- **Build query classifier**: "Best build for X" previously filtered to "mechanic" only, missing item/character chunks with equipment stats. New BUILD classifier fires before all others and returns `null` (no content_type filter) so all content types contribute to build recommendations.
+- **Commits**: `2b17bbb` (keyword boost fix), `c6132b9` (build classifier fix)
+
+### Debugging Note
+- Discovered model mismatch bug in manual testing: using `voyage-3-large` to test similarity against `voyage-3.5-lite` stored embeddings gives near-zero similarity scores (false alarm). Always use the production model when debugging.
+
 ## [0.10.0] - 2026-04-13 (Security Hardening + Retrieval Fixes)
 
 ### Security (session 12)

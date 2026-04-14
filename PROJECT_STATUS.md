@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-13 (session 12)
+**Last updated:** 2026-04-14 (session 13)
 
 ## Overview
 
@@ -20,6 +20,14 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 13 Retrieval Fixes (2026-04-14)
+- **RAG pass rate**: **13/15 (87%)** on 15-query test battery, up from 6/15 (40%) at session start
+- **Stale cache cleared**: 14 "no info" cache entries removed after game8 content was already in DB
+- **Keyword boost breadth fix**: Multi-word URL terms only (not single words) — prevents "necklace" from matching every necklace page
+- **Content_type filter applied to keyword boost**: URL-match and content-ILIKE boost queries now respect the active content_type filter — prevents fextralife exploration chunks outscoring game8 puzzle chunks
+- **Build classifier added**: "Best build for X" now uses null filter for cross-type search (equipment stats in item/character + guides in mechanic)
+- Remaining 2 failures: generic boss strategy query (no summary content), darkbringer sword (content gap)
 
 ### Session 12 Security Fixes (2026-04-13)
 - **API key exposure patched**: Removed ANTHROPIC/VOYAGE keys from `next.config.ts` `env` block (were being bundled client-side)
