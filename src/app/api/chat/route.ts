@@ -93,6 +93,12 @@ Rules:
 function classifyContentType(question: string): string | null {
   const q = question.toLowerCase();
 
+  // BUILD queries — "best build for X" needs equipment + mechanic cross-type search.
+  // Equipment with stats lives in "item"/"character" types; build guides in "mechanic".
+  // Return null (no filter) so we search all types and find the best matching chunks.
+  // Must come FIRST — before boss/mechanic that would otherwise capture "build" keywords.
+  if (/\b(best build|optimal build|build for|builds for|what.*build|recommended build|endgame build)\b/.test(q)) return null;
+
   // BOSS — fight-specific verbs + known boss names
   // Must come before mechanic/skill since "how do I beat X" is a boss question
   const bossNames = [
@@ -122,7 +128,7 @@ function classifyContentType(question: string): string | null {
   // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
   // Also catches puzzle/upgrade/healing queries whose guide content is content_type "mechanic"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance|build|best build)\b/.test(q)) return "mechanic";
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
