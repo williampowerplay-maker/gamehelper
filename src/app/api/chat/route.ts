@@ -112,13 +112,17 @@ function classifyContentType(question: string): string | null {
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
 
+  // PUZZLE — specific puzzle/solution queries → content_type "puzzle" (game8 puzzle guide chunks)
+  // Must come before mechanic and exploration so puzzle queries don't get diluted
+  if (/\b(puzzle|strongbox|ancient ruins|sealed gate|disc puzzle|spire.*puzzle|sanctum.*puzzle|maze.*puzzle|ruins.*puzzle|how (do i|to) solve|how (do i|to) open the|puzzle solution)\b/.test(q)) return "puzzle";
+
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
   if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
 
   // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
   // Also catches puzzle/upgrade/healing queries whose guide content is content_type "mechanic"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|puzzle|strongbox|disc puzzle|ancient ruins puzzle|sealed gate|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance|build|best build|how do i solve|how to solve)\b/.test(q)) return "mechanic";
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance|build|best build)\b/.test(q)) return "mechanic";
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
