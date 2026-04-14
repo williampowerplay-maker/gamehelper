@@ -102,6 +102,12 @@ function classifyContentType(question: string): string | null {
     "demeniss", "trukan", "delesyia", "pailune", "saigord", "staglord",
     "reed devil", "blinding flash", "grave walker", "icewalker",
     "white horn", "stoneback crab", "taming dragon",
+    // game8 bosses
+    "tenebrum", "crowcaller", "draven", "cassius", "kearush", "myurdin",
+    "excavatron", "staglord", "priscus", "muskan", "cubewalker", "lithus",
+    "black fang", "hornsplitter", "hemon", "beindel", "gwen kraber",
+    "white bearclaw", "queen spider", "crookrock", "desert marauder", "rusten",
+    "abyss kutum", "kutum",
   ];
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
@@ -111,19 +117,21 @@ function classifyContentType(question: string): string | null {
 
   // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do)\b/.test(q)) return "mechanic";
+  // Also catches puzzle/upgrade/healing queries whose guide content is content_type "mechanic"
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|puzzle|strongbox|disc puzzle|ancient ruins puzzle|sealed gate|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance|build|best build|how do i solve|how to solve)\b/.test(q)) return "mechanic";
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
   // because that info often lives in beginner-guides (mechanic content_type). Full vector search
   // across all content types finds it better than a filtered item-only search.
-  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|upgrade|enhance)\b/;
-  const getItemPhrases = /\b(how (do i|to) get|where (do i|can i) (find|get|buy|farm)|how (do i|to) acquire)\b/;
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|enhance)\b/;
+  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm)|how (do i|to) acquire|where to (find|get|buy)|where (is|are) the)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
   // EXPLORATION — location/navigation/dungeon queries
   // Catches "how do I get to X", dungeon names, and navigation questions
-  if (/\b(where is|how do i get to|how to reach|how do i (solve|complete|clear|finish)|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|ruin|ruins|tower|temple|crypt|catacomb|sanctum|camp|ranch|gate|basin|falls|grotto|ridge|beacon)\b/.test(q)) return "exploration";
+  // Note: "ruins" alone removed — too broad, catches puzzle queries. Use more specific patterns.
+  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|camp|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
 
   // QUEST — story/objective keywords
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
