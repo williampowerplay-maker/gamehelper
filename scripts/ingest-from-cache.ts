@@ -91,7 +91,7 @@ const CATEGORIES: Category[] = [
   { name: "guides",           indexPath: "/Guides+%26+Walkthrough", contentType: "mechanic",    spoilerLevel: 1 },
   { name: "challenges",       indexPath: "/Challenges",             contentType: "mechanic",    spoilerLevel: 2 },
   // ── Game8.co guide categories (puzzle/mechanic/strategy content) ────────
-  { name: "game8-puzzles",    indexPath: "",                        contentType: "mechanic",    spoilerLevel: 2 },
+  { name: "game8-puzzles",    indexPath: "",                        contentType: "puzzle",      spoilerLevel: 2 },
   { name: "game8-bosses",     indexPath: "",                        contentType: "boss",        spoilerLevel: 2 },
   { name: "game8-walkthrough",indexPath: "",                        contentType: "quest",       spoilerLevel: 3 },
   { name: "game8-guides",     indexPath: "",                        contentType: "mechanic",    spoilerLevel: 1 },

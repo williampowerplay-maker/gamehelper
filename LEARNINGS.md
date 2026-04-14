@@ -38,6 +38,13 @@ Things discovered during development that are worth remembering across sessions.
 - **Add new content category keywords to the classifier immediately**: When a new wiki category is ingested (e.g. "challenges"), add its keywords to `classifyContentType()` at the same time. If the classifier doesn't recognize "challenge" as a mechanic question, it returns `null` and the search runs unfiltered across all 17,000+ chunks — correct chunks rarely win.
 - **"challenge" questions belong in the mechanic content type**: Challenges in Crimson Desert are game mechanics (life skills, exploration tasks, minigames). Classifier regex: `challenge|challenges|mastery|minigame|mini-game` added to mechanic regex.
 
+## RAG: Ingest DELETE Silently Fails with Anon Key (RLS)
+
+- **The DELETE step in ingest-from-cache.ts uses supabase-js with the anon key** — but RLS restricts DELETE on `knowledge_chunks` to `service_role` only. The DELETE silently succeeds (returns no error, 0 rows deleted), then INSERT adds new chunks alongside the old ones. You end up with duplicates: same source_url, same text, but two different `content_type` labels.
+- **Symptom**: After a re-ingest you see the same source_url appearing under two content_type values in the DB. Query: `SELECT source_url, array_agg(DISTINCT content_type) FROM knowledge_chunks WHERE source_url LIKE '%game8%' GROUP BY source_url HAVING COUNT(DISTINCT content_type) > 1`.
+- **Fix**: Use `SUPABASE_SERVICE_ROLE_KEY` (not anon key) in `.env.local` for ingest scripts. Or use the Supabase MCP `apply_migration` / `execute_sql` to run the DELETE as service_role.
+- **Content_type must match classifier**: When ingesting a new category, check what `content_type` the classifier routes those queries to (`classifyContentType()`) and use that exact value. Mismatch = chunks invisible to filtered searches. E.g. game8-puzzles must be `"puzzle"` not `"mechanic"` because puzzle queries filter by `content_type = 'puzzle'`.
+
 ## RAG: Cache Poisoning from Stale Responses
 
 - **7-day cache causes stale "no info" responses after content ingestion**: When new content is added to the KB (e.g. game8 puzzle solutions), queries that were cached before with "I don't have info" responses will keep returning stale answers for up to 7 days. After any major content ingestion, run `DELETE FROM queries WHERE response ILIKE '%don''t have specific%' OR response ILIKE '%no information%' ...` to wipe stale negative-cache entries.

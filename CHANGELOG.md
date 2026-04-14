@@ -16,6 +16,9 @@ All notable changes to the Crimson Desert Guide project.
   - `game8-skills`, `game8-crafting`, `game8-items`, `game8-locations`, `game8-characters`, `game8-challenges`
 - **Darkbringer Location** content gap resolved — `game8-accessories` contained the Darkbringer Location page, now ingested
 - **RLS note**: A temporary `anon` INSERT policy was added during ingest, then removed immediately after
+- **Duplicate cleanup**: Re-ingest silently skipped DELETE steps (anon key lacks DELETE permission on `knowledge_chunks` per RLS). 1,536 wrongly-typed `mechanic` duplicate chunks for game8-puzzles pages were found and removed via service_role SQL. The correct `puzzle`-typed counterparts at the same source_urls were preserved.
+- **`ingest-from-cache.ts` fix**: `game8-puzzles` contentType corrected from `"mechanic"` → `"puzzle"` to match the classifier's `content_type = 'puzzle'` filter for puzzle queries
+- **Test result after cleanup**: 11/15 (73%) on boss/puzzle/item test battery. Puzzle category: **5/5** (all pass, up from 0/5 before game8 ingest). Boss: 3/5, Item: 3/5
 
 ### Bug Fix — Cache No-Store for Missing Answers (`src/app/api/chat/route.ts`)
 - **Problem**: When Claude returned a "no information" response (e.g. "I don't have specific information about..."), that response was cached for 7 days in the `queries` table. After new content was ingested, users asking the same question within 7 days still received the stale "no info" answer.
