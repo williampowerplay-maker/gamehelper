@@ -4,6 +4,24 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.12.0] - 2026-04-14 (Game8 Full Ingest + Cache No-Store Fix)
+
+### Content (session 14)
+- **647 game8.co pages ingested** across 14 categories — all content now in Supabase:
+  - `game8-puzzles`: 110 pages → 1,221 chunks (puzzle solutions, ancient ruins, strongbox, spire/maze/rift puzzles)
+  - `game8-bosses`: 38 pages → 347 chunks (Hornsplitter, Tenebrum, Crowcaller, Kearush, Cassius, Myurdin, Ludvig, Gregor, Fortain, Lucian Bastier, Trukan, Excavatron, Crimson Nightmare, Staglord, Antumbra variants, Priscus, Ogre, Crookrock, Desert Marauder Rusten, Queen Spider, Walter Lanford, Hemon Beindel, Black Fang, Muskan + more)
+  - `game8-walkthrough`: 84 pages → walkthrough chapters
+  - `game8-guides`: 286 pages → mechanics, systems, tips
+  - `game8-weapons`, `game8-armor`, `game8-accessories`, `game8-abyss`: equipment guides
+  - `game8-skills`, `game8-crafting`, `game8-items`, `game8-locations`, `game8-characters`, `game8-challenges`
+- **Darkbringer Location** content gap resolved — `game8-accessories` contained the Darkbringer Location page, now ingested
+- **RLS note**: A temporary `anon` INSERT policy was added during ingest, then removed immediately after
+
+### Bug Fix — Cache No-Store for Missing Answers (`src/app/api/chat/route.ts`)
+- **Problem**: When Claude returned a "no information" response (e.g. "I don't have specific information about..."), that response was cached for 7 days in the `queries` table. After new content was ingested, users asking the same question within 7 days still received the stale "no info" answer.
+- **Fix**: Added `isMissingOrDefaultResponse()` helper that detects no-info/content-gap responses via regex patterns. If matched, the response is **not** written to the cache (`response: null`). The query is still logged for analytics (rate limiting still works) but won't be returned by the cache lookup (which requires `response IS NOT NULL`).
+- **Patterns detected**: "I don't have information", "not in the provided context", "context doesn't contain/include/mention", "I can't find information", "no relevant information available/found", and the fallback "Sorry, I couldn't generate an answer right now."
+
 ## [0.11.0] - 2026-04-14 (Retrieval Bug Fixes — 87% Query Pass Rate)
 
 ### RAG Retrieval Fixes (session 13)

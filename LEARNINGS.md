@@ -41,7 +41,7 @@ Things discovered during development that are worth remembering across sessions.
 ## RAG: Cache Poisoning from Stale Responses
 
 - **7-day cache causes stale "no info" responses after content ingestion**: When new content is added to the KB (e.g. game8 puzzle solutions), queries that were cached before with "I don't have info" responses will keep returning stale answers for up to 7 days. After any major content ingestion, run `DELETE FROM queries WHERE response ILIKE '%don''t have specific%' OR response ILIKE '%no information%' ...` to wipe stale negative-cache entries.
-- **Don't cache "no info" responses**: A future improvement would be to detect no-info responses in the route before caching them — only cache responses that actually contain useful content. For now, manual cache clearing after ingestion is required.
+- **Don't cache "no info" responses** ✅ IMPLEMENTED: `isMissingOrDefaultResponse(text)` in `route.ts` detects no-info/content-gap answers via regex before the cache insert. If matched, the query is logged with `response: null` (so rate limiting still counts it) but the cache lookup only returns rows where `response IS NOT NULL`, so the null row is never served. Patterns detected: "I don't have information", "not in the provided context", "context doesn't contain/mention/cover", "I can't find information", "no relevant information available/found/provided", plus fallback text like "couldn't generate an answer".
 - **Cache is exact-match on question string**: "where is the white lion necklace" and "where to find darkbringer sword?" are different cache keys. Test suites that vary question phrasing will bypass cache and generate fresh (and potentially failing) responses.
 
 ## RAG: URL-Match Keyword Boost

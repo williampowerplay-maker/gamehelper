@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-14 (session 13)
+**Last updated:** 2026-04-14 (session 14)
 
 ## Overview
 
@@ -20,6 +20,12 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 14 — Game8 Full Ingest + Cache Fix (2026-04-14)
+- **647 game8.co pages ingested** across 14 categories — puzzles (1,221 chunks), bosses (347 chunks), walkthrough, guides, weapons, armor, accessories, abyss, skills, crafting, items, locations, characters, challenges
+- **Darkbringer Location content gap resolved** — `game8-accessories` category contained the Darkbringer Location page, now ingested
+- **Cache no-store fix**: Added `isMissingOrDefaultResponse()` to `route.ts` — Claude "no info" responses are now logged with `response: null` so they're never served from cache. Previous behaviour caused stale "no info" answers to persist 7 days post-ingest.
+- **All work moved to `gamehelper` project** — this is now the canonical project going forward
 
 ### Session 13 Retrieval Fixes (2026-04-14)
 - **RAG pass rate**: **13/15 (87%)** on 15-query test battery, up from 6/15 (40%) at session start

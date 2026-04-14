@@ -548,6 +548,27 @@ export async function POST(req: NextRequest) {
       console.error("Search error:", searchError);
     }
 
+    // ===== MISSING/DEFAULT RESPONSE DETECTOR =====
+    // Returns true if a Claude answer is a "no info" / content-gap response.
+    // These must NOT be cached — stale no-info entries would be served for up to
+    // 7 days even after new content is ingested, poisoning results for users.
+    function isMissingOrDefaultResponse(text: string): boolean {
+      const lower = text.toLowerCase();
+      return (
+        /i (don'?t|do not) have (specific |enough )?information/.test(lower) ||
+        /not (in|part of|covered (by|in)) (the |this )?(provided |available )?context/.test(lower) ||
+        /context (provided |given )?(doesn'?t|does not|focuses entirely)/.test(lower) ||
+        /context (doesn'?t|does not) (contain|include|mention|cover)/.test(lower) ||
+        /i (can'?t|cannot) find (any |enough )?information/.test(lower) ||
+        /no (relevant |specific |useful )?information (is )?(available|found|provided)/.test(lower) ||
+        lower.includes("couldn't generate an answer") ||
+        lower.includes("drawing a blank") ||
+        lower.includes("not in my knowledge base") ||
+        lower.includes("haven't learned that") ||
+        lower.includes("wiki may not have it documented")
+      );
+    }
+
     // Snarky no-info responses for when we can't help
     const NO_INFO_RESPONSES = [
       "I don't have info on that one yet — the wiki may not have it documented.",
@@ -632,18 +653,38 @@ export async function POST(req: NextRequest) {
       claudeData.content?.[0]?.text ||
       "Sorry, I couldn't generate an answer right now.";
 
-    // Step 4: Log the query (async, don't block response)
-    supabase
-      .from("queries")
-      .insert({
-        question,
-        response: answer,
-        spoiler_tier: spoilerTier,
-        chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
-        tokens_used: claudeData.usage?.output_tokens || 0,
-        client_ip: clientIp,
-      })
-      .then(() => {});
+    // Step 4: Log the query (async, don't block response).
+    // Skip caching if the answer is a "no info" / content-gap response — stale
+    // no-info entries would poison the cache for 7 days even after new content
+    // is ingested, causing future users to receive outdated "no data" answers.
+    const shouldCache = !isMissingOrDefaultResponse(answer);
+    console.log("Caching response:", shouldCache);
+    if (shouldCache) {
+      supabase
+        .from("queries")
+        .insert({
+          question,
+          response: answer,
+          spoiler_tier: spoilerTier,
+          chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
+          tokens_used: claudeData.usage?.output_tokens || 0,
+          client_ip: clientIp,
+        })
+        .then(() => {});
+    } else {
+      // Still log the query for analytics (but without response so it won't be served from cache)
+      supabase
+        .from("queries")
+        .insert({
+          question,
+          response: null,
+          spoiler_tier: spoilerTier,
+          chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
+          tokens_used: claudeData.usage?.output_tokens || 0,
+          client_ip: clientIp,
+        })
+        .then(() => {});
+    }
 
     return NextResponse.json({ answer, sources });
   } catch (error) {
