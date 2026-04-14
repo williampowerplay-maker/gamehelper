@@ -38,7 +38,7 @@ const RATE_LIMITS = {
 // are no longer a selectable tier; if a request arrives with spoilerTier="guide"
 // (cached client, old API consumer) we map it to "full" at read time below.
 const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
-  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 4 },
+  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 6 },
   full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
 };
 
@@ -306,7 +306,7 @@ export async function POST(req: NextRequest) {
           const rpcParams: Record<string, unknown> = {
             query_embedding: queryEmbedding,
             match_threshold: 0.25,
-            match_count: tierConfig.matchCount + 4, // fetch extra, we'll re-rank
+            match_count: tierConfig.matchCount + 10, // fetch extra, we'll re-rank
           };
           if (contentTypeFilter) rpcParams.content_type_filter = contentTypeFilter;
 
@@ -443,19 +443,27 @@ export async function POST(req: NextRequest) {
             chunks = chunks.map((c: Record<string, unknown>) => {
               const content = String(c.content || "").toLowerCase();
               const sourceUrl = String(c.source_url || "").toLowerCase();
+              // First 200 chars = title/heading area (especially important for game8 chunks
+              // where we prepend the page title, since game8 URLs are numeric archive IDs)
+              const contentStart = content.substring(0, 200);
               const termHits = questionTerms.filter((t: string) => content.includes(t)).length;
               const baseSim = Number(c.similarity || 0.3);
               // Boost per general term match
               let boost = Math.min(0.10, termHits * 0.02);
-              // Bigger boost if chunk is FROM the page about the topic (URL match).
-              // Raised from 0.15 → 0.25 so URL matches win the rerank over unrelated
-              // filtered-vector results in the 0.78–0.90 sim range.
+              // URL-match boost: fextralife URLs contain page names, game8 URLs are numeric.
+              // Lowered from 0.25 → 0.08 so URL matches help but don't overwhelm semantic sim.
               if (urlTermsForRerank.some((t: string) => sourceUrl.includes(t))) {
-                boost += 0.25;
+                boost += 0.08;
               }
-              // Medium boost if proper noun appears in content
+              // Content-start boost: if the chunk's title area contains query terms, it's
+              // very likely the right page. Works for both fextralife and game8.
+              const contentStartHits = urlTermsForRerank.filter((t: string) =>
+                contentStart.includes(t.replace(/\+/g, " "))
+              ).length;
+              if (contentStartHits > 0) boost += Math.min(0.20, contentStartHits * 0.10);
+              // Medium boost if proper noun appears anywhere in content
               for (const pn of allBoostTerms) {
-                if (content.includes(pn.toLowerCase())) boost += 0.05;
+                if (content.includes(pn.toLowerCase())) boost += 0.04;
               }
               return { ...c, similarity: baseSim + boost, termHits };
             });
