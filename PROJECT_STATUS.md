@@ -10,6 +10,7 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 
 | Layer | Technology | Version |
 |-------|-----------|---------|
+| GitHub repo | williampowerplay-maker/gamehelper | (renamed from crimson-guide) |
 | Framework | Next.js (App Router) | 16.2.1 |
 | Frontend | React + TypeScript | 19.2.4 / 6.0.2 |
 | Styling | Tailwind CSS 4 + PostCSS | 4.2.2 |

@@ -197,6 +197,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const clientIp = getClientIp(req);
+    const supabase = createClient(supabaseUrl, supabaseKey);
+
     // ===== RATE LIMITING — DISABLED DURING DEVELOPMENT =====
     // TODO (PRE-LAUNCH): Re-enable rate limiting before going live.
     // The full implementation is preserved below — just uncomment the block.
@@ -523,12 +526,12 @@ export async function POST(req: NextRequest) {
 
       if (data && data.length > 0) {
         // Rank by how many keywords each chunk contains
-        const ranked = data.map((chunk) => {
+        const ranked = data.map((chunk: Record<string, unknown>) => {
           const lowerContent = String(chunk.content).toLowerCase();
           const matchCount = keywords.filter((kw) => lowerContent.includes(kw)).length;
           return { ...chunk, matchCount };
         });
-        ranked.sort((a, b) => b.matchCount - a.matchCount);
+        ranked.sort((a: { matchCount: number }, b: { matchCount: number }) => b.matchCount - a.matchCount);
         chunks = ranked.slice(0, 5);
         console.log("Text search: top match has", ranked[0]?.matchCount, "/", keywords.length, "keywords");
       } else {

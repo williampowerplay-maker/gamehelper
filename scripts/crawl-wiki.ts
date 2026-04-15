@@ -288,7 +288,7 @@ async function fetchPage(pagePath: string): Promise<string | null> {
     const res = await fetch(url, {
       headers: {
         "User-Agent":
-          "CrimsonDesertGuide/1.0 (game-guide-bot; +https://github.com/williampowerplay-maker/crimson-guide)",
+          "CrimsonDesertGuide/1.0 (game-guide-bot; +https://github.com/williampowerplay-maker/gamehelper)",
       },
     });
     if (!res.ok) {

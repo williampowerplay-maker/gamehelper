@@ -7,11 +7,9 @@ AI-powered game guide for Crimson Desert. Players ask questions; the app retriev
 | Thing | Value |
 |---|---|
 | **Active local folder** | `C:\Users\William Power\Documents\GitHub\gamehelper` |
-| **GitHub repo** | `williampowerplay-maker/crimson-guide` |
+| **GitHub repo** | `williampowerplay-maker/gamehelper` |
 | **Vercel project** | `crimson-guide` |
 | **Production URL** | https://crimson-guide.vercel.app |
-
-> There is also a stale local folder at `C:\Users\William Power\Documents\GitHub\crimson-guide` — this is a leftover duplicate and should be deleted. All development happens in this (`gamehelper`) folder.
 
 ## Stack
 
