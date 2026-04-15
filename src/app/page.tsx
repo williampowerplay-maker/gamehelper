@@ -127,7 +127,7 @@ export default function Home() {
       <div className="flex-1 overflow-y-auto px-4 py-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
-            <div className="text-5xl mb-4">{"\u2694\uFE0F"}</div>
+            <Image src="/logo.webp" alt="Crimson Desert Guide" width={96} height={96} className="mb-4 opacity-90" priority />
             <h2 className="text-lg font-semibold text-gray-200 mb-2">
               Ask anything about Crimson Desert
             </h2>
