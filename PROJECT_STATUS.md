@@ -189,6 +189,12 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Tip of the Day Push Notifications** - Daily game tip based on where the user is in the game. Keeps users opening the app between play sessions. Drives ad impressions on free tier.
 - [ ] **Community Upvoting on Answers** - Users rate AI responses as helpful/not helpful. Best-rated answers get cached and served faster (saves API costs). Creates feedback loop for quality improvement.
 
+### Legal / Compliance (do before monetisation)
+
+- [ ] **Update contact emails** in `/privacy` and `/terms` pages — replace `privacy@crimsondesertguide.com` and `legal@crimsondesertguide.com` with real addresses once domain is live.
+- [ ] **Google AdSense application** — requires a live site with real content. Apply at adsense.google.com, then add publisher ID + ad slot IDs to Vercel env vars (`NEXT_PUBLIC_ADSENSE_ID`, `NEXT_PUBLIC_AD_SLOT_BANNER`, `NEXT_PUBLIC_AD_SLOT_SIDEBAR`) and drop an `ads.txt` file in `public/`.
+- [ ] **GDPR cookie consent banner** — required for EU users before enabling personalised AdSense ads. Implement a CMP (consent management platform) or a lightweight consent banner that gates AdSense loading behind user acceptance.
+
 ### Manual Setup Required
 
 See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and configs needed (AdSense, Stripe, Google OAuth, domain, content seeding, legal pages).
