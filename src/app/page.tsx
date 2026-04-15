@@ -188,6 +188,13 @@ export default function Home() {
       <div className="flex-shrink-0 border-t border-[#2a2a3a] px-4 py-3">
         <ChatInput onSend={handleSend} disabled={isLoading} />
       </div>
+
+      {/* Footer */}
+      <div className="flex-shrink-0 px-4 py-2 flex justify-center gap-4 text-xs text-gray-600">
+        <a href="/privacy" className="hover:text-gray-400 transition-colors">Privacy Policy</a>
+        <span>·</span>
+        <a href="/terms" className="hover:text-gray-400 transition-colors">Terms of Service</a>
+      </div>
     </div>
 
     {/* Desktop sidebar ad */}
