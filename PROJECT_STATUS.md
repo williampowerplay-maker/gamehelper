@@ -195,6 +195,23 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Google AdSense application** — requires a live site with real content. Apply at adsense.google.com, then add publisher ID + ad slot IDs to Vercel env vars (`NEXT_PUBLIC_ADSENSE_ID`, `NEXT_PUBLIC_AD_SLOT_BANNER`, `NEXT_PUBLIC_AD_SLOT_SIDEBAR`) and drop an `ads.txt` file in `public/`.
 - [ ] **GDPR cookie consent banner** — required for EU users before enabling personalised AdSense ads. Implement a CMP (consent management platform) or a lightweight consent banner that gates AdSense loading behind user acceptance.
 
+### Supabase Infrastructure (do before scaling)
+
+**Context (checked 2026-04-15):** DB is 1,576 MB total. `knowledge_chunks` has 94,107 rows with a 956 MB IVFFlat vector index — larger than the default Supabase compute RAM, causing disk IO on every similarity search. This triggered the IO alert.
+
+- [ ] **Upgrade Supabase compute** — go to Project Settings → Compute and upgrade to at least the Small add-on (2 GB RAM) so the 956 MB vector index fits in memory. Dashboard action, no code change needed.
+- [ ] **Rebuild vector index with correct lists count** — current `lists=100` is undersized for 94k rows. Run in Supabase SQL editor:
+  ```sql
+  DROP INDEX idx_chunks_embedding;
+  CREATE INDEX idx_chunks_embedding ON knowledge_chunks
+    USING ivfflat (embedding vector_cosine_ops) WITH (lists = 307);
+  ```
+- [ ] **Fix RLS initplan performance** — 10 policies across `users`, `bookmarks`, `queries`, `knowledge_chunks`, `page_hashes` re-evaluate `auth.uid()` per row. Replace `auth.uid()` with `(select auth.uid())` in each policy.
+- [ ] **Drop 3 unused indexes** — `idx_error_logs_created_at`, `idx_error_logs_type`, `idx_queries_user_id`.
+- [ ] **Fix mutable search_path on functions** — add `SET search_path = public` to `match_knowledge_chunks` and `match_chunks` functions.
+- [ ] **Enable leaked password protection** — Supabase dashboard → Authentication → Security. Checks passwords against HaveIBeenPwned. One toggle.
+- [ ] **Add missing FK index** — `bookmarks.query_id` has no covering index. Add: `CREATE INDEX ON bookmarks (query_id);`
+
 ### Manual Setup Required
 
 See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and configs needed (AdSense, Stripe, Google OAuth, domain, content seeding, legal pages).
