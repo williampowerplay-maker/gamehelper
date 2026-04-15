@@ -87,6 +87,10 @@ Once secrets are set, the workflow runs automatically every Sunday at 3am UTC.
 - [ ] When ready to increase: update the env var in Vercel (no code change needed)
 - [ ] When ready to remove cap entirely: set to a very high number or remove the check
 
+## Pre-Launch Code Changes (must do before going live)
+
+- [ ] **Re-enable rate limiting** in `src/app/api/chat/route.ts` — the block is fully preserved as commented-out code with a `TODO (PRE-LAUNCH)` marker. Uncomment it and wire `userTier` to the authenticated user's DB record (free vs premium). Limits: free = 5/min, 20/hr | premium = 10/min, 60/hr.
+
 ## Legal / Compliance
 
 - [ ] Add Privacy Policy page (required for AdSense and GDPR)

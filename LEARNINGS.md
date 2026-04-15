@@ -28,6 +28,13 @@ Things discovered during development that are worth remembering across sessions.
 - **Cache can mask newly ingested content**: If a query was cached before new content was added, the stale "I don't know" response gets served for 7 days even though the answer is now in the DB. When ingesting new categories that fix known retrieval gaps, **always clear the cache for those specific failing queries** via `DELETE FROM queries WHERE question = '...'` in Supabase.
 - **Nudge token budget doesn't need to grow with chunk count**: Increasing from 2→4 chunks doesn't require increasing `maxTokens` — Claude Haiku is still capped at 100 tokens and will synthesize from whichever chunks are most relevant. More chunks = more retrieval candidates, not necessarily more output.
 
+## RAG: Item Location Re-ranking
+
+- **Item pages contain both stats AND location data — but stats sections are often first**: Fextralife item pages have a "Where to Find" section, but the page's opening sections (name, stats, effects) generate chunks that are semantically close to "where is X" queries. Without a location-specific boost, stats/refinement chunks outscore the location chunk.
+- **Location-intent boost pattern**: In the Step C re-ranking loop, detect whether the query is asking for location (`where do i find`, `how to get`, `where to obtain`, etc.). If yes, add +0.15 to chunks containing location signal phrases: `where to find`, `can be found`, `obtained from`, `merchant`, `boss drop`, `chest`, `dropped by`, `found in`, `sold by`, `purchase from`, `reward from`. This promotes the location-data chunk above surrounding stats chunks.
+- **Fextralife has ~1,330 chunks with "where to find"** — good coverage of weapons/armor/shields/accessories. If a query returns no location info, the item may be a true content gap (e.g. White Lion Necklace — no location data in either source).
+- **Keep location-intent classifier broad**: The `getItemPhrases` regex must catch `how to get`, `how do I obtain`, `where can I obtain` in addition to `where do I find`. These patterns should route to `content_type = 'item'` rather than falling through to mechanic/exploration classifiers that would pick the wrong content.
+
 ## RAG: Wiki Domain Fragmentation
 
 - **Fextralife wiki has two subdomains**: `crimsondesert.wiki.fextralife.com` (original, most content) and `crimsondesertgame.wiki.fextralife.com` (newer migration). Some pages redirect across domains — e.g. `/Grappling` on the original domain 301s to the new domain. The ingest script uses a fixed `BASE_URL` and may not follow cross-domain redirects, resulting in sparse or empty chunk extraction for those pages. Workaround: the linked skill pages (Restrain, Throw, Lariat etc.) are crawled via BFS from the redirect target and do get ingested correctly. The overview page itself may be thin.
@@ -44,6 +51,13 @@ Things discovered during development that are worth remembering across sessions.
 - **Symptom**: After a re-ingest you see the same source_url appearing under two content_type values in the DB. Query: `SELECT source_url, array_agg(DISTINCT content_type) FROM knowledge_chunks WHERE source_url LIKE '%game8%' GROUP BY source_url HAVING COUNT(DISTINCT content_type) > 1`.
 - **Fix**: Use `SUPABASE_SERVICE_ROLE_KEY` (not anon key) in `.env.local` for ingest scripts. Or use the Supabase MCP `apply_migration` / `execute_sql` to run the DELETE as service_role.
 - **Content_type must match classifier**: When ingesting a new category, check what `content_type` the classifier routes those queries to (`classifyContentType()`) and use that exact value. Mismatch = chunks invisible to filtered searches. E.g. game8-puzzles must be `"puzzle"` not `"mechanic"` because puzzle queries filter by `content_type = 'puzzle'`.
+
+## RAG: Threshold Sensitivity — It Doesn't Matter Much
+
+- **Threshold (0.10–0.35) is rarely the retrieval bottleneck**: Per-category sensitivity sweep across all failing questions showed that questions either find their answer at ALL thresholds or at NONE. Tuning threshold does not recover missing answers — if the content isn't returned at 0.25 (production value), lowering to 0.10 won't help either (and may cause Supabase timeouts on large categories like `item`).
+- **Supabase statement timeouts at threshold=0.10 with item filter**: The `item` content_type has the most chunks (~12k+). At threshold=0.10, too many rows pass the similarity check and the query times out. Keep minimum threshold at 0.15 for item queries; 0.25 (current production) is safe for all categories.
+- **Real bottlenecks in order of impact**: (1) stale cached no-info responses, (2) wrong content_type classifier routing, (3) true content gaps. Threshold tuning is rarely #1.
+- **Diagnosis script**: `scripts/test-sensitivity-by-category.ts` — queries Supabase + Voyage AI directly (bypasses HTTP API) with a threshold sweep and matchCount sweep per question. Shows whether each question's answer is in the DB at all, and at what rank. Useful after major content changes.
 
 ## RAG: Cache Poisoning from Stale Responses
 

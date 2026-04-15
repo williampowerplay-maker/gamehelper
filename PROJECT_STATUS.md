@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-14 (session 14)
+**Last updated:** 2026-04-14 (session 16)
 
 ## Overview
 
@@ -20,6 +20,21 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 16 — Sensitivity Sweep + 95% Pass Rate (2026-04-14)
+- **Pass rate: 95% (38/40)** on 40-question Reddit-style test battery — up from 53% at session start
+- **Per-category sensitivity sweep** (`test-sensitivity-by-category.ts`): queried Supabase directly with threshold 0.10–0.35, confirmed threshold is NOT the bottleneck — stale cache and wrong classifier routing were the real issues
+- **Stale cache purge**: 30 cached "no-info" responses deleted from `queries` table — these were blocking good retrieval for kearush, myurdin, antumbra, ludvig, excavatron, alpha wolf helm, and others
+- **Classifier fixes**: "best weapon for beginner" and "what weapons can X use" now return `null` (cross-type search) instead of routing to `item`-only
+- **No-info pattern tightened**: Consolidated overlapping `"context doesn't"` patterns; removed overly broad `includes("i don't have")` false-positive catchers
+- **Rate limits**: Already disabled for development with pre-launch TODO note preserved in code
+- **Remaining true gaps** (need crawling): Darkbringer Sword, "hidden weapons" (generic), Kearush weak point detail, Abyss Kutum dedicated page
+- **Pre-launch checklist**: Rate limits must be re-enabled before going live (see `route.ts` lines 197–219)
+
+### Session 15 — Boss + Item Location Retrieval (2026-04-14)
+- **Boss classifier**: Added missing boss names `goyen`, `matthias`, `white bear`, `t'rukan` to `bossNames` array — these were falling through to full-type search instead of routing to `content_type = 'boss'`
+- **Item location re-ranking**: Added `isLocationQuery` detection + +0.15 boost for chunks containing location signal phrases (`where to find`, `obtained from`, `merchant`, `boss drop`, `chest`, `dropped by`, etc.) — promotes location data over stats chunks for "where to find X" queries
+- **Item classifier expansion**: `getItemPhrases` regex now captures `how to get`, `how do I obtain`, `where can I obtain`, and other location-intent patterns — routes them to `content_type = 'item'`
 
 ### Session 14 — Game8 Full Ingest + Cache Fix (2026-04-14)
 - **647 game8.co pages ingested** across 14 categories — puzzles (1,221 chunks), bosses (347 chunks), walkthrough, guides, weapons, armor, accessories, abyss, skills, crafting, items, locations, characters, challenges

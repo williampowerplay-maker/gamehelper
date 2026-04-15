@@ -93,11 +93,14 @@ Rules:
 function classifyContentType(question: string): string | null {
   const q = question.toLowerCase();
 
-  // BUILD queries — "best build for X" needs equipment + mechanic cross-type search.
-  // Equipment with stats lives in "item"/"character" types; build guides in "mechanic".
-  // Return null (no filter) so we search all types and find the best matching chunks.
-  // Must come FIRST — before boss/mechanic that would otherwise capture "build" keywords.
+  // BUILD / OVERVIEW queries — these need cross-type search (equipment stats in "item" +
+  // guides in "mechanic" + character info in "character"). Return null so all types contribute.
+  // Must come FIRST — before boss/mechanic/item classifiers that would otherwise capture keywords.
   if (/\b(best build|optimal build|build for|builds for|what.*build|recommended build|endgame build)\b/.test(q)) return null;
+  // "Best weapon/gear for beginner/early game" — guide content lives in mechanic, not item
+  if (/\b(best (weapon|gear|armor|accessory|accessories|item|equipment) for (a ?)?(beginner|new player|early|starter)|starter (weapon|gear)|beginner (weapon|gear))\b/.test(q)) return null;
+  // "What weapons/abilities can X use" — overview lives in mechanic/character, not item
+  if (/\b(what (weapons?|abilities|skills|classes|weapon types?) (can|does|do) \w+ use|what (weapons?|weapon types?) (are|is) (available|in the game))\b/.test(q)) return null;
 
   // BOSS — fight-specific verbs + known boss names
   // Must come before mechanic/skill since "how do I beat X" is a boss question
@@ -114,6 +117,8 @@ function classifyContentType(question: string): string | null {
     "black fang", "hornsplitter", "hemon", "beindel", "gwen kraber",
     "white bearclaw", "queen spider", "crookrock", "desert marauder", "rusten",
     "abyss kutum", "kutum",
+    // additional confirmed bosses
+    "goyen", "matthias", "white bear", "t'rukan",
   ];
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
@@ -135,7 +140,7 @@ function classifyContentType(question: string): string | null {
   // because that info often lives in beginner-guides (mechanic content_type). Full vector search
   // across all content types finds it better than a filtered item-only search.
   const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|enhance)\b/;
-  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm)|how (do i|to) acquire|where to (find|get|buy)|where (is|are) the)\b/;
+  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm|obtain)|how (do i|to) (acquire|obtain|get|find)|where to (find|get|buy|obtain)|where (is|are) the|how to get)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
   // EXPLORATION — location/navigation/dungeon queries
@@ -192,51 +197,29 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // ===== RATE LIMITING =====
-    const clientIp = getClientIp(req);
-    // SECURITY: Rate limit tier is always "free" for unauthenticated requests.
-    // Do NOT derive it from the client-controlled `spoilerTier` body param —
-    // that would let anyone pass spoilerTier:"full" to get 60/hr premium limits
-    // and force Sonnet usage on every query, multiplying API costs ~10x.
-    // TODO: once auth is wired, read the real user tier from their DB record.
-    const userTier: keyof typeof RATE_LIMITS = "free";
-    const limits = RATE_LIMITS[userTier];
-
-    // Single Supabase client for the whole request
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    const now = new Date();
-    const oneMinuteAgo = new Date(now.getTime() - 60 * 1000).toISOString();
-    const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
-
-    const [minuteCheck, hourCheck] = await Promise.all([
-      supabase
-        .from("queries")
-        .select("id", { count: "exact", head: true })
-        .eq("client_ip", clientIp)
-        .gte("created_at", oneMinuteAgo),
-      supabase
-        .from("queries")
-        .select("id", { count: "exact", head: true })
-        .eq("client_ip", clientIp)
-        .gte("created_at", oneHourAgo),
-    ]);
-
-    const queriesLastMinute = minuteCheck.count ?? 0;
-    const queriesLastHour = hourCheck.count ?? 0;
-
-    if (queriesLastMinute >= limits.perMinute) {
-      return NextResponse.json(
-        { error: "Slow down! You can ask another question in a minute.", rateLimited: true },
-        { status: 429 }
-      );
-    }
-    if (queriesLastHour >= limits.perHour) {
-      const resetMinutes = Math.ceil((60 * 60 * 1000 - (now.getTime() - new Date(oneHourAgo).getTime())) / 60000);
-      return NextResponse.json(
-        { error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true },
-        { status: 429 }
-      );
-    }
+    // ===== RATE LIMITING — DISABLED DURING DEVELOPMENT =====
+    // TODO (PRE-LAUNCH): Re-enable rate limiting before going live.
+    // The full implementation is preserved below — just uncomment the block.
+    // Limits: free = 5/min, 20/hr | premium = 10/min, 60/hr
+    // Also wire userTier to the authenticated user's DB record instead of hardcoding "free".
+    //
+    // const clientIp = getClientIp(req);
+    // const userTier: keyof typeof RATE_LIMITS = "free";
+    // const limits = RATE_LIMITS[userTier];
+    // const now = new Date();
+    // const oneMinuteAgo = new Date(now.getTime() - 60 * 1000).toISOString();
+    // const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
+    // const [minuteCheck, hourCheck] = await Promise.all([
+    //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneMinuteAgo),
+    //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneHourAgo),
+    // ]);
+    // if ((minuteCheck.count ?? 0) >= limits.perMinute) {
+    //   return NextResponse.json({ error: "Slow down! You can ask another question in a minute.", rateLimited: true }, { status: 429 });
+    // }
+    // if ((hourCheck.count ?? 0) >= limits.perHour) {
+    //   const resetMinutes = Math.ceil((60 * 60 * 1000 - (now.getTime() - new Date(oneHourAgo).getTime())) / 60000);
+    //   return NextResponse.json({ error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true }, { status: 429 });
+    // }
 
     // Check if API keys are configured
     const anthropicKey = process.env.ANTHROPIC_API_KEY || envVars.ANTHROPIC_API_KEY;
@@ -495,6 +478,15 @@ export async function POST(req: NextRequest) {
               for (const pn of allBoostTerms) {
                 if (content.includes(pn.toLowerCase())) boost += 0.04;
               }
+              // Location-intent boost: for "where to find/get X" queries, prefer chunks
+              // that contain actual location data (drop sources, merchants, map areas) over
+              // stat/refinement chunks from the same item page.
+              const isLocationQuery = /\b(where (do i|can i|to) (find|get|buy|farm|obtain)|how (do i|to) (get|obtain|acquire|find)|where is|location of|how to get|where to find|where to get)\b/.test(question.toLowerCase());
+              if (isLocationQuery) {
+                const locationSignals = ["where to find", "where to get", "can be found", "obtained from", "merchant", "boss drop", "chest", "located at", "how to obtain", "dropped by", "found in", "sold by", "purchase from", "reward from"];
+                const hasLocationContent = locationSignals.some((sig: string) => content.includes(sig));
+                if (hasLocationContent) boost += 0.15;
+              }
               return { ...c, similarity: baseSim + boost, termHits };
             });
             chunks.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
@@ -557,8 +549,7 @@ export async function POST(req: NextRequest) {
       return (
         /i (don'?t|do not) have (specific |enough )?information/.test(lower) ||
         /not (in|part of|covered (by|in)) (the |this )?(provided |available )?context/.test(lower) ||
-        /context (provided |given )?(doesn'?t|does not|focuses entirely)/.test(lower) ||
-        /context (doesn'?t|does not) (contain|include|mention|cover)/.test(lower) ||
+        /context (provided |given )?(doesn'?t|does not) (contain|include|mention|cover|have)/.test(lower) ||
         /i (can'?t|cannot) find (any |enough )?information/.test(lower) ||
         /no (relevant |specific |useful )?information (is )?(available|found|provided)/.test(lower) ||
         lower.includes("couldn't generate an answer") ||
