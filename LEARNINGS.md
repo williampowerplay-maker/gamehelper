@@ -182,6 +182,30 @@ Things discovered during development that are worth remembering across sessions.
 - **Nudge tier needs explicit anti-leak rules**: When context contains detailed strategies (button inputs, phase breakdowns), Claude will leak them into nudge responses unless explicitly told not to. Good/bad examples in the prompt are essential. Also: fewer chunks (2 vs 3) and lower max tokens (100 vs 150) help.
 - **Wiki section header variants break extraction**: Fextralife uses "How to Get", "How to Obtain", "How to Craft", "Where to Find" inconsistently across pages. Any regex-based extractor must account for all variants.
 
+## Next.js App Router: Favicon & Icons
+
+- **Drop files in `src/app/` to auto-serve icons**: Next.js App Router uses file-based icon conventions. `src/app/icon.png` → browser favicon, `src/app/apple-icon.png` → Apple touch icon, `src/app/icon-192.png` → high-res PWA icon. No `<link>` tags needed — Next.js injects them into `<head>` automatically. Routes show up as `○ /icon.png` in the build output confirming they're serving.
+- **Use Sharp to generate icons from a source image**: Sharp is already a Next.js dependency (used for image optimization). Run it directly in Node: `sharp(src).resize(32, 32).png().toFile('./src/app/icon.png')`. No extra packages needed.
+- **Transparent background webp/png works best for logos on dark themes**: The shield logo has a transparent background which renders cleanly on the dark header without needing a box or background treatment.
+
+## Supabase: Vector Index Sizing
+
+- **IVFFlat `lists` must scale with row count**: Formula is `sqrt(n_rows)` for datasets under 1M rows. At 94k rows, correct value is ~307. The original `lists=100` was set when the DB had ~17k rows and was never updated. With 100 lists and 94k vectors, each bucket holds ~940 vectors — oversized buckets cause more data to be scanned per query, increasing IO.
+- **Vector index size can exceed compute RAM and cause IO alerts**: The IVFFlat index on 94k × 1024-dimension vectors is ~956 MB. On Supabase starter compute (1 GB RAM), this barely fits and any competing memory use causes the index to be paged to disk. Every similarity search then requires disk reads → IO alert. Fix: upgrade compute so index fits in RAM, AND rebuild index with correct `lists` value.
+- **Rebuilding IVFFlat requires a brief table lock**: `DROP INDEX` then `CREATE INDEX USING ivfflat` takes the full table lock while building. Schedule during low-traffic window. For 94k rows the rebuild is fast (seconds to low minutes).
+- **Index size dominates DB storage for vector tables**: `knowledge_chunks` has 76 MB of table data but 963 MB of indexes (956 MB vector + 7 MB btree). Total = 1,564 MB. When estimating DB storage, the vector index is typically 10–15× the raw table size.
+
+## Supabase: RLS Performance
+
+- **`auth.uid()` in RLS policies re-evaluates per row by default**: Postgres evaluates RLS policy expressions for every row scanned unless the expression is wrapped in a subquery. `auth.uid()` is a function call that hits the session context each time. At scale this becomes significant. Fix: replace `auth.uid()` with `(select auth.uid())` — the subquery form is evaluated once per query and the result is reused.
+- **Supabase's advisor tool catches this**: The `auth_rls_initplan` lint fires on any policy using bare `auth.uid()` or `auth.role()`. Run the performance advisor after any schema change.
+
+## Debugging Vercel Deployments
+
+- **A broken deployment stays silently broken until you check logs**: Vercel shows `ERROR` state in the dashboard, but the git push doesn't fail and there's no email by default. After wiring a new repo, always verify the first deployment succeeded by checking the Vercel dashboard or using the MCP `get_deployment_build_logs` tool.
+- **TypeScript errors that pass locally can fail on Vercel if tsconfig differs**: Vercel runs `next build` which includes a full TypeScript check. Locally, `next dev` skips strict type checking. Always run `npx tsc --noEmit` locally before pushing to confirm the build is clean.
+- **`live: false` on a Vercel project means no successful production deployment has landed**: The project exists but has never successfully deployed, or all deployments are in ERROR state. Normal healthy projects show `live: true` with a valid `latestDeployment.readyState: "READY"`.
+
 ## Deployment
 
 - **Vercel Hobby plan**: Does not support git-triggered deploys from collaborators. The git author's email must match the Vercel account owner. Fix: deploy via CLI (`npx vercel --prod`) instead of git integration.

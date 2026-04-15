@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-14 (session 16)
+**Last updated:** 2026-04-15 (session 17)
 
 ## Overview
 
@@ -21,6 +21,16 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 17 — Build Fix, Legal Pages, Logo, Supabase Audit (2026-04-15)
+
+- **Build-breaking TS errors fixed**: `supabase` client and `clientIp` were only defined inside the commented-out rate limiting block — all Supabase calls in the main try block were referencing undefined variables. Added `const supabase = createClient(...)` and `const clientIp = getClientIp(req)` at the top of the POST handler. Also fixed 3 implicit `any` types in text search fallback. Zero TS errors; Vercel deployment unblocked.
+- **Vercel deployment confirmed + unblocked**: Vercel was already connected to `williampowerplay-maker/gamehelper` (user had done this) but the latest deployment was in `ERROR` state due to the TS errors above. Fixed build lets Vercel auto-deploy all session 12–16 improvements (95% pass rate, boss classifier, location boost, cache no-store fix) to production for the first time.
+- **Repo rename cleanup**: Updated `README.md` (GitHub repo field, removed stale local folder note), `scripts/crawl-wiki.ts` User-Agent string, and `PROJECT_STATUS.md` to reflect the rename from `crimson-guide` → `gamehelper`.
+- **Privacy Policy + Terms of Service**: Added `/privacy` and `/terms` as static Next.js pages with dark theme styling. Content covers: data collection (queries, IP, email, OAuth), third-party services (Supabase, Anthropic, Voyage AI, AdSense, Vercel), AI disclaimer, subscription terms, fan-project IP notice. Footer links added to main chat page.
+- **Shield AI logo**: Added `GGAi Logo1.webp` to `public/logo.webp`. Generated `src/app/icon.png` (32×32), `src/app/icon-192.png` (192×192), and `src/app/apple-icon.png` (180×180) via Sharp — Next.js App Router auto-serves these as browser favicon and Apple touch icon. Logo shown at 44px in header alongside title text; also replaces the ⚔️ emoji on the empty chat screen at 96px.
+- **Supabase health audit**: DB is **1,576 MB** total. `knowledge_chunks` has **94,107 rows** (docs said ~38,600 — corrected). IVFFlat vector index is **956 MB** — exceeds free/starter compute RAM, causing disk IO on every similarity search (root cause of the IO alert). Index also has wrong `lists=100` for 94k rows (should be ~307). 10 performance advisors (RLS initplan, unused indexes, unindexed FK) and 7 security advisors (mutable search_path, permissive RLS, leaked password protection) logged — fixes deferred, documented in project scope.
+- **Chunk count corrected**: Verified via `SELECT COUNT(*)` — 94,107 chunks live in DB. Previous estimate of ~38,600 in docs was stale; game8 full ingest (session 14) more than doubled the total.
 
 ### Session 16 — Sensitivity Sweep + 95% Pass Rate (2026-04-14)
 - **Pass rate: 95% (38/40)** on 40-question Reddit-style test battery — up from 53% at session start
@@ -169,6 +179,8 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 
 **DB admin task completed (2026-04-04)**: Dropped the duplicate 3-arg `match_knowledge_chunks` overload via `DROP FUNCTION public.match_knowledge_chunks(vector, double precision, integer);` in Supabase SQL editor. Verified with `pg_proc` query — only the 4-arg version (with `content_type_filter`) remains. The unfiltered-retry path and `null`-classifier path now work cleanly.
 
+- [x] **Privacy Policy + Terms of Service** — `/privacy` and `/terms` static pages, dark-themed, linked in footer. Contact email placeholders to replace when domain is live.
+- [x] **Branding** — Shield AI logo (`public/logo.webp`) in header (44px) and empty chat screen (96px). Auto-generated favicon (`src/app/icon.png` 32×32) and Apple touch icon (`src/app/apple-icon.png` 180×180) via Next.js App Router convention.
 - [ ] **Streaming Responses** - Currently waits for full Claude response; no SSE/streaming
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
