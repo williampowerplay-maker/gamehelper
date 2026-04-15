@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useRef, useEffect } from "react";
+import Image from "next/image";
 import ChatInput from "@/components/ChatInput";
 import ChatMessage, { type Message } from "@/components/ChatMessage";
 import SpoilerTierSelector from "@/components/SpoilerTierSelector";
@@ -88,14 +89,24 @@ export default function Home() {
       {/* Header */}
       <header className="flex-shrink-0 border-b border-[#2a2a3a] px-4 py-2 sm:py-4">
         <div className="flex items-center justify-between">
-          <div>
-            <h1 className="text-xl font-bold">
-              <span className="text-red-500">Crimson</span>{" "}
-              <span className="text-gray-100">Desert Guide</span>
-            </h1>
-            <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">
-              AI-powered game companion
-            </p>
+          <div className="flex items-center gap-3">
+            <Image
+              src="/logo.webp"
+              alt="Crimson Desert Guide"
+              width={44}
+              height={44}
+              className="flex-shrink-0"
+              priority
+            />
+            <div>
+              <h1 className="text-xl font-bold">
+                <span className="text-red-500">Crimson</span>{" "}
+                <span className="text-gray-100">Desert Guide</span>
+              </h1>
+              <p className="text-xs text-gray-500 mt-0.5 hidden sm:block">
+                AI-powered game companion
+              </p>
+            </div>
           </div>
           <AuthButton />
         </div>
