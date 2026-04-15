@@ -235,6 +235,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ===== RESPONSE CACHE CHECK =====
+    const now = new Date();
     const tierConfig = TIER_CLAUDE[spoilerTier] || TIER_CLAUDE.nudge;
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
     const { data: cachedQuery } = await supabase
