@@ -222,11 +222,11 @@ export async function POST(req: NextRequest) {
     //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneHourAgo),
     // ]);
     // if ((minuteCheck.count ?? 0) >= limits.perMinute) {
-    //   return NextResponse.json({ error: "Slow down! You can ask another question in a minute.", rateLimited: true }, { status: 429 });
+    //   return NextResponse.json({ error: "Slow down! You can ask another question in a minute.", rateLimited: true, showUpgradeCTA: userTier === "free" }, { status: 429 });
     // }
     // if ((hourCheck.count ?? 0) >= limits.perHour) {
     //   const resetMinutes = Math.ceil((60 * 60 * 1000 - (now.getTime() - new Date(oneHourAgo).getTime())) / 60000);
-    //   return NextResponse.json({ error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true }, { status: 429 });
+    //   return NextResponse.json({ error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true, showUpgradeCTA: userTier === "free" }, { status: 429 });
     // }
 
     // Check if API keys are configured

@@ -55,6 +55,7 @@ export default function Home() {
           id: (Date.now() + 1).toString(),
           role: "assistant",
           content: data.error,
+          showUpgradeCTA: !!data.showUpgradeCTA,
         };
         setMessages((prev) => [...prev, rateLimitMessage]);
         return;
@@ -162,8 +163,12 @@ export default function Home() {
           return (
             <div key={msg.id}>
               <ChatMessage message={msg} />
+              {/* Show upgrade CTA when free user hits rate limit */}
+              {isAssistant && msg.showUpgradeCTA && (
+                <UpgradeCTA rateLimitHit />
+              )}
               {/* Show upgrade CTA after every 5th assistant response */}
-              {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && (
+              {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
                 <UpgradeCTA />
               )}
               {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}

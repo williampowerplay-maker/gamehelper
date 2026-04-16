@@ -8,6 +8,7 @@ interface Message {
   content: string;
   spoilerTier?: SpoilerTier;
   sources?: { title: string; url: string }[];
+  showUpgradeCTA?: boolean;
 }
 
 const tierBadge: Record<SpoilerTier, { label: string; color: string }> = {
