@@ -338,7 +338,7 @@ export async function POST(req: NextRequest) {
           // and do an ILIKE search to find chunks that mention them exactly.
           // Uses a stop-word filter instead of uppercase-first check so lowercase
           // questions like "feather of the earth challenge" are handled correctly.
-          const boostStopWords = new Set(["how", "what", "where", "when", "why", "who", "which", "does", "the", "and", "for", "are", "but", "not", "you", "this", "that", "with", "have", "from", "they", "will", "just", "than", "then", "here", "some", "there", "about", "into", "can", "could", "would", "should", "did"]);
+          const boostStopWords = new Set(["how", "what", "where", "when", "why", "who", "which", "does", "the", "and", "for", "are", "but", "not", "you", "this", "that", "with", "have", "from", "they", "will", "just", "than", "then", "here", "some", "there", "about", "into", "can", "could", "would", "should", "did", "find", "get", "give", "buy", "farm", "craft", "make", "locate", "obtain", "show", "tell", "use", "equip", "upgrade", "unlock"]);
           const boostKeywords = question
             .replace(/[^a-zA-Z0-9\s'-]/g, "")
             .split(/\s+/)
@@ -355,6 +355,7 @@ export async function POST(req: NextRequest) {
           // e.g. "how to do feather of the earth challenge" → "feather of the earth"
           const cleanedForPhrase = question
             .replace(/^(how (to do|to get|to reach|to complete|to find|to unlock|to|do i|does|can i)|where (is|can i find|do i find)|what (is|are|does)|who is|when is|tell me about|explain)\s+/i, "")
+            .replace(/^(find|locate|get|buy|farm|obtain|craft|make|use|equip|upgrade|unlock|show|tell|give)\s+/i, "")
             .replace(/^(the|a|an|do|my)\s+/i, "")
             .replace(/\s+(challenge|challenges|quest|mission|boss|fight|item|skill|location|area|region|guide|help|tips?|strategy|strategies|ruins?|dungeon)s?\s*$/i, "")
             .trim();
