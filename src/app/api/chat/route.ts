@@ -678,6 +678,7 @@ export async function POST(req: NextRequest) {
         .then(() => {});
     } else {
       // Still log the query for analytics (but without response so it won't be served from cache)
+      // content_gap: true marks this as an unanswered question for later review
       supabase
         .from("queries")
         .insert({
@@ -687,6 +688,7 @@ export async function POST(req: NextRequest) {
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
           tokens_used: claudeData.usage?.output_tokens || 0,
           client_ip: clientIp,
+          content_gap: true,
         })
         .then(() => {});
     }

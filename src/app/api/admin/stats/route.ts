@@ -101,6 +101,7 @@ export async function GET(req: NextRequest) {
     errorsLast24hRes,
     queriesLastHourRes,
     ipLast24hRes,
+    contentGapsRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -119,6 +120,11 @@ export async function GET(req: NextRequest) {
     supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", oneDayAgo),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", oneHourAgo),
     supabase.from("queries").select("client_ip").gte("created_at", oneDayAgo),
+    supabase.from("queries")
+      .select("id, question, spoiler_tier, created_at")
+      .eq("content_gap", true)
+      .order("created_at", { ascending: false })
+      .limit(100),
   ]);
 
   // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
@@ -199,5 +205,6 @@ export async function GET(req: NextRequest) {
     recentErrors: recentErrorsRes.data ?? [],
     queryRates,
     topIps,
+    contentGaps: contentGapsRes.data ?? [],
   });
 }

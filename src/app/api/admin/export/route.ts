@@ -65,7 +65,7 @@ function escapeCSV(val: string | null | undefined): string {
   return str;
 }
 
-const ALLOWED_EXPORT_TYPES = ["waitlist", "users"] as const;
+const ALLOWED_EXPORT_TYPES = ["waitlist", "users", "content-gaps"] as const;
 
 export async function GET(req: NextRequest) {
   const auth = checkAdminAuth(req);
@@ -102,6 +102,32 @@ export async function GET(req: NextRequest) {
       headers: {
         "Content-Type": "text/csv",
         "Content-Disposition": `attachment; filename="waitlist-${new Date().toISOString().slice(0, 10)}.csv"`,
+      },
+    });
+  }
+
+  if (type === "content-gaps") {
+    const { data, error } = await supabase
+      .from("queries")
+      .select("question, spoiler_tier, created_at")
+      .eq("content_gap", true)
+      .order("created_at", { ascending: false });
+
+    if (error) return NextResponse.json({ error: error.message }, { status: 500 });
+
+    const rows = data ?? [];
+    const csv = [
+      "question,spoiler_tier,asked_at",
+      ...rows.map((r) =>
+        [escapeCSV(r.question), escapeCSV(r.spoiler_tier), escapeCSV(r.created_at)].join(",")
+      ),
+    ].join("\n");
+
+    return new NextResponse(csv, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv",
+        "Content-Disposition": `attachment; filename="content-gaps-${new Date().toISOString().slice(0, 10)}.csv"`,
       },
     });
   }

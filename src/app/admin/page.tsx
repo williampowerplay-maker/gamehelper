@@ -77,6 +77,7 @@ interface StatsData {
     last24hTotal: number;
   };
   topIps: { ip: string; count: number; suspicious: boolean }[];
+  contentGaps: { id: string; question: string; spoiler_tier: string; created_at: string }[];
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -205,7 +206,7 @@ export default function AdminPage() {
     if (secret) fetchErrors(errorWindow, secret);
   }, [errorWindow, secret, fetchErrors]);
 
-  const handleExport = async (type: "waitlist" | "users") => {
+  const handleExport = async (type: "waitlist" | "users" | "content-gaps") => {
     setExporting(type);
     try {
       const res = await fetch(`/api/admin/export?type=${type}`, {
@@ -296,7 +297,7 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps } = data;
   const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
@@ -313,6 +314,14 @@ export default function AdminPage() {
           </h1>
         </div>
         <div className="flex items-center gap-3">
+          <button
+            onClick={() => handleExport("content-gaps")}
+            disabled={exporting === "content-gaps"}
+            title="Download unanswered questions as CSV"
+            className="text-xs text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+          >
+            {exporting === "content-gaps" ? "Exporting..." : "↓ Content Gaps CSV"}
+          </button>
           <button
             onClick={() => handleExport("waitlist")}
             disabled={exporting === "waitlist"}
@@ -530,6 +539,53 @@ export default function AdminPage() {
               </tbody>
             </table>
           </div>
+        </div>
+
+        {/* Content Gaps */}
+        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-300">
+              Unanswered Questions
+              <span className="text-gray-600 font-normal ml-2">({contentGaps.length} total)</span>
+            </h2>
+            <button
+              onClick={() => handleExport("content-gaps")}
+              disabled={exporting === "content-gaps"}
+              className="text-xs text-purple-400 hover:text-purple-300 border border-purple-500/30 hover:border-purple-500/60 rounded-lg px-3 py-1.5 transition-colors disabled:opacity-50"
+            >
+              {exporting === "content-gaps" ? "Exporting..." : "↓ Export CSV"}
+            </button>
+          </div>
+          {contentGaps.length === 0 ? (
+            <p className="text-xs text-gray-600 text-center py-4">No unanswered questions yet</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
+                    <th className="pb-2 pr-4 font-medium">Question</th>
+                    <th className="pb-2 pr-4 font-medium w-16">Tier</th>
+                    <th className="pb-2 font-medium w-20 text-right">When</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {contentGaps.map((q) => (
+                    <tr key={q.id} className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/50 transition-colors">
+                      <td className="py-2 pr-4 text-gray-300 max-w-xs">
+                        <span className="line-clamp-1">{q.question}</span>
+                      </td>
+                      <td className={`py-2 pr-4 capitalize font-medium ${TIER_COLORS[q.spoiler_tier] ?? "text-gray-400"}`}>
+                        {q.spoiler_tier}
+                      </td>
+                      <td className="py-2 text-gray-600 text-right whitespace-nowrap">
+                        {timeAgo(q.created_at)}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
 
         {/* Error Log Dashboard */}
