@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 
@@ -30,6 +31,14 @@ export default function AuthButton() {
         >
           {tier === "premium" ? "Premium" : "Free"}
         </span>
+        {tier !== "premium" && (
+          <Link
+            href="/upgrade"
+            className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"
+          >
+            Upgrade
+          </Link>
+        )}
         <button
           onClick={signOut}
           className="text-xs text-gray-500 hover:text-gray-300 transition-colors"
