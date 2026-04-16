@@ -120,6 +120,7 @@ export default function Home() {
           <SpoilerTierSelector
             selected={spoilerTier}
             onChange={setSpoilerTier}
+            isPremium={tier === "premium"}
           />
         </div>
       </div>

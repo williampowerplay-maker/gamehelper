@@ -1,48 +1,67 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { type SpoilerTier } from "@/lib/supabase";
 
-const tiers: { id: SpoilerTier; label: string; desc: string; icon: string }[] =
-  [
-    {
-      id: "nudge",
-      label: "Nudge",
-      desc: "A gentle hint — preserves discovery",
-      icon: "\u{1F441}",
-    },
-    {
-      id: "full",
-      label: "Solution",
-      desc: "Complete answer — tell me everything",
-      icon: "\u{1F4A1}",
-    },
-  ];
+const tiers: { id: SpoilerTier; label: string; desc: string; icon: string; premiumOnly: boolean }[] = [
+  {
+    id: "nudge",
+    label: "Nudge",
+    desc: "A gentle hint — preserves discovery",
+    icon: "\u{1F441}",
+    premiumOnly: false,
+  },
+  {
+    id: "full",
+    label: "Solution",
+    desc: "Complete answer — Premium only",
+    icon: "\u{1F4A1}",
+    premiumOnly: true,
+  },
+];
 
 export default function SpoilerTierSelector({
   selected,
   onChange,
+  isPremium = false,
 }: {
   selected: SpoilerTier;
   onChange: (tier: SpoilerTier) => void;
+  isPremium?: boolean;
 }) {
+  const router = useRouter();
+
   return (
     <div className="flex gap-2">
-      {tiers.map((tier) => (
-        <button
-          key={tier.id}
-          onClick={() => onChange(tier.id)}
-          className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
-            ${
-              selected === tier.id
-                ? "bg-red-600/20 text-red-400 border border-red-500/40"
-                : "bg-[#1a1a24] text-gray-400 border border-[#2a2a3a] hover:border-gray-500 hover:text-gray-300"
-            }`}
-          title={tier.desc}
-        >
-          <span>{tier.icon}</span>
-          <span>{tier.label}</span>
-        </button>
-      ))}
+      {tiers.map((tier) => {
+        const locked = tier.premiumOnly && !isPremium;
+        const isSelected = selected === tier.id;
+
+        return (
+          <button
+            key={tier.id}
+            onClick={() => {
+              if (locked) {
+                router.push("/upgrade");
+              } else {
+                onChange(tier.id);
+              }
+            }}
+            title={locked ? "Premium only — click to upgrade" : tier.desc}
+            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
+              ${locked
+                ? "bg-[#1a1a24] text-gray-600 border border-[#2a2a3a] hover:border-amber-500/40 hover:text-amber-500/70 cursor-pointer"
+                : isSelected
+                  ? "bg-red-600/20 text-red-400 border border-red-500/40"
+                  : "bg-[#1a1a24] text-gray-400 border border-[#2a2a3a] hover:border-gray-500 hover:text-gray-300"
+              }`}
+          >
+            <span>{tier.icon}</span>
+            <span>{tier.label}</span>
+            {locked && <span className="text-[10px] text-amber-500/60">★</span>}
+          </button>
+        );
+      })}
     </div>
   );
 }
