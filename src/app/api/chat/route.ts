@@ -38,8 +38,8 @@ const RATE_LIMITS = {
 // are no longer a selectable tier; if a request arrives with spoilerTier="guide"
 // (cached client, old API consumer) we map it to "full" at read time below.
 const TIER_CLAUDE: Record<string, { model: string; maxTokens: number; matchCount: number }> = {
-  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100,  matchCount: 6 },
-  full:  { model: "claude-sonnet-4-20250514",  maxTokens: 1024, matchCount: 8 },
+  nudge: { model: "claude-haiku-4-5-20251001", maxTokens: 100, matchCount: 4 },
+  full:  { model: "claude-sonnet-4-20250514",  maxTokens: 650, matchCount: 8 },
 };
 
 function getClientIp(req: NextRequest): string {
@@ -247,6 +247,7 @@ export async function POST(req: NextRequest) {
     }
 
     // ===== RESPONSE CACHE CHECK =====
+    // Runs BEFORE Voyage embedding — cache hits cost $0 in API calls.
     const now = new Date();
     const tierConfig = TIER_CLAUDE[spoilerTier] || TIER_CLAUDE.nudge;
     const sevenDaysAgo = new Date(now.getTime() - 7 * 24 * 60 * 60 * 1000).toISOString();
@@ -262,8 +263,40 @@ export async function POST(req: NextRequest) {
 
     if (cachedQuery?.response) {
       console.log("Cache hit — returning cached response");
+      // Log cache hit for analytics (non-blocking)
+      supabase.from("queries").insert({
+        question: cacheKey,
+        response: cachedQuery.response,
+        spoiler_tier: spoilerTier,
+        chunk_ids_used: [],
+        tokens_used: 0,
+        client_ip: clientIp,
+        cache_hit: true,
+      }).then(() => {});
       return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true });
     }
+
+    // ===== FREE TIER: SOLUTION DAILY CAP =====
+    // TODO (PRE-LAUNCH): Wire userTier to authenticated user's DB record.
+    // Solution tier (Sonnet) costs ~10x more than nudge (Haiku).
+    // Free users are limited to 10 solution-tier queries per day.
+    // const userTierForSolution: string = "free"; // replace with real auth lookup
+    // if (spoilerTier === "full" && userTierForSolution === "free") {
+    //   const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    //   const { count: solutionCount } = await supabase
+    //     .from("queries")
+    //     .select("id", { count: "exact", head: true })
+    //     .eq("client_ip", clientIp)
+    //     .eq("spoiler_tier", "full")
+    //     .gte("created_at", oneDayAgo);
+    //   if ((solutionCount ?? 0) >= 10) {
+    //     return NextResponse.json({
+    //       error: "You've used your 10 full solutions for today. Upgrade to Premium for unlimited solutions, or switch to Nudge mode.",
+    //       rateLimited: true,
+    //       showUpgradeCTA: true,
+    //     }, { status: 429 });
+    //   }
+    // }
 
     // ===== FULL RAG PIPELINE =====
     let chunks: Record<string, unknown>[] | null = null;
@@ -620,7 +653,11 @@ export async function POST(req: NextRequest) {
         })) || [];
 
     // Step 3: Call Claude
-    const systemPrompt = `${BASE_SYSTEM_PROMPT}\n\n${SPOILER_INSTRUCTIONS[spoilerTier] || SPOILER_INSTRUCTIONS.full}`;
+    // Nudge tier uses a trimmed system prompt — Haiku doesn't need the full
+    // BASE_SYSTEM_PROMPT detail to produce a good hint, and fewer input tokens = lower cost.
+    const systemPrompt = spoilerTier === "nudge"
+      ? `You are a helpful Crimson Desert game guide. Answer using ONLY the provided context.\n\n${SPOILER_INSTRUCTIONS.nudge}`
+      : `${BASE_SYSTEM_PROMPT}\n\n${SPOILER_INSTRUCTIONS.full}`;
 
     const claudeRes = await fetch("https://api.anthropic.com/v1/messages", {
       method: "POST",
@@ -674,6 +711,7 @@ export async function POST(req: NextRequest) {
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
           tokens_used: claudeData.usage?.output_tokens || 0,
           client_ip: clientIp,
+          cache_hit: false,
         })
         .then(() => {});
     } else {
@@ -688,6 +726,7 @@ export async function POST(req: NextRequest) {
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
           tokens_used: claudeData.usage?.output_tokens || 0,
           client_ip: clientIp,
+          cache_hit: false,
           content_gap: true,
         })
         .then(() => {});

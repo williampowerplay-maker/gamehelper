@@ -78,6 +78,8 @@ interface StatsData {
   };
   topIps: { ip: string; count: number; suspicious: boolean }[];
   contentGaps: { id: string; question: string; spoiler_tier: string; created_at: string }[];
+  cacheHitRate: number;
+  cacheHits: number;
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -297,7 +299,7 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps, cacheHitRate, cacheHits } = data;
   const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
@@ -380,6 +382,11 @@ export default function AdminPage() {
               }
             />
             <StatCard label="Errors (24h)" value={overview.errorsLast24h ?? 0} />
+            <StatCard
+              label="Cache Hit Rate"
+              value={`${cacheHitRate}%`}
+              sub={`${cacheHits.toLocaleString()} hits · 7 days`}
+            />
           </div>
         </section>
 

@@ -102,6 +102,8 @@ export async function GET(req: NextRequest) {
     queriesLastHourRes,
     ipLast24hRes,
     contentGapsRes,
+    cacheHitsRes,
+    totalCachedWindowRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -125,6 +127,8 @@ export async function GET(req: NextRequest) {
       .eq("content_gap", true)
       .order("created_at", { ascending: false })
       .limit(100),
+    supabase.from("queries").select("id", { count: "exact", head: true }).eq("cache_hit", true).gte("created_at", sevenDaysAgo),
+    supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
   ]);
 
   // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
@@ -156,6 +160,11 @@ export async function GET(req: NextRequest) {
     const t = row.content_type as string;
     typeMap[t] = (typeMap[t] ?? 0) + 1;
   }
+
+  // Cache hit rate (last 7 days)
+  const cacheHits = cacheHitsRes.count ?? 0;
+  const totalCached = totalCachedWindowRes.count ?? 0;
+  const cacheHitRate = totalCached > 0 ? Math.round((cacheHits / totalCached) * 100) : 0;
 
   // Query rate averages (rolling windows)
   const queriesLastHour = queriesLastHourRes.count ?? 0;
@@ -206,5 +215,7 @@ export async function GET(req: NextRequest) {
     queryRates,
     topIps,
     contentGaps: contentGapsRes.data ?? [],
+    cacheHitRate,
+    cacheHits,
   });
 }
