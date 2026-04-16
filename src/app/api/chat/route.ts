@@ -200,6 +200,11 @@ export async function POST(req: NextRequest) {
     const clientIp = getClientIp(req);
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // Normalize question for cache lookup — treats "How do I beat Kearush?",
+    // "how do i beat kearush" and "how do I beat Kearush!" as the same cache key.
+    // Original question is passed to Claude for best response quality.
+    const cacheKey = question.trim().toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ");
+
     // ===== RATE LIMITING — DISABLED DURING DEVELOPMENT =====
     // TODO (PRE-LAUNCH): Re-enable rate limiting before going live.
     // The full implementation is preserved below — just uncomment the block.
@@ -244,7 +249,7 @@ export async function POST(req: NextRequest) {
     const { data: cachedQuery } = await supabase
       .from("queries")
       .select("response")
-      .eq("question", question)
+      .eq("question", cacheKey)
       .eq("spoiler_tier", spoilerTier)
       .gte("created_at", sevenDaysAgo)
       .not("response", "is", null)
@@ -658,7 +663,7 @@ export async function POST(req: NextRequest) {
       supabase
         .from("queries")
         .insert({
-          question,
+          question: cacheKey,
           response: answer,
           spoiler_tier: spoilerTier,
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
@@ -671,7 +676,7 @@ export async function POST(req: NextRequest) {
       supabase
         .from("queries")
         .insert({
-          question,
+          question: cacheKey,
           response: null,
           spoiler_tier: spoilerTier,
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
