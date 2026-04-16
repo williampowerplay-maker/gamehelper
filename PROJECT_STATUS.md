@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-16 (session 18)
+**Last updated:** 2026-04-16 (session 19)
 
 ## Overview
 
@@ -21,6 +21,13 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 19 — Google OAuth Fix, Content Gap Tracking (2026-04-16)
+
+- **Google OAuth redirect fixed**: Supabase Site URL was still set to `localhost` — updated to `https://crimson-guide.vercel.app`. Added `https://crimson-guide.vercel.app/auth/callback` to Supabase redirect URLs. Added Supabase's auth endpoint (`https://tyjyqzojuhnnnmuhobso.supabase.co/auth/v1/callback`) to Google Cloud Console OAuth client. Confirmed new user row created in DB after successful Google login.
+- **App URL confirmed**: `https://crimson-guide.vercel.app` (Vercel project name is `crimson-guide`, repo is `gamehelper`). Admin dashboard at `/admin`.
+- **Content gap tracking**: Added `content_gap boolean DEFAULT false` column to `queries` table. `route.ts` now sets `content_gap: true` whenever `isMissingOrDefaultResponse()` fires. Admin dashboard shows an "Unanswered Questions" table (last 100) with question text, tier, and timestamp. "↓ Content Gaps CSV" export button added to admin header and section — downloads `question, spoiler_tier, asked_at` for all content gap queries. This creates a live priority list for future knowledge base expansion.
+- **User signup cap confirmed working**: 3 users in DB (March 27, April 6, April 16). Waitlist flow confirmed — `signupsClosed` triggers when user count ≥ `NEXT_PUBLIC_MAX_USERS` (default 100).
 
 ### Session 18 — Rate Limiting, Keyword Fix, Admin Abuse Detection (2026-04-16)
 
@@ -193,7 +200,7 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
 - [x] **Error Boundaries & Error Dashboard** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard has a full error analysis section: **1h / 24h / 7d time filter**, sparkline bar chart, per-type breakdown cards, expandable rows with stack trace + JSON context.
-- [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log, **query rate stats** (avg/min, avg/hr, avg/day — rolling windows), **high-volume IP table** (top 15 IPs last 24h, flagged orange if >30 queries). **CSV export buttons** for waitlist emails and all users.
+- [x] **Analytics Dashboard** - `/admin` page (live at `https://crimson-guide.vercel.app/admin`) with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log, query rate stats (avg/min/hr/day rolling), high-volume IP table (flags >30 queries/24h), **unanswered questions table** (content gaps). CSV exports for waitlist, users, and content gaps.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 

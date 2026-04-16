@@ -77,6 +77,20 @@ Things discovered during development that are worth remembering across sessions.
 - **Build queries need cross-type search**: "Best build for X" requires equipment data (content_type="item"/"character") for stats AND guide content (content_type="mechanic"). Using mechanic-only filter misses weapons/accessories with critical rate/attack stats. Fix: add a BUILD classifier at the top that returns `null` (no filter) for any query containing "best build", "build for", etc., ensuring cross-type retrieval.
 - **TypeScript: `RegExpMatchArray` is not assignable to `string[]` for push**: `const x = str.match(/regex/g) || []` infers `x` as `RegExpMatchArray | never[]`, which TS narrows to `RegExpMatchArray`. That type has a readonly-like push signature of `(item: never) => number` — pushing any string causes a type error. Fix: explicitly annotate: `const x: string[] = str.match(/regex/g) || [];`
 
+## Google OAuth with Supabase: Production Setup
+
+- **Supabase Site URL is the root cause of localhost redirects in production**: Supabase uses the Site URL as the base for OAuth redirects. If it's still `http://localhost:3000`, Google sends users back to localhost even when the `redirectTo` in code says the production URL. Fix: update Site URL to the production domain in Supabase → Authentication → URL Configuration.
+- **Two separate redirect URI configs required**: (1) Supabase needs the app callback URL in its "Redirect URLs" list (`https://your-domain.com/auth/callback`). (2) Google Cloud Console needs Supabase's own auth endpoint as an authorized redirect URI (`https://[project-ref].supabase.co/auth/v1/callback`) — this is NOT the app URL. These are different and both are required.
+- **`window.location.origin` in `redirectTo` is correct for multi-environment setups**: Using `window.location.origin + "/auth/callback"` dynamically picks up localhost in dev and the production domain in prod without any env var needed. The fix is always in the dashboard configs, not the code.
+- **Vercel project name ≠ GitHub repo name**: The Vercel project is named `crimson-guide` (URL: `crimson-guide.vercel.app`) while the GitHub repo is `gamehelper`. The Vercel project name determines the deployment URL — it doesn't auto-update when the repo is renamed.
+
+## Content Gap Tracking
+
+- **Store unanswered questions automatically for KB improvement**: When the RAG pipeline returns a fallback/no-info response, log the query with `content_gap: true`. Over time this builds a prioritised list of exactly what users are asking that the KB can't answer — far more valuable than guessing what to add next.
+- **`content_gap` boolean column beats `response IS NULL` for distinguishing gap queries**: `response: null` is also set for rate-limited queries and other non-cached cases. A dedicated boolean column is unambiguous, filterable, and self-documenting.
+- **Add the column with `IF NOT EXISTS` so the migration is safe to re-run**: `ALTER TABLE queries ADD COLUMN IF NOT EXISTS content_gap boolean DEFAULT false;` — no risk of failure if accidentally run twice.
+- **The admin CSV export is the key workflow**: The point isn't just to store gaps — it's to periodically download the CSV, sort by frequency (most-asked unanswered questions), and use those as a crawl/ingest target list. The `question, spoiler_tier, asked_at` columns give enough context to prioritise by recency and user intent.
+
 ## RAG: Action Verb Contamination in Keyword Boost
 
 - **Bare action verbs at the start of a question contaminate multi-word phrase extraction**: "find tauria curved sword" → `cleanedForPhrase` = "find tauria curved sword" → URL boost term = `find+tauria+curved+sword` → `ilike %find+tauria+curved+sword%` → no match against `/Tauria+Curved+Sword`. The same query capitalised ("Tauria curved sword") worked because no prefix verb was present.
