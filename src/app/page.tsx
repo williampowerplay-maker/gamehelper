@@ -172,7 +172,7 @@ export default function Home() {
                 <UpgradeCTA />
               )}
               {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}
-              {showAds && isAssistant && assistantCount > 0 && assistantCount % 3 === 0 && assistantCount % 5 !== 0 && (
+              {showAds && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
                 <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
               )}
             </div>
