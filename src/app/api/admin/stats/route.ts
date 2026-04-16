@@ -84,6 +84,7 @@ export async function GET(req: NextRequest) {
   const today = new Date().toISOString().split("T")[0];
   const sevenDaysAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString();
   const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+  const oneHourAgo = new Date(Date.now() - 60 * 60 * 1000).toISOString();
 
   const [
     totalQueriesRes,
@@ -98,6 +99,8 @@ export async function GET(req: NextRequest) {
     knowledgeRes,
     recentErrorsRes,
     errorsLast24hRes,
+    queriesLastHourRes,
+    ipLast24hRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -114,6 +117,8 @@ export async function GET(req: NextRequest) {
     supabase.from("knowledge_chunks").select("content_type"),
     supabase.from("error_logs").select("id, error_type, message, context, client_ip, created_at").order("created_at", { ascending: false }).limit(30),
     supabase.from("error_logs").select("id", { count: "exact", head: true }).gte("created_at", oneDayAgo),
+    supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", oneHourAgo),
+    supabase.from("queries").select("client_ip").gte("created_at", oneDayAgo),
   ]);
 
   // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
@@ -146,6 +151,34 @@ export async function GET(req: NextRequest) {
     typeMap[t] = (typeMap[t] ?? 0) + 1;
   }
 
+  // Query rate averages (rolling windows)
+  const queriesLastHour = queriesLastHourRes.count ?? 0;
+  const queriesLast24h = ipLast24hRes.data?.length ?? 0;
+  const queriesLast7d = last7DaysRes.data?.length ?? 0;
+  const queryRates = {
+    avgPerMinute: parseFloat((queriesLastHour / 60).toFixed(2)),
+    avgPerHour:   parseFloat((queriesLast24h / 24).toFixed(1)),
+    avgPerDay:    parseFloat((queriesLast7d / 7).toFixed(1)),
+    lastHourTotal:  queriesLastHour,
+    last24hTotal:   queriesLast24h,
+  };
+
+  // Top IPs by query count (last 24h) — flag outliers above free daily limit (30)
+  const ipMap: Record<string, number> = {};
+  for (const row of ipLast24hRes.data ?? []) {
+    const ip = (row.client_ip as string | null) ?? "unknown";
+    ipMap[ip] = (ipMap[ip] ?? 0) + 1;
+  }
+  const topIps = Object.entries(ipMap)
+    .sort(([, a], [, b]) => b - a)
+    .slice(0, 15)
+    .map(([ip, count]) => ({
+      ip,
+      count,
+      // suspicious = exceeds free daily limit; likely abuse or needs premium
+      suspicious: count > 30,
+    }));
+
   return NextResponse.json({
     overview: {
       totalQueries: totalQueriesRes.count ?? 0,
@@ -164,5 +197,7 @@ export async function GET(req: NextRequest) {
       byType: typeMap,
     },
     recentErrors: recentErrorsRes.data ?? [],
+    queryRates,
+    topIps,
   });
 }

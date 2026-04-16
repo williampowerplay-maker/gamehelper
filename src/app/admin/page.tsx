@@ -69,6 +69,14 @@ interface StatsData {
     client_ip: string | null;
     created_at: string;
   }[];
+  queryRates: {
+    avgPerMinute: number;
+    avgPerHour: number;
+    avgPerDay: number;
+    lastHourTotal: number;
+    last24hTotal: number;
+  };
+  topIps: { ip: string; count: number; suspicious: boolean }[];
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -288,7 +296,7 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps } = data;
   const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
@@ -365,6 +373,62 @@ export default function AdminPage() {
             <StatCard label="Errors (24h)" value={overview.errorsLast24h ?? 0} />
           </div>
         </section>
+
+        {/* Query rate averages */}
+        <section>
+          <h2 className="text-xs text-gray-500 uppercase tracking-wider mb-3">Query Rate (Rolling)</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+            <StatCard label="Avg / Minute" value={queryRates.avgPerMinute} sub="last 60 min" />
+            <StatCard label="Avg / Hour" value={queryRates.avgPerHour} sub="last 24 hrs" />
+            <StatCard label="Avg / Day" value={queryRates.avgPerDay} sub="last 7 days" />
+            <StatCard label="Last Hour" value={queryRates.lastHourTotal} sub="total queries" />
+            <StatCard label="Last 24h" value={queryRates.last24hTotal} sub="total queries" />
+          </div>
+        </section>
+
+        {/* High-volume IPs */}
+        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-300">
+              Top IPs — Last 24h
+            </h2>
+            <span className="text-xs text-gray-600">Free limit: 30/day · flagged in <span className="text-orange-400">orange</span></span>
+          </div>
+          {topIps.length === 0 ? (
+            <p className="text-xs text-gray-600 text-center py-4">No queries in the last 24h</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
+                    <th className="pb-2 pr-4 font-medium">#</th>
+                    <th className="pb-2 pr-4 font-medium">IP Address</th>
+                    <th className="pb-2 pr-4 font-medium text-right">Queries (24h)</th>
+                    <th className="pb-2 font-medium text-right">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {topIps.map(({ ip, count, suspicious }, i) => (
+                    <tr key={ip} className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/50 transition-colors">
+                      <td className="py-2 pr-4 text-gray-600">{i + 1}</td>
+                      <td className={`py-2 pr-4 font-mono ${suspicious ? "text-orange-400" : "text-gray-300"}`}>{ip}</td>
+                      <td className={`py-2 pr-4 text-right font-medium ${suspicious ? "text-orange-400" : "text-gray-400"}`}>{count}</td>
+                      <td className="py-2 text-right">
+                        {suspicious ? (
+                          <span className="inline-block px-2 py-0.5 rounded border text-[10px] font-medium bg-orange-500/20 text-orange-400 border-orange-500/30">
+                            High Volume
+                          </span>
+                        ) : (
+                          <span className="text-gray-700">—</span>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
 
         {/* Charts row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
