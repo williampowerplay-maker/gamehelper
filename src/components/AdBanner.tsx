@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
+import Link from "next/link";
 
 interface AdBannerProps {
   slot: string;
@@ -33,15 +34,26 @@ export default function AdBanner({ slot, format = "horizontal", className = "" }
     : "min-h-[100px] w-full";
 
   return (
-    <div className={`flex justify-center ${className}`} ref={adRef}>
-      <ins
-        className={`adsbygoogle block ${sizeClass}`}
-        style={{ display: "block" }}
-        data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_ID || ""}
-        data-ad-slot={slot}
-        data-ad-format={format === "rectangle" ? "auto" : "horizontal"}
-        data-full-width-responsive="true"
-      />
+    <div className={`${className}`} ref={adRef}>
+      <div className="flex items-center justify-between mb-1 px-0.5">
+        <span className="text-[10px] text-gray-600 uppercase tracking-wider">Advertisement</span>
+        <Link
+          href="/upgrade"
+          className="text-[10px] text-red-500/70 hover:text-red-400 transition-colors"
+        >
+          Remove ads — Upgrade
+        </Link>
+      </div>
+      <div className="flex justify-center">
+        <ins
+          className={`adsbygoogle block ${sizeClass}`}
+          style={{ display: "block" }}
+          data-ad-client={process.env.NEXT_PUBLIC_ADSENSE_ID || ""}
+          data-ad-slot={slot}
+          data-ad-format={format === "rectangle" ? "auto" : "horizontal"}
+          data-full-width-responsive="true"
+        />
+      </div>
     </div>
   );
 }
