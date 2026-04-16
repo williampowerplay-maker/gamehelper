@@ -77,6 +77,27 @@ Things discovered during development that are worth remembering across sessions.
 - **Build queries need cross-type search**: "Best build for X" requires equipment data (content_type="item"/"character") for stats AND guide content (content_type="mechanic"). Using mechanic-only filter misses weapons/accessories with critical rate/attack stats. Fix: add a BUILD classifier at the top that returns `null` (no filter) for any query containing "best build", "build for", etc., ensuring cross-type retrieval.
 - **TypeScript: `RegExpMatchArray` is not assignable to `string[]` for push**: `const x = str.match(/regex/g) || []` infers `x` as `RegExpMatchArray | never[]`, which TS narrows to `RegExpMatchArray`. That type has a readonly-like push signature of `(item: never) => number` — pushing any string causes a type error. Fix: explicitly annotate: `const x: string[] = str.match(/regex/g) || [];`
 
+## RAG: Action Verb Contamination in Keyword Boost
+
+- **Bare action verbs at the start of a question contaminate multi-word phrase extraction**: "find tauria curved sword" → `cleanedForPhrase` = "find tauria curved sword" → URL boost term = `find+tauria+curved+sword` → `ilike %find+tauria+curved+sword%` → no match against `/Tauria+Curved+Sword`. The same query capitalised ("Tauria curved sword") worked because no prefix verb was present.
+- **Two-part fix**: (1) Add action verbs (`find`, `locate`, `get`, `buy`, `farm`, `obtain`, `craft`, `make`, `use`, `equip`, `upgrade`, `unlock`, `show`, `tell`, `give`) to `boostStopWords` so they're filtered from keyword lists. (2) Add a `.replace(/^(find|locate|get|buy|...)\ s+/i, "")` step to `cleanedForPhrase` so the verb is stripped before multi-word phrase extraction.
+- **Order of replacements in `cleanedForPhrase` matters**: Strip compound question prefixes ("how to find", "where is") first, then bare action verbs, then articles ("the", "a", "an"). This ensures "how to upgrade tauria sword" correctly strips "how to" then "upgrade" in sequence → "tauria sword".
+- **Action verbs survive `boostKeywords` length filter without stop-word coverage**: "find" is 4 chars (passes `> 3`) and was not in the original stop-word set — so it appeared in boost keyword lists AND in URL match terms.
+
+## Rate Limiting Design
+
+- **Daily cap is critical for cost protection at flat-rate pricing**: Per-minute and per-hour limits prevent burst abuse but don't stop a determined user from consistently querying 60/hr × 8hrs = 480 queries/day. At ~$0.004/query, one power user on a $4.99/mo plan costs ~$1.92/day = $57.60/month. A daily cap (free: 30, premium: 200) prevents this while still feeling unlimited to normal players.
+- **Show upgrade CTA immediately when a free user hits a limit**: The rate-limit error message is the highest-intent conversion moment — the user just hit a wall and is still engaged. Add `showUpgradeCTA: userTier === "free"` to the JSON response and render `<UpgradeCTA rateLimitHit />` directly below the error bubble. Use different copy from the mid-conversation CTA ("You've reached your free limit" vs "Enjoying the guide?").
+- **Three-tier check (min/hr/day) can run in a single `Promise.all`**: All three window checks are independent Supabase count queries — run them in parallel. The day check adds one DB round-trip but no sequential latency.
+- **Flag rate-limited responses in the Message type**: Add `showUpgradeCTA?: boolean` to the `Message` interface. The API sets this flag; the frontend reads it to conditionally render the CTA. Keeps the UI logic clean — the CTA knows why it's appearing and can show contextual copy.
+
+## Admin Dashboard: Abuse Detection
+
+- **Group by IP in JS, not SQL, for the admin dashboard**: Supabase JS client doesn't support `GROUP BY` in select queries. Fetch `client_ip` for the time window (`select("client_ip").gte("created_at", oneDayAgo)`) and aggregate in a `Record<string, number>` map. Fast enough for thousands of rows; avoids needing an RPC function.
+- **Use the free daily limit as the abuse threshold**: Flagging IPs at `count > 30` (the free tier daily cap) surfaces users who are over-quota without rate limiting being enabled yet, and distinguishes them from normal premium usage. When rate limiting goes live, this table becomes a way to confirm it's working.
+- **Rolling rate averages reveal traffic patterns**: `avg/min = queriesLastHour / 60`, `avg/hr = queriesLast24h / 24`, `avg/day = last7dTotal / 7`. These three numbers together show whether traffic is growing, what the sustained load is, and whether a spike is an outlier or a new baseline. More useful for operational awareness than point-in-time totals.
+- **Reuse existing fetches for derived metrics**: The IP fetch for abuse detection (`select("client_ip").gte(oneDayAgo)`) has `.data.length` equal to the 24h query count — no need for a separate count query. Similarly, `last7DaysRes.data.length` gives the 7d total without an extra DB call.
+
 ## Next.js 16 + Node 24
 
 - **`.env.local` not loading in API routes**: Next.js 16 running on Node 24 had issues where `process.env` didn't pick up `.env.local` values in server-side route handlers. Workaround: built a manual `loadEnv()` function in `route.ts` that reads and parses the file directly. The function checks `process.env.VERCEL` to skip file reads in production (where Vercel injects env vars natively).

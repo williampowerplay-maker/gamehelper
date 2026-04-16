@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-15 (session 17)
+**Last updated:** 2026-04-16 (session 18)
 
 ## Overview
 
@@ -21,6 +21,14 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 18 — Rate Limiting, Keyword Fix, Admin Abuse Detection (2026-04-16)
+
+- **Action verb keyword boost fix**: "find tauria curved sword" was producing URL boost term `find+tauria+curved+sword` instead of `tauria+curved+sword`, missing the wiki page URL match. Added `find/locate/get/buy/farm/obtain/craft/make/use/equip/upgrade/unlock/show/tell/give` to `boostStopWords` and added a matching `.replace()` to `cleanedForPhrase` to strip bare action verbs at the start of questions before phrase extraction.
+- **Upgrade CTA on rate limit**: When a free user hits their query limit, the rate-limit error message is now followed by an inline `<UpgradeCTA rateLimitHit />` with targeted copy ("You've reached your free limit") rather than the generic mid-conversation CTA. `showUpgradeCTA: userTier === "free"` added to both rate-limit response paths. `Message` type extended with `showUpgradeCTA?: boolean`.
+- **Daily query caps added**: Rate limits now include a per-day cap (free: 30/day, premium: 200/day) to prevent power users from exhausting API cost at $0.003–0.006/query on a $4.99/mo plan. Full limit table: Free = 3/min, 10/hr, 30/day · Premium = 10/min, 60/hr, 200/day. Daily check added to commented rate-limiting block; `oneDayAgo` window added to the Promise.all.
+- **Admin: query rate stats**: Stats API now computes rolling averages — avg queries/min (last hr), avg/hr (last 24h), avg/day (last 7d) — plus last-hour and last-24h totals. New "Query Rate" stat card row added to dashboard.
+- **Admin: high-volume IP abuse detection**: Stats API groups `client_ip` counts over the last 24h and returns the top 15 IPs. IPs with >30 queries (exceeding the free daily limit) are flagged `suspicious: true`. New "Top IPs — Last 24h" table in admin dashboard highlights outliers in orange with a "High Volume" badge.
 
 ### Session 17 — Build Fix, Legal Pages, Logo, Supabase Audit (2026-04-15)
 
@@ -94,7 +102,7 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] **Auth System** - Email/password + Google OAuth via Supabase Auth, with AuthProvider context
 - [x] **User Tiers** - Free/Premium tier tracking with daily query counter and reset logic
 - [x] **Signup Cap + Waitlist** - Limits signups to 100 users (configurable via `NEXT_PUBLIC_MAX_USERS`). When full, shows waitlist email form. Waitlist table in Supabase.
-- [x] **Rate Limiting** - IP-based, server-side. Free: 5/min, 20/hr. Premium: 10/min, 60/hr. Returns friendly messages shown inline in chat.
+- [x] **Rate Limiting** - IP-based, server-side. Free: 3/min, 10/hr, 30/day. Premium: 10/min, 60/hr, 200/day. Returns friendly messages shown inline in chat. Free users who hit a limit see an upgrade CTA immediately below the error. **Still disabled for dev — re-enable pre-launch.**
 - [x] **Google AdSense Integration** - Banner ads after every 3rd response, desktop sidebar ad (300x250), upgrade CTA every 5th response. Premium users see zero ads. Requires AdSense account setup (see TODO_MANUAL.md).
 - [x] **Query Logging** - All queries logged to `queries` table with client_ip (async, non-blocking)
 - [x] **Voice I/O** - Speech-to-text input (Web Speech API) + text-to-speech playback on responses
@@ -185,7 +193,7 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
 - [x] **Error Boundaries & Error Dashboard** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard has a full error analysis section: **1h / 24h / 7d time filter**, sparkline bar chart, per-type breakdown cards, expandable rows with stack trace + JSON context.
-- [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log. **CSV export buttons** for waitlist emails and all users — download directly from dashboard header.
+- [x] **Analytics Dashboard** - `/admin` page with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log, **query rate stats** (avg/min, avg/hr, avg/day — rolling windows), **high-volume IP table** (top 15 IPs last 24h, flagged orange if >30 queries). **CSV export buttons** for waitlist emails and all users.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 
