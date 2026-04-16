@@ -29,8 +29,8 @@ const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PU
 
 // Rate limits by tier
 const RATE_LIMITS = {
-  free:    { perMinute: 5,  perHour: 20 },
-  premium: { perMinute: 10, perHour: 60 },
+  free:    { perMinute: 3,  perHour: 10,  perDay: 30  },
+  premium: { perMinute: 10, perHour: 60,  perDay: 200 },
 };
 
 // Per-tier Claude settings — nudge uses Haiku (~20x cheaper), full uses Sonnet.
@@ -208,18 +208,19 @@ export async function POST(req: NextRequest) {
     // ===== RATE LIMITING — DISABLED DURING DEVELOPMENT =====
     // TODO (PRE-LAUNCH): Re-enable rate limiting before going live.
     // The full implementation is preserved below — just uncomment the block.
-    // Limits: free = 5/min, 20/hr | premium = 10/min, 60/hr
+    // Limits: free = 3/min, 10/hr, 30/day | premium = 10/min, 60/hr, 200/day
     // Also wire userTier to the authenticated user's DB record instead of hardcoding "free".
     //
-    // const clientIp = getClientIp(req);
     // const userTier: keyof typeof RATE_LIMITS = "free";
     // const limits = RATE_LIMITS[userTier];
     // const now = new Date();
     // const oneMinuteAgo = new Date(now.getTime() - 60 * 1000).toISOString();
     // const oneHourAgo = new Date(now.getTime() - 60 * 60 * 1000).toISOString();
-    // const [minuteCheck, hourCheck] = await Promise.all([
+    // const oneDayAgo = new Date(now.getTime() - 24 * 60 * 60 * 1000).toISOString();
+    // const [minuteCheck, hourCheck, dayCheck] = await Promise.all([
     //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneMinuteAgo),
     //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneHourAgo),
+    //   supabase.from("queries").select("id", { count: "exact", head: true }).eq("client_ip", clientIp).gte("created_at", oneDayAgo),
     // ]);
     // if ((minuteCheck.count ?? 0) >= limits.perMinute) {
     //   return NextResponse.json({ error: "Slow down! You can ask another question in a minute.", rateLimited: true, showUpgradeCTA: userTier === "free" }, { status: 429 });
@@ -227,6 +228,9 @@ export async function POST(req: NextRequest) {
     // if ((hourCheck.count ?? 0) >= limits.perHour) {
     //   const resetMinutes = Math.ceil((60 * 60 * 1000 - (now.getTime() - new Date(oneHourAgo).getTime())) / 60000);
     //   return NextResponse.json({ error: `You've hit the hourly limit (${limits.perHour} questions/hour). Try again in ~${resetMinutes} minutes.`, rateLimited: true, showUpgradeCTA: userTier === "free" }, { status: 429 });
+    // }
+    // if ((dayCheck.count ?? 0) >= limits.perDay) {
+    //   return NextResponse.json({ error: `You've reached your daily limit (${limits.perDay} questions/day). Come back tomorrow!`, rateLimited: true, showUpgradeCTA: userTier === "free" }, { status: 429 });
     // }
 
     // Check if API keys are configured
