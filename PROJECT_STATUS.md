@@ -256,6 +256,47 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Enable leaked password protection** — Supabase dashboard → Authentication → Security. Checks passwords against HaveIBeenPwned. One toggle.
 - [ ] **Add missing FK index** — `bookmarks.query_id` has no covering index. Add: `CREATE INDEX ON bookmarks (query_id);`
 
+### Domain Migration (gitgudai.com)
+
+When moving the app from `crimson-guide.vercel.app` to `gitgudai.com`, complete these steps in order:
+
+**1. Vercel — add custom domain**
+- [ ] Go to Vercel → crimson-guide project → Settings → Domains
+- [ ] Add `gitgudai.com` and `www.gitgudai.com`
+- [ ] Copy the DNS records Vercel provides (A record + CNAME)
+
+**2. Domain registrar — add DNS records**
+- [ ] Log into your registrar (where you bought gitgudai.com)
+- [ ] Add the A record and CNAME from Vercel
+- [ ] Wait for DNS propagation (typically 15–60 min, up to 48h)
+
+**3. Supabase — update allowed URLs**
+- [ ] Go to Supabase → Authentication → URL Configuration
+- [ ] Change **Site URL** from `https://crimson-guide.vercel.app` → `https://gitgudai.com`
+- [ ] Add `https://gitgudai.com/auth/callback` to **Redirect URLs**
+- [ ] Keep the old Vercel URL in Redirect URLs during transition if needed
+
+**4. Google Cloud Console — no change needed**
+- Google OAuth redirects through Supabase's auth endpoint, not your domain — nothing to update there.
+
+**5. Code / content updates**
+- [ ] Update contact emails in `/privacy` and `/terms`: replace `privacy@crimsondesertguide.com` and `legal@crimsondesertguide.com` with `@gitgudai.com` addresses
+- [ ] Update `PROJECT_STATUS.md` live URL reference from `crimson-guide.vercel.app` to `gitgudai.com`
+- [ ] Update `README.md` live URL if listed
+- [ ] Consider branding: decide whether to keep "Crimson Desert Guide" as the product name or rename to match `gitgudai.com`
+
+**6. AdSense**
+- [ ] Add `ads.txt` to `public/` with your AdSense publisher ID: `google.com, pub-XXXXXXXXXX, DIRECT, f08c47fec0942fa0`
+- [ ] Update AdSense account to include `gitgudai.com` as a verified site
+
+**7. Post-migration verification**
+- [ ] Confirm HTTPS works on both `gitgudai.com` and `www.gitgudai.com`
+- [ ] Test Google OAuth login end-to-end on the new domain
+- [ ] Test a chat query to confirm the RAG pipeline works (Supabase + Voyage + Claude)
+- [ ] Check admin dashboard at `gitgudai.com/admin`
+
+---
+
 ### Manual Setup Required
 
 See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and configs needed (AdSense, Stripe, Google OAuth, domain, content seeding, legal pages).
