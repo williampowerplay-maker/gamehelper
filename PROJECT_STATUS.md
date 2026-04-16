@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-16 (session 19)
+**Last updated:** 2026-04-16 (session 20)
 
 ## Overview
 
@@ -21,6 +21,20 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Security Hardened
+
+### Session 20 — Cost Optimisations, Upgrade Page, Ad Labels (2026-04-16)
+
+- **Cost optimisations (5 changes)**:
+  - **Cache check before Voyage embedding**: Cache lookup now runs before the Voyage AI call — cache hits skip the $0.0001 embedding entirely. `cache_hit boolean` column added to `queries` table; hits log with `cache_hit: true, tokens_used: 0`.
+  - **Sonnet token cap reduced**: `maxTokens` 1,024 → 650. Most good answers are 200–400 tokens; saves ~35% Sonnet output cost with minimal quality loss.
+  - **Nudge matchCount reduced**: 6 → 4 chunks. Haiku only needs 3–4 for a hint; fewer chunks = fewer input tokens.
+  - **Solution tier free daily cap**: 10 solution-tier queries/day for free users — preserved in commented pre-launch block alongside other rate limits.
+  - **Nudge system prompt trimmed**: Haiku gets a 1-line base prompt instead of full `BASE_SYSTEM_PROMPT` (~60% fewer input tokens per nudge query).
+- **Cache hit rate in admin dashboard**: Stats API computes cache hit % over last 7 days. New "Cache Hit Rate" stat card in overview section shows % and hit count.
+- **`/upgrade` placeholder page**: Free vs Premium plan comparison, "Coming Soon" badge, email capture form (stores to `waitlist` table). All upgrade CTAs and the dead "Upgrade — $4.99/mo" buttons now link here.
+- **Upgrade button in header**: Signed-in free users now see `[Free] Upgrade Sign out` in the header. Premium users see no upgrade link.
+- **Ad banner upgrade prompt**: Every `AdBanner` now shows `Advertisement` label (left) and `Remove ads — Upgrade →` link (right) above the ad unit. Covers both inline chat banner and desktop sidebar.
+- **Ad frequency reduced**: Inline banner changed from every 3rd to every 6th assistant response. New pattern: ads on 6, 12, 18… · upgrade CTA on 5, 10, 15…
 
 ### Session 19 — Google OAuth Fix, Content Gap Tracking (2026-04-16)
 
@@ -200,7 +214,7 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Conversation History** - Each question is standalone; no multi-turn context
 - [x] **Mobile Optimization (partial)** - Input field always above fold on mobile: `h-[100dvh]`, tighter header padding, subtitle hidden on mobile, `overflow:hidden` on body. Full polish (message bubbles, touch targets) still TODO.
 - [x] **Error Boundaries & Error Dashboard** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard has a full error analysis section: **1h / 24h / 7d time filter**, sparkline bar chart, per-type breakdown cards, expandable rows with stack trace + JSON context.
-- [x] **Analytics Dashboard** - `/admin` page (live at `https://crimson-guide.vercel.app/admin`) with password gate, overview stats, 7-day chart, tier usage, knowledge base breakdown, recent query log, query rate stats (avg/min/hr/day rolling), high-volume IP table (flags >30 queries/24h), **unanswered questions table** (content gaps). CSV exports for waitlist, users, and content gaps.
+- [x] **Analytics Dashboard** - `/admin` (live at `https://crimson-guide.vercel.app/admin`) — overview stats incl. **cache hit rate %**, 7-day chart, tier usage, query rate stats (avg/min/hr/day), high-volume IP table, unanswered questions table. CSV exports for waitlist, users, content gaps.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
 - [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
 
