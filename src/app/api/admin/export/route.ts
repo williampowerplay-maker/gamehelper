@@ -23,7 +23,7 @@ function loadEnv(): Record<string, string> {
 const envVars = loadEnv();
 const ADMIN_SECRET = process.env.ADMIN_SECRET || envVars.ADMIN_SECRET || "";
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || envVars.NEXT_PUBLIC_SUPABASE_URL || "";
-const supabaseKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || envVars.NEXT_PUBLIC_SUPABASE_ANON_KEY || "";
+const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY || envVars.SUPABASE_SERVICE_ROLE_KEY || "";
 
 // Failed-attempt throttle: max 5 failures per IP per 15 minutes
 const failedAttempts: Map<string, { count: number; resetAt: number }> = new Map();
