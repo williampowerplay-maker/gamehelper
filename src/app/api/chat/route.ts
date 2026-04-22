@@ -319,6 +319,7 @@ export async function POST(req: NextRequest) {
         spoiler_tier: spoilerTier,
         chunk_ids_used: [],
         tokens_used: 0,
+        input_tokens: 0,
         client_ip: clientIp,
         cache_hit: true,
       }).then(() => {});
@@ -350,6 +351,7 @@ export async function POST(req: NextRequest) {
     // ===== FULL RAG PIPELINE =====
     let chunks: Record<string, unknown>[] | null = null;
     let searchError: Error | null = null;
+    let voyageTokensUsed = 0;
 
     // Classify question to narrow vector search to a specific content type
     const contentTypeFilter = classifyContentType(question);
@@ -397,6 +399,8 @@ export async function POST(req: NextRequest) {
         }
         const embeddingData = await embeddingRes.json();
         const queryEmbedding = embeddingData.data?.[0]?.embedding;
+        const voyageTokens: number = embeddingData.usage?.total_tokens ?? 0;
+        voyageTokensUsed = voyageTokens;
 
         console.log("Query embedding generated:", !!queryEmbedding, "dim:", queryEmbedding?.length);
         if (queryEmbedding) {
@@ -775,6 +779,7 @@ export async function POST(req: NextRequest) {
           spoiler_tier: spoilerTier,
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
           tokens_used: claudeData.usage?.output_tokens || 0,
+          input_tokens: claudeData.usage?.input_tokens || 0,
           client_ip: clientIp,
           cache_hit: false,
         })
@@ -790,6 +795,7 @@ export async function POST(req: NextRequest) {
           spoiler_tier: spoilerTier,
           chunk_ids_used: chunks?.map((c) => String(c.id)) || [],
           tokens_used: claudeData.usage?.output_tokens || 0,
+          input_tokens: claudeData.usage?.input_tokens || 0,
           client_ip: clientIp,
           cache_hit: false,
           content_gap: true,

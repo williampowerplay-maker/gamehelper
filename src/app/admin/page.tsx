@@ -81,6 +81,25 @@ interface StatsData {
   cacheHitRate: number;
   cacheHits: number;
   activeUsers: { email: string; queries_today: number; tier: string }[];
+  costStats: {
+    allTime: {
+      total: number; haiku: number; sonnet: number; voyage: number;
+      perQueryNudge: number; perQueryFull: number; perQueryOverall: number;
+    };
+    last7Days: {
+      total: number; haiku: number; sonnet: number; voyage: number;
+      avgPerUserPerDay: number; avgPerActiveUserPerDay: number; projectedMonthly: number;
+    };
+    today: {
+      total: number; haiku: number; sonnet: number; voyage: number;
+      avgPerActiveUser: number; avgPerFreeUser: number; avgPerPremiumUser: number;
+    };
+    pricing: {
+      haikuInputPerMToken: number; haikuOutputPerMToken: number;
+      sonnetInputPerMToken: number; sonnetOutputPerMToken: number;
+      voyagePerMToken: number;
+    };
+  };
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -300,7 +319,14 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps, cacheHitRate, cacheHits, activeUsers } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps, cacheHitRate, cacheHits, activeUsers, costStats } = data;
+
+  function fmtUSD(n: number): string {
+    if (n === 0) return "$0.00";
+    if (n < 0.01) return `$${n.toFixed(5)}`;
+    if (n < 1)    return `$${n.toFixed(4)}`;
+    return `$${n.toFixed(2)}`;
+  }
   const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
@@ -490,6 +516,153 @@ export default function AdminPage() {
             </div>
           )}
         </div>
+
+        {/* ── API Cost Breakdown ── */}
+        <section>
+          <h2 className="text-xs text-gray-500 uppercase tracking-wider mb-3">
+            API Cost Breakdown
+            <span className="normal-case text-gray-600 ml-2 font-normal">
+              · Haiku ${costStats.pricing.haikuInputPerMToken}/${costStats.pricing.haikuOutputPerMToken} per M · Sonnet ${costStats.pricing.sonnetInputPerMToken}/${costStats.pricing.sonnetOutputPerMToken} per M · Voyage ${costStats.pricing.voyagePerMToken} per M
+            </span>
+          </h2>
+
+          {/* Three time-window cards */}
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+            {/* All time */}
+            <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">All Time</p>
+              <p className="text-2xl font-bold text-gray-100 mb-3">{fmtUSD(costStats.allTime.total)}</p>
+              <div className="space-y-1.5">
+                {[
+                  { label: "Sonnet (full)",  value: costStats.allTime.sonnet,  color: "bg-red-500" },
+                  { label: "Haiku (nudge)",  value: costStats.allTime.haiku,   color: "bg-yellow-500" },
+                  { label: "Voyage",         value: costStats.allTime.voyage,  color: "bg-purple-500" },
+                ].map(({ label, value, color }) => {
+                  const pct = costStats.allTime.total > 0 ? (value / costStats.allTime.total) * 100 : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-400">{label}</span>
+                        <span className="text-gray-500">{fmtUSD(value)}</span>
+                      </div>
+                      <div className="h-1.5 bg-[#2a2a3a] rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+
+            {/* Last 7 days */}
+            <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Last 7 Days</p>
+              <p className="text-2xl font-bold text-gray-100 mb-3">{fmtUSD(costStats.last7Days.total)}</p>
+              <div className="space-y-1.5 mb-3">
+                {[
+                  { label: "Sonnet (full)",  value: costStats.last7Days.sonnet,  color: "bg-red-500" },
+                  { label: "Haiku (nudge)",  value: costStats.last7Days.haiku,   color: "bg-yellow-500" },
+                  { label: "Voyage",         value: costStats.last7Days.voyage,  color: "bg-purple-500" },
+                ].map(({ label, value, color }) => {
+                  const pct = costStats.last7Days.total > 0 ? (value / costStats.last7Days.total) * 100 : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-400">{label}</span>
+                        <span className="text-gray-500">{fmtUSD(value)}</span>
+                      </div>
+                      <div className="h-1.5 bg-[#2a2a3a] rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="border-t border-[#2a2a3a] pt-2 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Projected / month</span>
+                  <span className="text-gray-300 font-medium">{fmtUSD(costStats.last7Days.projectedMonthly)}</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Today */}
+            <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Today</p>
+              <p className="text-2xl font-bold text-gray-100 mb-3">{fmtUSD(costStats.today.total)}</p>
+              <div className="space-y-1.5 mb-3">
+                {[
+                  { label: "Sonnet (full)",  value: costStats.today.sonnet,  color: "bg-red-500" },
+                  { label: "Haiku (nudge)",  value: costStats.today.haiku,   color: "bg-yellow-500" },
+                  { label: "Voyage",         value: costStats.today.voyage,  color: "bg-purple-500" },
+                ].map(({ label, value, color }) => {
+                  const pct = costStats.today.total > 0 ? (value / costStats.today.total) * 100 : 0;
+                  return (
+                    <div key={label}>
+                      <div className="flex justify-between text-xs mb-0.5">
+                        <span className="text-gray-400">{label}</span>
+                        <span className="text-gray-500">{fmtUSD(value)}</span>
+                      </div>
+                      <div className="h-1.5 bg-[#2a2a3a] rounded-full overflow-hidden">
+                        <div className={`h-full rounded-full ${color}`} style={{ width: `${pct}%` }} />
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+              <div className="border-t border-[#2a2a3a] pt-2 space-y-1">
+                <div className="flex justify-between text-xs">
+                  <span className="text-gray-500">Avg / active user</span>
+                  <span className="text-gray-300 font-medium">{fmtUSD(costStats.today.avgPerActiveUser)}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Per-query + per-user averages */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Per-query cost */}
+            <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Avg Cost per Query</p>
+              <div className="space-y-2">
+                {[
+                  { label: "Nudge (Haiku)",    value: costStats.allTime.perQueryNudge,   sub: "hint tier" },
+                  { label: "Full (Sonnet)",     value: costStats.allTime.perQueryFull,    sub: "solution tier" },
+                  { label: "Overall (blended)", value: costStats.allTime.perQueryOverall, sub: "all tiers" },
+                ].map(({ label, value, sub }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-300">{label}</p>
+                      <p className="text-[10px] text-gray-600">{sub}</p>
+                    </div>
+                    <span className="text-sm font-mono font-medium text-gray-200">{fmtUSD(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Per-user cost averages */}
+            <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-4">
+              <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Avg Cost per User</p>
+              <div className="space-y-2">
+                {[
+                  { label: "Per user / day (7d avg)",    value: costStats.last7Days.avgPerUserPerDay,        sub: "all registered users" },
+                  { label: "Per active user / day (7d)", value: costStats.last7Days.avgPerActiveUserPerDay,  sub: "users who queried today" },
+                  { label: "Per free user today",        value: costStats.today.avgPerFreeUser,              sub: "Haiku cost ÷ free users" },
+                  { label: "Per premium user today",     value: costStats.today.avgPerPremiumUser,           sub: "Sonnet cost ÷ premium users" },
+                ].map(({ label, value, sub }) => (
+                  <div key={label} className="flex items-center justify-between">
+                    <div>
+                      <p className="text-xs text-gray-300">{label}</p>
+                      <p className="text-[10px] text-gray-600">{sub}</p>
+                    </div>
+                    <span className="text-sm font-mono font-medium text-gray-200">{fmtUSD(value)}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Charts row */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">

@@ -75,6 +75,50 @@ function checkAdminAuth(req: NextRequest): { ok: boolean; response?: NextRespons
   return { ok: true };
 }
 
+// ── API pricing (as of 2025) ──────────────────────────────────────────────────
+// claude-haiku-4-5-20251001  → nudge tier
+// claude-sonnet-4-20250514   → full tier
+// voyage-3.5-lite            → all embeddings
+const PRICING = {
+  haiku:  { input: 0.80 / 1_000_000, output: 4.00  / 1_000_000 },
+  sonnet: { input: 3.00 / 1_000_000, output: 15.00 / 1_000_000 },
+  voyage: 0.02 / 1_000_000,
+};
+// Fallback avg input token counts for historical rows (input_tokens column defaulted 0)
+const AVG_INPUT = { nudge: 1_500, full: 2_800 };
+// Avg Voyage tokens per query (short question text ~15-20 tokens)
+const AVG_VOYAGE_TOKENS = 20;
+
+interface RawCostWindow {
+  nudge_output_tokens: number;
+  nudge_input_tokens:  number;
+  full_output_tokens:  number;
+  full_input_tokens:   number;
+  total_queries:       number;
+  nudge_queries:       number;
+  full_queries:        number;
+}
+
+function calcCost(w: RawCostWindow) {
+  // Use actual input tokens if they look real (avg ≥ 200 tokens/query means recorded data).
+  // For historical rows where input_tokens defaulted to 0, fall back to avg estimates.
+  const avgNudgeInput = w.nudge_queries > 0 ? w.nudge_input_tokens / w.nudge_queries : 0;
+  const avgFullInput  = w.full_queries  > 0 ? w.full_input_tokens  / w.full_queries  : 0;
+  const nudgeInput = avgNudgeInput >= 200 ? w.nudge_input_tokens : w.nudge_queries * AVG_INPUT.nudge;
+  const fullInput  = avgFullInput  >= 200 ? w.full_input_tokens  : w.full_queries  * AVG_INPUT.full;
+
+  const haiku  = nudgeInput * PRICING.haiku.input  + w.nudge_output_tokens * PRICING.haiku.output;
+  const sonnet = fullInput  * PRICING.sonnet.input + w.full_output_tokens  * PRICING.sonnet.output;
+  const voyage = w.total_queries * AVG_VOYAGE_TOKENS * PRICING.voyage;
+  const total  = haiku + sonnet + voyage;
+
+  const perQueryNudge   = w.nudge_queries > 0 ? (haiku  + w.nudge_queries * AVG_VOYAGE_TOKENS * PRICING.voyage) / w.nudge_queries : 0;
+  const perQueryFull    = w.full_queries  > 0 ? (sonnet + w.full_queries  * AVG_VOYAGE_TOKENS * PRICING.voyage) / w.full_queries  : 0;
+  const perQueryOverall = w.total_queries > 0 ? total / w.total_queries : 0;
+
+  return { haiku, sonnet, voyage, total, perQueryNudge, perQueryFull, perQueryOverall };
+}
+
 export async function GET(req: NextRequest) {
   const auth = checkAdminAuth(req);
   if (!auth.ok) return auth.response!;
@@ -105,6 +149,7 @@ export async function GET(req: NextRequest) {
     cacheHitsRes,
     totalCachedWindowRes,
     activeUsersRes,
+    costStatsRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -131,6 +176,7 @@ export async function GET(req: NextRequest) {
     supabase.from("queries").select("id", { count: "exact", head: true }).eq("cache_hit", true).gte("created_at", sevenDaysAgo),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
     supabase.from("users").select("id, queries_today, tier").gt("queries_today", 0).order("queries_today", { ascending: false }).limit(10),
+    supabase.rpc("get_cost_stats"),
   ]);
 
   // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
@@ -196,6 +242,68 @@ export async function GET(req: NextRequest) {
       suspicious: count > 30,
     }));
 
+  // ── Cost stats ────────────────────────────────────────────────────────────
+  const rawCost = costStatsRes.data as {
+    allTime:   RawCostWindow;
+    last7Days: RawCostWindow;
+    today:     RawCostWindow;
+  } | null;
+
+  const zeroWindow: RawCostWindow = {
+    nudge_output_tokens: 0, nudge_input_tokens: 0,
+    full_output_tokens: 0,  full_input_tokens: 0,
+    total_queries: 0, nudge_queries: 0, full_queries: 0,
+  };
+
+  const allTimeCost   = calcCost(rawCost?.allTime   ?? zeroWindow);
+  const sevenDayCost  = calcCost(rawCost?.last7Days ?? zeroWindow);
+  const todayCost     = calcCost(rawCost?.today     ?? zeroWindow);
+
+  const totalUsersCount   = totalUsersRes.count ?? 1;
+  const activeUsersCount  = Math.max(activeUsersRes.data?.length ?? 0, 1);
+  const premiumCount      = premiumUsersRes.count ?? 0;
+  const freeCount         = Math.max(totalUsersCount - premiumCount, 0);
+
+  const costStats = {
+    allTime: {
+      total:   allTimeCost.total,
+      haiku:   allTimeCost.haiku,
+      sonnet:  allTimeCost.sonnet,
+      voyage:  allTimeCost.voyage,
+      perQueryNudge:   allTimeCost.perQueryNudge,
+      perQueryFull:    allTimeCost.perQueryFull,
+      perQueryOverall: allTimeCost.perQueryOverall,
+    },
+    last7Days: {
+      total:   sevenDayCost.total,
+      haiku:   sevenDayCost.haiku,
+      sonnet:  sevenDayCost.sonnet,
+      voyage:  sevenDayCost.voyage,
+      // avg per user per day over the 7-day window
+      avgPerUserPerDay: totalUsersCount > 0 ? sevenDayCost.total / totalUsersCount / 7 : 0,
+      avgPerActiveUserPerDay: sevenDayCost.total / activeUsersCount / 7,
+      projectedMonthly: (sevenDayCost.total / 7) * 30,
+    },
+    today: {
+      total:   todayCost.total,
+      haiku:   todayCost.haiku,
+      sonnet:  todayCost.sonnet,
+      voyage:  todayCost.voyage,
+      // avg cost per user who queried today
+      avgPerActiveUser: todayCost.total / activeUsersCount,
+      // rough per-tier user cost estimate (split total proportionally by model usage)
+      avgPerFreeUser:    freeCount  > 0 ? todayCost.haiku  / Math.max(freeCount,    1) : 0,
+      avgPerPremiumUser: premiumCount > 0 ? todayCost.sonnet / Math.max(premiumCount, 1) : 0,
+    },
+    pricing: {
+      haikuInputPerMToken:   PRICING.haiku.input  * 1_000_000,
+      haikuOutputPerMToken:  PRICING.haiku.output * 1_000_000,
+      sonnetInputPerMToken:  PRICING.sonnet.input * 1_000_000,
+      sonnetOutputPerMToken: PRICING.sonnet.output * 1_000_000,
+      voyagePerMToken:       PRICING.voyage       * 1_000_000,
+    },
+  };
+
   // Active users today — join public.users.queries_today with auth emails
   const activeUsersRaw = activeUsersRes.data ?? [];
   let activeUsers: { email: string; queries_today: number; tier: string }[] = [];
@@ -241,5 +349,6 @@ export async function GET(req: NextRequest) {
     cacheHitRate,
     cacheHits,
     activeUsers,
+    costStats,
   });
 }
