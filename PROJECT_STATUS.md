@@ -22,6 +22,23 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
 
+### Session 22 — Admin Polish, Cost Dashboard, Referral Program Design (2026-04-22)
+
+- **Admin dashboard scroll fixed** — `body { overflow: hidden }` in `globals.css` is intentional for the chat UI's locked-scroll. Admin outer div changed to `h-screen overflow-y-auto` so it creates its own scroll context and scrolls independently.
+
+- **Most Active Users Today** section added to admin dashboard — fetches `public.users WHERE queries_today > 0 ORDER BY queries_today DESC LIMIT 10`, cross-references with `supabase.auth.admin.listUsers()` (service role) to resolve emails. Shows rank, email, queries today, tier badge.
+
+- **Full API Cost Breakdown dashboard** (new admin section):
+  - `queries.input_tokens` column added (default 0); `route.ts` now stores `claudeData.usage.input_tokens` and captures Voyage `embeddingData.usage.total_tokens`
+  - `get_cost_stats()` Postgres function — conditional aggregation across all-time / last-7-days / today without fetching 111K rows into JS
+  - Pricing: Haiku $0.80/$4.00 per M input/output, Sonnet $3/$15 per M, Voyage $0.02 per M
+  - Input cost falls back to query-count estimates for historical rows (nudge ~1,500 tokens, full ~2,800 tokens)
+  - Dashboard shows: 3 time-window cards (all time / 7d / today) with Sonnet/Haiku/Voyage split bars; projected monthly cost; avg cost per query by tier; avg cost per user/day; avg per active user; avg per free vs premium user
+
+- **Referral program — designed, DB deployed, code pending** (see "Planned Features" below):
+  - DB migration already applied: `referral_code text NOT NULL UNIQUE` on `users` (auto-generated from first 8 chars of UUID via `trg_set_referral_code` trigger); `referrals` table with `referrer_id`, `referred_id`, `status` ('pending'|'converted'|'rewarded'|'reward_pending'), timestamps; RLS policy (referrers read own rows)
+  - All existing users already have `referral_code` values backfilled
+
 ### Session 21 — Stripe Integration, RAG Classifier Expansion, game8 Full Ingest (2026-04-22)
 
 - **Admin dashboard fixed** — all three admin routes (`/api/admin/stats`, `/api/admin/export`, `/api/admin/errors`) were using `NEXT_PUBLIC_SUPABASE_ANON_KEY`, which is blocked by RLS policies, causing all stats to silently return empty. Fixed by switching to `SUPABASE_SERVICE_ROLE_KEY`. User also added `SUPABASE_SERVICE_ROLE_KEY` to Vercel env vars and redeployed.
@@ -262,6 +279,28 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [ ] **Interactive Map Integration** - Simplified embedded map where users ask "where is X?" and see it pinned. Overlay collectibles, boss locations, quest givers.
 - [ ] **Voice-First Mode (Controller-Friendly)** - Dedicated hands-free UI with larger buttons, auto-read responses, minimal scrolling. Killer differentiator vs wikis for players mid-game.
 
+### Referral Program (DB live — code not built yet)
+
+Full design is spec'd. DB schema already deployed. Build order when ready:
+
+1. **`/api/referral/claim` route** (POST, JWT-authenticated) — attaches a referral code to a newly signed-up user. Validates code exists, blocks self-referral, upserts `referrals` row as `pending`. Idempotent.
+2. **`/api/referral/stats` route** (GET, JWT-authenticated) — returns caller's `referral_code`, shareable link (`?ref=CODE`), and conversion stats (total referred / converted / rewarded / reward_pending).
+3. **`auth-context.tsx` update** — two additions:
+   - On mount: read `?ref=` URL param → `localStorage.setItem('referral_code', code)` (persists through Google OAuth redirect)
+   - On `SIGNED_IN` event in `onAuthStateChange`: if localStorage has `referral_code`, call `/api/referral/claim` with the session access token, then clear localStorage. Covers both email/password and Google OAuth sign-ups.
+4. **`/api/stripe/webhook` update** — in `checkout.session.completed`, after upgrading user to premium: query `referrals WHERE referred_id = userId AND status = 'pending'`. If found: apply `REFERRAL_1MONTH_FREE` Stripe coupon (100% off, once, created idempotently if missing) to referrer's active subscription → mark `rewarded`. If referrer has no active subscription → mark `reward_pending`.
+5. **`/api/stripe/checkout` update** — before creating the Checkout Session, check if this user has any `reward_pending` referrals. If yes, apply the `REFERRAL_1MONTH_FREE` coupon to the checkout session's first payment (the reward owed to them for converting referrals before they subscribed).
+6. **`ReferralCard` component** — shows: shareable referral link with copy button, stats pill (X referred / X converted / X rewarded), and contextual state messages ("Your next billing cycle is free!" / "X rewards pending — subscribe to claim").
+7. **Show `ReferralCard`**: Add to `/upgrade/success` page ("Share with friends, get a month free!") and to the `/upgrade` page for already-premium users visiting their billing page.
+
+**Stripe coupon**: `REFERRAL_1MONTH_FREE` — `percent_off: 100`, `duration: 'once'`, `name: 'Referral Reward — 1 Month Free'`. Created idempotently in the webhook handler (try retrieve, catch → create). Applied via `stripe.subscriptions.update(subId, { coupon: 'REFERRAL_1MONTH_FREE' })`.
+
+**Edge cases handled in design:**
+- Self-referral blocked (`referrer_id !== referred_id`)
+- One referrer per referred user (`UNIQUE(referred_id)` in DB)
+- Referrer without subscription → `reward_pending`, applied at their checkout
+- Multiple conversions before next billing: Stripe coupon replacement is idempotent for one free month; additional rewards tracked in DB for future stacking support
+
 ### Community & Retention
 
 - [ ] **Creator/Streamer Partnerships** - Embeddable guide widget for Twitch streams ("Ask the AI guide" overlay). Revenue share on premium signups via referral links.
@@ -341,7 +380,8 @@ See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and 
 ### Tables
 - **`knowledge_chunks`** - Game content with vector embeddings (id, content, embedding, source_url, source_type, chapter, region, quest_name, content_type, character, spoiler_level)
 - **`queries`** - Query log (question, response, spoiler_tier, chunk_ids_used, tokens_used, client_ip)
-- **`users`** - User profiles (tier, queries_today, queries_today_reset_at, stripe_customer_id, stripe_subscription_id)
+- **`users`** - User profiles (tier, queries_today, queries_today_reset_at, stripe_customer_id, stripe_subscription_id, referral_code)
+- **`referrals`** - Referral tracking (id, referrer_id, referred_id, status['pending'|'converted'|'rewarded'|'reward_pending'], created_at, converted_at, rewarded_at). DB is live; application code not yet wired.
 - **`waitlist`** - Email waitlist for when signups are at capacity (id, email unique, created_at)
 
 ### RPC Functions
