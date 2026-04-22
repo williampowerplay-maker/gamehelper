@@ -2,13 +2,16 @@
 
 import { useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 
 export default function AuthButton() {
   const { user, tier, signIn, signUp, signInWithGoogle, signOut, loading, signupsClosed } =
     useAuth();
+  const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+  const [portalLoading, setPortalLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -18,6 +21,27 @@ export default function AuthButton() {
   const [waitlistStatus, setWaitlistStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
   if (loading) return null;
+
+  const handleManageBilling = async () => {
+    if (!user) return;
+    setPortalLoading(true);
+    try {
+      const res = await fetch("/api/stripe/portal", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ userId: user.id }),
+      });
+      const data = await res.json();
+      if (data.url) {
+        window.location.href = data.url;
+      } else {
+        // No billing account yet — send to upgrade page
+        router.push("/upgrade");
+      }
+    } finally {
+      setPortalLoading(false);
+    }
+  };
 
   if (user) {
     return (
@@ -31,7 +55,15 @@ export default function AuthButton() {
         >
           {tier === "premium" ? "Premium" : "Free"}
         </span>
-        {tier !== "premium" && (
+        {tier === "premium" ? (
+          <button
+            onClick={handleManageBilling}
+            disabled={portalLoading}
+            className="text-xs text-amber-500/70 hover:text-amber-400 font-medium transition-colors disabled:opacity-50"
+          >
+            {portalLoading ? "..." : "Billing"}
+          </button>
+        ) : (
           <Link
             href="/upgrade"
             className="text-xs text-red-400 hover:text-red-300 font-medium transition-colors"

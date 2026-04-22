@@ -17,6 +17,7 @@ interface AuthState {
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<void>;
   signOut: () => Promise<void>;
+  refreshProfile: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthState | null>(null);
@@ -131,6 +132,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setQueriesToday(0);
   }
 
+  async function refreshProfile() {
+    const { data: { session: currentSession } } = await supabase.auth.getSession();
+    if (currentSession?.user) {
+      await fetchUserProfile(currentSession.user.id);
+    }
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -144,6 +152,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signUp,
         signInWithGoogle,
         signOut,
+        refreshProfile,
       }}
     >
       {children}
