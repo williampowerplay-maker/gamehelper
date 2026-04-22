@@ -84,7 +84,7 @@ Rules:
 // Returns a content_type filter to narrow the vector search, or null if the
 // question is ambiguous and should search across all content types.
 //
-// Content types in DB: boss | quest | item | exploration | character | mechanic | recipe
+// Content types in DB: boss | quest | item | exploration | character | mechanic | recipe | puzzle
 //
 // Design rules:
 //  1. Ordered from most-specific to least-specific — first match wins
@@ -101,6 +101,15 @@ function classifyContentType(question: string): string | null {
   if (/\b(best (weapon|gear|armor|accessory|accessories|item|equipment) for (a ?)?(beginner|new player|early|starter)|starter (weapon|gear)|beginner (weapon|gear))\b/.test(q)) return null;
   // "What weapons/abilities can X use" — overview lives in mechanic/character, not item
   if (/\b(what (weapons?|abilities|skills|classes|weapon types?) (can|does|do) \w+ use|what (weapons?|weapon types?) (are|is) (available|in the game))\b/.test(q)) return null;
+
+  // VERSUS / COMPARISON — "X vs Y", "sword or spear", "is X better than Y"
+  // Must come BEFORE item classifier — these contain item keywords but need cross-type
+  // search to pull in tier-list/guide content from mechanic alongside item stats.
+  if (/\b(vs\.?|versus)\b|better than\b|compare.{0,30}(weapon|armor|skill|class)|(sword|spear|bow|axe|staff|dagger|ring|necklace|earring|armor|armour)\s+(or|vs)\s+\w|\bor\b.{0,30}\b(which (is |one )?(better|stronger|best|worse|worse))|which (is|one) (better|stronger|best)/.test(q)) return null;
+
+  // FOOD / BUFF / CONSUMABLE queries — food buffs span recipe + mechanic + item.
+  // Must come BEFORE boss classifier so "what food before a boss fight" → null, not "boss".
+  if (/\b(food (buff|bonus|effect|for|before|during|guide)|best food (for|to eat|before)|what (food|meal) (should|to|is good)|elixir (effect|buff|guide)|buff food|combat food|healing food|consumable (guide|tips?|buff|strategy)|what (to eat|should i eat|food (to use|gives))|food (that (gives|boosts?|increases?)|for (combat|fighting|bosses?|dungeons?)))\b/.test(q)) return null;
 
   // BOSS — fight-specific verbs + known boss names
   // Must come before mechanic/skill since "how do I beat X" is a boss question
@@ -128,7 +137,18 @@ function classifyContentType(question: string): string | null {
   if (/\b(puzzles?|strongbox|ancient ruins|sealed gate|disc puzzle|spire.{0,15}puzzle|sanctum.{0,15}puzzle|maze.{0,15}puzzle|ruins.{0,15}puzzle|how (do i|to) solve|puzzle solution)\b/.test(q)) return "puzzle";
 
   // RECIPE — crafting-specific terms (before item, since crafting pages are content_type "recipe")
-  if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge)\b/.test(q)) return "recipe";
+  // Note: "best food for X" and food buff queries are caught by the null-return above before
+  // this fires, so recipe only catches direct crafting/ingredient questions.
+  if (/\b(craft|crafting|recipe|how to make|how do i make|ingredients?|materials? needed|forge|cook|cooking)\b/.test(q)) return "recipe";
+
+  // ENDGAME / NEW GAME+ / POST-GAME — guide content in mechanic
+  if (/\b(new game\+?|ng\+|post.?game|after (beating|finishing|completing) the (game|story|main quest)|endgame (content|guide|tips?|activities?)|what (to do|is there) after (the )?(game|story|ending)|end game content|postgame|game\+)\b/.test(q)) return "mechanic";
+
+  // CAMP / FACTION SYSTEM — all guide content lives in mechanic
+  if (/\b(camp (management|system|upgrade|level|buildings?|feature|guide)|greymane camp (guide|upgrade|system|how)|faction (system|reputation|rank|guide|how)|how (do i|to) (upgrade|level up|build up|improve) (my |the )?camp|base (building|management|upgrade|system)|camp (resources?|workers?|npc|unlock))\b/.test(q)) return "mechanic";
+
+  // MOUNT / PET — system and how-to guides live in mechanic
+  if (/\b(mount(s)? (system|guide|tips?|unlock|how|work)|how (do i|to|do) (get|obtain|unlock|tame|ride|use) (a |the )?(mount|horse|pet|steed)|how do(es)? (mounts?|horses?|pets?) work|pet (system|guide|combat|unlock|how)|horse (guide|system|tips?|riding|unlock|taming)|riding (system|guide|tips?)|best (mount|horse|pet)\b)\b/.test(q)) return "mechanic";
 
   // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
   // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
@@ -168,6 +188,22 @@ function classifyContentType(question: string): string | null {
 function isRecommendationQuery(question: string): boolean {
   const q = question.toLowerCase();
   return /\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q);
+}
+
+// Detects "list all X" / "every X" queries that need a much wider candidate pool.
+function isListQuery(question: string): boolean {
+  const q = question.toLowerCase();
+  return /\b(list (all|every)|all (the )?(bosses?|weapons?|armou?rs?|skills?|quests?|accessories|items?|locations?|enemies?|recipes?|puzzles?|challenges?)|every (weapon|boss|skill|armou?r|item|accessory|enemy|quest)|complete list|full list of|how many (bosses?|weapons?|skills?|quests?|items?|regions?|dungeons?))\b/.test(q);
+}
+
+// Detects clearly off-topic questions that have no Crimson Desert context.
+// Short-circuits the pipeline immediately to save Voyage + Claude API costs.
+function isOffTopic(question: string): boolean {
+  const q = question.toLowerCase();
+  // If it references any game-related term, it's not off-topic
+  const hasGameContext = /\b(crimson desert|kliff|greymane|pywel|abyss|pailune|hernand|delesyia|demeniss|nexus|fextralife|game8|boss|bosses|weapon|armor|armour|skill|quest|dungeon|grapple|grappling|mount|horse|camp|faction|crafting|abyss artifact|silver|gold bar)\b/.test(q);
+  if (hasGameContext) return false;
+  return /\b(weather forecast|homework|recipe for (pizza|pasta|cake|bread|cookies)|who is the president|capital city of|stock (market|price|ticker)|sports? score|football|basketball|soccer score|movie review|celebrity|latest news|politics|election result|what country|translate (this|to)|convert \d|math (problem|equation)|solve for x)\b/.test(q);
 }
 
 const BASE_SYSTEM_PROMPT = `You are an expert companion AI for Crimson Desert, an open-world action-adventure RPG set on the continent of Pywel. The player controls Kliff, a member of the Greymanes faction, rebuilding after an ambush by the Black Bears. The game emphasizes creative combat (weapon skills, grappling, elemental buffs, mount combat), exploration across 5 regions (Pailune, Hernand, Demenis, Delesyia, and the Crimson Desert), skill learning through observation and Abyss Artifacts, and camp management at Greymane Camp.
@@ -317,13 +353,18 @@ export async function POST(req: NextRequest) {
 
     // Classify question to narrow vector search to a specific content type
     const contentTypeFilter = classifyContentType(question);
-    // Recommendation queries (vague "best X", "what are good swords") need more candidates
-    // to surface tier-list and guide content spread across multiple content types.
+    // List queries need a very wide net; recommendation queries need a moderately wider net.
     const isRec = isRecommendationQuery(question);
-    const effectiveMatchCount = isRec
-      ? Math.min(tierConfig.matchCount + 4, 12)
-      : tierConfig.matchCount;
-    console.log("Content type filter:", contentTypeFilter ?? "none (full search)", isRec ? "| recommendation query (+4 matchCount)" : "");
+    const isList = isListQuery(question);
+    const effectiveMatchCount = isList
+      ? 20
+      : isRec
+        ? Math.min(tierConfig.matchCount + 4, 12)
+        : tierConfig.matchCount;
+    console.log(
+      "Content type filter:", contentTypeFilter ?? "none (full search)",
+      isList ? "| list query (matchCount=20)" : isRec ? "| recommendation query (+4 matchCount)" : ""
+    );
 
     // Step 1: Try vector search if Voyage AI key is available
     console.log("Voyage key present:", !!voyageKey);
@@ -640,6 +681,11 @@ export async function POST(req: NextRequest) {
       "\n\n---\n\n**What I'm built for:** I'm your Crimson Desert companion for specific in-game questions — boss strategies, enemy weaknesses, weapon/armor/accessory stats and locations, skill details, quest objectives, NPC info, and region/landmark directions. Try asking something like:\n- *\"How do I beat Reed Devil?\"*\n- *\"Where do I find the Hwando Sword?\"*\n- *\"What does the Focused Shot skill do?\"*\n- *\"How do I get to Greymane Camp?\"*\n\nI'm not great at broad overview questions yet (\"list all recovery items\", \"general combat tips\"). Ask about a specific thing and I've got you.";
     const randomNoInfo = () =>
       NO_INFO_RESPONSES[Math.floor(Math.random() * NO_INFO_RESPONSES.length)] + SCOPE_EXPLAINER;
+
+    // Off-topic short-circuit — return immediately, skip Voyage + Claude costs
+    if (isOffTopic(question)) {
+      return NextResponse.json({ answer: randomNoInfo(), sources: [] });
+    }
 
     // Check if we have genuinely relevant results (not just partial keyword matches)
     const hasRelevantContext = chunks && chunks.length > 0 && (
