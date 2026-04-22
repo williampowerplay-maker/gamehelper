@@ -80,6 +80,7 @@ interface StatsData {
   contentGaps: { id: string; question: string; spoiler_tier: string; created_at: string }[];
   cacheHitRate: number;
   cacheHits: number;
+  activeUsers: { email: string; queries_today: number; tier: string }[];
 }
 
 const TIER_COLORS: Record<string, string> = {
@@ -299,13 +300,13 @@ export default function AdminPage() {
   }
 
   // -- Dashboard --
-  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps, cacheHitRate, cacheHits } = data;
+  const { overview, tierBreakdown, last7Days, recentQueries, knowledgeStats, recentErrors, queryRates, topIps, contentGaps, cacheHitRate, cacheHits, activeUsers } = data;
   const totalTier = tierBreakdown.nudge + tierBreakdown.full;
   const knowledgeEntries = Object.entries(knowledgeStats.byType).sort(([, a], [, b]) => b - a);
   const maxKnowledge = Math.max(...knowledgeEntries.map(([, v]) => v), 1);
 
   return (
-    <div className="min-h-screen bg-[#0e0e16] text-gray-200">
+    <div className="h-screen overflow-y-auto bg-[#0e0e16] text-gray-200">
       {/* Header */}
       <header className="border-b border-[#2a2a3a] px-6 py-4 flex items-center justify-between">
         <div>
@@ -437,6 +438,50 @@ export default function AdminPage() {
                         ) : (
                           <span className="text-gray-700">—</span>
                         )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+        </div>
+
+        {/* Most Active Users Today */}
+        <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-xl p-5">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-sm font-medium text-gray-300">
+              Most Active Users Today
+            </h2>
+            <span className="text-xs text-gray-600">by queries sent today</span>
+          </div>
+          {activeUsers.length === 0 ? (
+            <p className="text-xs text-gray-600 text-center py-4">No authenticated user queries today</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full text-xs">
+                <thead>
+                  <tr className="text-left text-gray-600 border-b border-[#2a2a3a]">
+                    <th className="pb-2 pr-4 font-medium">#</th>
+                    <th className="pb-2 pr-4 font-medium">Email</th>
+                    <th className="pb-2 pr-4 font-medium text-right">Queries Today</th>
+                    <th className="pb-2 font-medium text-right">Tier</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {activeUsers.map(({ email, queries_today, tier }, i) => (
+                    <tr key={email} className="border-b border-[#1e1e2e] hover:bg-[#0e0e16]/50 transition-colors">
+                      <td className="py-2 pr-4 text-gray-600">{i + 1}</td>
+                      <td className="py-2 pr-4 text-gray-300 font-mono">{email}</td>
+                      <td className="py-2 pr-4 text-right font-medium text-gray-300">{queries_today}</td>
+                      <td className="py-2 text-right">
+                        <span className={`inline-block px-2 py-0.5 rounded border text-[10px] font-medium ${
+                          tier === "premium"
+                            ? "bg-yellow-500/20 text-yellow-400 border-yellow-500/30"
+                            : "bg-gray-500/20 text-gray-400 border-gray-500/30"
+                        }`}>
+                          {tier}
+                        </span>
                       </td>
                     </tr>
                   ))}

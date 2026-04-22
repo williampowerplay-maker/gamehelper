@@ -104,6 +104,7 @@ export async function GET(req: NextRequest) {
     contentGapsRes,
     cacheHitsRes,
     totalCachedWindowRes,
+    activeUsersRes,
   ] = await Promise.all([
     supabase.from("queries").select("id", { count: "exact", head: true }),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", `${today}T00:00:00`),
@@ -129,6 +130,7 @@ export async function GET(req: NextRequest) {
       .limit(100),
     supabase.from("queries").select("id", { count: "exact", head: true }).eq("cache_hit", true).gte("created_at", sevenDaysAgo),
     supabase.from("queries").select("id", { count: "exact", head: true }).gte("created_at", sevenDaysAgo),
+    supabase.from("users").select("id, queries_today, tier").gt("queries_today", 0).order("queries_today", { ascending: false }).limit(10),
   ]);
 
   // Tier breakdown (2-tier system; legacy "guide" rows folded into "full")
@@ -194,6 +196,27 @@ export async function GET(req: NextRequest) {
       suspicious: count > 30,
     }));
 
+  // Active users today — join public.users.queries_today with auth emails
+  const activeUsersRaw = activeUsersRes.data ?? [];
+  let activeUsers: { email: string; queries_today: number; tier: string }[] = [];
+  if (activeUsersRaw.length > 0) {
+    try {
+      const { data: authData } = await supabase.auth.admin.listUsers({ perPage: 1000 });
+      const emailById: Record<string, string> = {};
+      for (const u of authData?.users ?? []) {
+        emailById[u.id] = u.email ?? "unknown";
+      }
+      activeUsers = activeUsersRaw.map((u) => ({
+        email: emailById[u.id] ?? "unknown",
+        queries_today: u.queries_today as number,
+        tier: (u.tier as string) ?? "free",
+      }));
+    } catch {
+      // Non-fatal — return empty if auth admin call fails
+      activeUsers = [];
+    }
+  }
+
   return NextResponse.json({
     overview: {
       totalQueries: totalQueriesRes.count ?? 0,
@@ -217,5 +240,6 @@ export async function GET(req: NextRequest) {
     contentGaps: contentGapsRes.data ?? [],
     cacheHitRate,
     cacheHits,
+    activeUsers,
   });
 }
