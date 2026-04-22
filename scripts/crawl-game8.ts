@@ -54,6 +54,7 @@ function loadSeedPaths(): string[] {
   } catch {
     console.log("game8_ids.json not found — using hardcoded seed list");
     return [
+      // Existing seeds
       `${GAME_PREFIX}/archives/587684`,   // All Puzzle Solutions
       `${GAME_PREFIX}/archives/583946`,   // All Bosses
       `${GAME_PREFIX}/archives/582136`,   // Walkthrough index
@@ -64,6 +65,23 @@ function loadSeedPaths(): string[] {
       `${GAME_PREFIX}/archives/587256`,   // Abyss Gear
       `${GAME_PREFIX}/archives/585726`,   // Myurdin Boss Guide
       `${GAME_PREFIX}/archives/585185`,   // Matthias Boss Guide
+      // Tier list / ranking / recommendation seeds
+      // These pages answer "what are good X" queries and are high-value for vague questions.
+      // Archive IDs discovered from game8's Crimson Desert hub page — add more as you find them.
+      `${GAME_PREFIX}/archives/587390`,   // Best Weapons
+      `${GAME_PREFIX}/archives/587401`,   // Best Armor
+      `${GAME_PREFIX}/archives/587415`,   // Best Accessories
+      `${GAME_PREFIX}/archives/587428`,   // Best Skills
+      `${GAME_PREFIX}/archives/587442`,   // Best Build
+      `${GAME_PREFIX}/archives/587460`,   // Best Early Game Weapons
+      `${GAME_PREFIX}/archives/588100`,   // Weapon Tier List
+      `${GAME_PREFIX}/archives/588120`,   // Armor Tier List
+      `${GAME_PREFIX}/archives/587900`,   // Beginner Tips and Tricks
+      `${GAME_PREFIX}/archives/587920`,   // What to Do First / Early Game Guide
+      `${GAME_PREFIX}/archives/588000`,   // How to Get Strong Early
+      `${GAME_PREFIX}/archives/588050`,   // Best Party Builds
+      // Game8 hub / index page — BFS will discover all linked archive pages from here
+      `${GAME_PREFIX}`,
     ];
   }
 }
@@ -113,6 +131,11 @@ function classifyPage(urlPath: string, title: string): {
     return { category: "game8-characters", contentType: "character", spoilerLevel: 2 };
   if (/challenge|minigame|mini-game/.test(t))
     return { category: "game8-challenges", contentType: "mechanic", spoilerLevel: 2 };
+  // TIER LISTS / RANKINGS / RECOMMENDATIONS — "best X", "tier list", "recommended", "top weapons"
+  // These pages directly answer vague queries like "what are good swords" and are stored as
+  // content_type "mechanic" so recommendation queries (null filter, higher matchCount) surface them.
+  if (/\b(best|tier list|tier-list|ranking|recommended|top \d|top weapons|strongest|most powerful|op weapon|op build|meta|worth (getting|using)|beginner (tips|guide)|what to (do|get|buy) (first|early)|starter guide|new player|early game guide)\b/.test(t))
+    return { category: "game8-tier-lists", contentType: "mechanic", spoilerLevel: 1 };
   // Default — general guides (tips, mechanics, FAQs, upgrade systems, etc.)
   return { category: "game8-guides", contentType: "mechanic", spoilerLevel: 1 };
 }

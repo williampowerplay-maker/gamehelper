@@ -135,6 +135,12 @@ function classifyContentType(question: string): string | null {
   // Also catches puzzle/upgrade/healing queries whose guide content is content_type "mechanic"
   if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
 
+  // RECOMMENDATION / COMPARISON — "what are good swords", "best weapons to get", "is X worth it"
+  // These need cross-type search: tier lists live in mechanic (game8 guides), stats in item.
+  // Must come BEFORE item classifier so "best swords" → null (full search) not "item".
+  // "best for beginners" and "best build" are already handled above — this catches the rest.
+  if (/\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|what.{0,20}(good for|best for|work(s)? (well|good))|is .{3,30} (any )?good\b|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q)) return null;
+
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
   // because that info often lives in beginner-guides (mechanic content_type). Full vector search
@@ -155,6 +161,13 @@ function classifyContentType(question: string): string | null {
   if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
 
   return null; // ambiguous — no filter, full vector search
+}
+
+// Detects vague recommendation/comparison queries ("what are good swords", "is X worth getting")
+// Used to boost matchCount so we cast a wider net across tier-list and guide content.
+function isRecommendationQuery(question: string): boolean {
+  const q = question.toLowerCase();
+  return /\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q);
 }
 
 const BASE_SYSTEM_PROMPT = `You are an expert companion AI for Crimson Desert, an open-world action-adventure RPG set on the continent of Pywel. The player controls Kliff, a member of the Greymanes faction, rebuilding after an ambush by the Black Bears. The game emphasizes creative combat (weapon skills, grappling, elemental buffs, mount combat), exploration across 5 regions (Pailune, Hernand, Demenis, Delesyia, and the Crimson Desert), skill learning through observation and Abyss Artifacts, and camp management at Greymane Camp.
@@ -304,7 +317,13 @@ export async function POST(req: NextRequest) {
 
     // Classify question to narrow vector search to a specific content type
     const contentTypeFilter = classifyContentType(question);
-    console.log("Content type filter:", contentTypeFilter ?? "none (full search)");
+    // Recommendation queries (vague "best X", "what are good swords") need more candidates
+    // to surface tier-list and guide content spread across multiple content types.
+    const isRec = isRecommendationQuery(question);
+    const effectiveMatchCount = isRec
+      ? Math.min(tierConfig.matchCount + 4, 12)
+      : tierConfig.matchCount;
+    console.log("Content type filter:", contentTypeFilter ?? "none (full search)", isRec ? "| recommendation query (+4 matchCount)" : "");
 
     // Step 1: Try vector search if Voyage AI key is available
     console.log("Voyage key present:", !!voyageKey);
@@ -345,7 +364,7 @@ export async function POST(req: NextRequest) {
           const rpcParams: Record<string, unknown> = {
             query_embedding: queryEmbedding,
             match_threshold: 0.25,
-            match_count: tierConfig.matchCount + 10, // fetch extra, we'll re-rank
+            match_count: effectiveMatchCount + 10, // fetch extra, we'll re-rank
           };
           if (contentTypeFilter) rpcParams.content_type_filter = contentTypeFilter;
 
@@ -360,7 +379,7 @@ export async function POST(req: NextRequest) {
               {
                 query_embedding: queryEmbedding,
                 match_threshold: 0.25,
-                match_count: tierConfig.matchCount + 4,
+                match_count: effectiveMatchCount + 4,
               }
             );
             console.log("Vector search (unfiltered fallback):", unfilteredData?.length || 0, "results");
@@ -539,7 +558,7 @@ export async function POST(req: NextRequest) {
             chunks.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
               Number(b.similarity) - Number(a.similarity)
             );
-            chunks = chunks.slice(0, tierConfig.matchCount);
+            chunks = chunks.slice(0, effectiveMatchCount);
             console.log("Re-ranked top chunk similarity:", Number(chunks[0]?.similarity).toFixed(3));
           }
         }

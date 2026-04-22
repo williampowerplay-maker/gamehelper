@@ -95,6 +95,7 @@ const CATEGORIES: Category[] = [
   { name: "game8-bosses",     indexPath: "",                        contentType: "boss",        spoilerLevel: 2 },
   { name: "game8-walkthrough",indexPath: "",                        contentType: "quest",       spoilerLevel: 3 },
   { name: "game8-guides",     indexPath: "",                        contentType: "mechanic",    spoilerLevel: 1 },
+  { name: "game8-tier-lists", indexPath: "",                        contentType: "mechanic",    spoilerLevel: 1 },
   { name: "game8-weapons",    indexPath: "",                        contentType: "item",        spoilerLevel: 1 },
   { name: "game8-armor",      indexPath: "",                        contentType: "item",        spoilerLevel: 1 },
   { name: "game8-accessories",indexPath: "",                        contentType: "item",        spoilerLevel: 1 },
