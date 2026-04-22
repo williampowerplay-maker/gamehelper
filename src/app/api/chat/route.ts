@@ -359,6 +359,9 @@ export async function POST(req: NextRequest) {
     let chunks: Record<string, unknown>[] | null = null;
     let searchError: Error | null = null;
     let voyageTokensUsed = 0;
+    // Retrieval instrumentation — populated throughout the pipeline, flushed to DB at log time
+    let classifierFallbackFired = false;
+    let preSliceChunks: Record<string, unknown>[] = []; // all ranked chunks BEFORE final slice
 
     // Classify question to narrow vector search to a specific content type
     const contentTypeFilter = classifyContentType(question);
@@ -426,6 +429,7 @@ export async function POST(req: NextRequest) {
           // Fallback: if filtered search returns nothing, retry without the filter
           if ((!data || data.length === 0) && contentTypeFilter) {
             console.log("Filtered search empty — retrying without content_type_filter");
+            classifierFallbackFired = true; // ← instrumentation
             const { data: unfilteredData, error: unfilteredError } = await supabase.rpc(
               "match_knowledge_chunks",
               {
@@ -610,6 +614,7 @@ export async function POST(req: NextRequest) {
             chunks.sort((a: Record<string, unknown>, b: Record<string, unknown>) =>
               Number(b.similarity) - Number(a.similarity)
             );
+            preSliceChunks = [...chunks]; // ← instrumentation: full ranked pool before trim
             chunks = chunks.slice(0, effectiveMatchCount);
             console.log("Re-ranked top chunk similarity:", Number(chunks[0]?.similarity).toFixed(3));
           }
@@ -777,10 +782,17 @@ export async function POST(req: NextRequest) {
     // is ingested, causing future users to receive outdated "no data" answers.
     const shouldCache = !isMissingOrDefaultResponse(answer);
     console.log("Caching response:", shouldCache);
+
+    // Pre-generate query ID so we can link retrieval_debug rows without awaiting the insert.
+    const queryId = crypto.randomUUID();
+    const retrievalSimilarities = preSliceChunks.map((c) => Number(c.similarity));
+    const topChunkSim = chunks && chunks.length > 0 ? Number(chunks[0].similarity) : null;
+
     if (shouldCache) {
       supabase
         .from("queries")
         .insert({
+          id: queryId,
           question: cacheKey,
           response: answer,
           spoiler_tier: spoilerTier,
@@ -789,6 +801,11 @@ export async function POST(req: NextRequest) {
           input_tokens: claudeData.usage?.input_tokens || 0,
           client_ip: clientIp,
           cache_hit: false,
+          // ── retrieval instrumentation ──────────────────────────────────
+          classified_content_type:   contentTypeFilter ?? null,
+          retrieval_similarities:    retrievalSimilarities,
+          classifier_fallback_fired: classifierFallbackFired,
+          top_chunk_similarity:      topChunkSim,
         })
         .then(() => {});
     } else {
@@ -797,6 +814,7 @@ export async function POST(req: NextRequest) {
       supabase
         .from("queries")
         .insert({
+          id: queryId,
           question: cacheKey,
           response: null,
           spoiler_tier: spoilerTier,
@@ -806,7 +824,30 @@ export async function POST(req: NextRequest) {
           client_ip: clientIp,
           cache_hit: false,
           content_gap: true,
+          // ── retrieval instrumentation ──────────────────────────────────
+          classified_content_type:   contentTypeFilter ?? null,
+          retrieval_similarities:    retrievalSimilarities,
+          classifier_fallback_fired: classifierFallbackFired,
+          top_chunk_similarity:      topChunkSim,
         })
+        .then(() => {});
+    }
+
+    // Log every chunk that entered the reranker to retrieval_debug (async, best-effort).
+    if (preSliceChunks.length > 0) {
+      supabase
+        .from("retrieval_debug")
+        .insert(
+          preSliceChunks.map((c, i) => ({
+            query_id:     queryId,
+            chunk_id:     c.id as string,
+            rank:         i + 1,
+            similarity:   Number(c.similarity),
+            source_type:  String(c.source_type  || ""),
+            content_type: String(c.content_type || ""),
+            source_url:   String(c.source_url   || ""),
+          }))
+        )
         .then(() => {});
     }
 
