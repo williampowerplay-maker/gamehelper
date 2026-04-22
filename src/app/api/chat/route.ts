@@ -145,7 +145,7 @@ function classifyContentType(question: string): string | null {
   if (/\b(new game\+?|ng\+|post.?game|after (beating|finishing|completing) the (game|story|main quest)|endgame (content|guide|tips?|activities?)|what (to do|is there) after (the )?(game|story|ending)|end game content|postgame|game\+)\b/.test(q)) return "mechanic";
 
   // CAMP / FACTION SYSTEM — all guide content lives in mechanic
-  if (/\b(camp (management|system|upgrade|level|buildings?|feature|guide)|greymane camp (guide|upgrade|system|how)|faction (system|reputation|rank|guide|how)|how (do i|to) (upgrade|level up|build up|improve) (my |the )?camp|base (building|management|upgrade|system)|camp (resources?|workers?|npc|unlock))\b/.test(q)) return "mechanic";
+  if (/\b(camp (management|system|upgrade|level|buildings?|feature|guide|expand|expansion)|greymane camp (guide|upgrade|system|how|expand)|faction (system|reputation|rank|guide|how)|how (do i|to) (upgrade|level up|build up|improve|expand|grow|develop) (my |the )?camp|base (building|management|upgrade|system)|camp (resources?|workers?|npc|unlock)|expand(ing)? (the |my |greymane )?camp|how (big|large) (can|does) (the |my )?camp (get|become|grow))\b/.test(q)) return "mechanic";
 
   // MOUNT / PET — system and how-to guides live in mechanic
   if (/\b(mount(s)? (system|guide|tips?|unlock|how|work)|how (do i|to|do) (get|obtain|unlock|tame|ride|use) (a |the )?(mount|horse|pet|steed)|how do(es)? (mounts?|horses?|pets?) work|pet (system|guide|combat|unlock|how)|horse (guide|system|tips?|riding|unlock|taming)|riding (system|guide|tips?)|best (mount|horse|pet)\b)\b/.test(q)) return "mechanic";
@@ -178,7 +178,7 @@ function classifyContentType(question: string): string | null {
   // EXPLORATION — location/navigation/dungeon queries
   // Catches "how do I get to X", dungeon names, and navigation questions
   // Note: "ruins" alone removed — too broad, catches puzzle queries. Use more specific patterns.
-  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|camp|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
+  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
 
   // QUEST — story/objective keywords
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
