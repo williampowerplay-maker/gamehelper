@@ -111,6 +111,12 @@ function classifyPage(urlPath: string, title: string): {
     return { category: "game8-walkthrough", contentType: "quest", spoilerLevel: 3 };
   if (/\ball bosses\b|list.*boss|boss list/.test(t))
     return { category: "game8-bosses", contentType: "boss", spoilerLevel: 2 };
+  // TIER LISTS / RANKINGS / RECOMMENDATIONS — checked BEFORE item/weapon/armor/accessory patterns
+  // so "Best One-Handed Weapons", "Best Armor", "Best Necklaces" etc. land here rather than in item categories.
+  // These pages directly answer vague queries like "what are good swords" and are stored as
+  // content_type "mechanic" so recommendation queries (null filter, higher matchCount) surface them.
+  if (/\b(best|tier list|tier-list|ranking|recommended|top \d|top weapons|strongest|most powerful|op weapon|op build|meta|worth (getting|using)|beginner (tips|guide)|what to (do|get|buy) (first|early)|starter guide|new player|early game guide)\b/.test(t))
+    return { category: "game8-tier-lists", contentType: "mechanic", spoilerLevel: 1 };
   if (/weapon|sword|spear|axe|bow|gun|hammer|rapier|dagger|blade/.test(t))
     return { category: "game8-weapons", contentType: "item", spoilerLevel: 1 };
   if (/\barmor\b|headgear|gloves|footwear|cloak|body armor/.test(t))
@@ -131,11 +137,6 @@ function classifyPage(urlPath: string, title: string): {
     return { category: "game8-characters", contentType: "character", spoilerLevel: 2 };
   if (/challenge|minigame|mini-game/.test(t))
     return { category: "game8-challenges", contentType: "mechanic", spoilerLevel: 2 };
-  // TIER LISTS / RANKINGS / RECOMMENDATIONS — "best X", "tier list", "recommended", "top weapons"
-  // These pages directly answer vague queries like "what are good swords" and are stored as
-  // content_type "mechanic" so recommendation queries (null filter, higher matchCount) surface them.
-  if (/\b(best|tier list|tier-list|ranking|recommended|top \d|top weapons|strongest|most powerful|op weapon|op build|meta|worth (getting|using)|beginner (tips|guide)|what to (do|get|buy) (first|early)|starter guide|new player|early game guide)\b/.test(t))
-    return { category: "game8-tier-lists", contentType: "mechanic", spoilerLevel: 1 };
   // Default — general guides (tips, mechanics, FAQs, upgrade systems, etc.)
   return { category: "game8-guides", contentType: "mechanic", spoilerLevel: 1 };
 }

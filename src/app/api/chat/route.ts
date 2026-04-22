@@ -159,7 +159,13 @@ function classifyContentType(question: string): string | null {
   // These need cross-type search: tier lists live in mechanic (game8 guides), stats in item.
   // Must come BEFORE item classifier so "best swords" → null (full search) not "item".
   // "best for beginners" and "best build" are already handled above — this catches the rest.
+  // Also catches "best [modifier] weapon" patterns like "best one-handed weapons", "best ranged bow",
+  // "best body armor", "best headgear" — the modifier between "best" and item type would otherwise
+  // fall through to the item classifier and miss game8 tier-list content (content_type=mechanic).
   if (/\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|what.{0,20}(good for|best for|work(s)? (well|good))|is .{3,30} (any )?good\b|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q)) return null;
+  // "best [modifier(s)] [item type]" — e.g. "best one-handed weapons", "best ranged weapons",
+  // "best two-handed sword", "best body armor", "best light armor" — needs full cross-type search.
+  if (/\bbest\b.{1,25}\b(weapon|sword|bow|spear|axe|dagger|staff|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories)\b/.test(q)) return null;
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
   // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
@@ -187,7 +193,8 @@ function classifyContentType(question: string): string | null {
 // Used to boost matchCount so we cast a wider net across tier-list and guide content.
 function isRecommendationQuery(question: string): boolean {
   const q = question.toLowerCase();
-  return /\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q);
+  return /\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q)
+    || /\bbest\b.{1,25}\b(weapon|sword|bow|spear|axe|dagger|staff|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories)\b/.test(q);
 }
 
 // Detects "list all X" / "every X" queries that need a much wider candidate pool.
