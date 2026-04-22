@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-16 (session 20)
+**Last updated:** 2026-04-22 (session 21)
 
 ## Overview
 
@@ -20,7 +20,39 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Auth | Supabase Auth (Email + Google OAuth) | via supabase-js |
 | Deployment | Vercel | - |
 
-## Current Status: MVP Functional + Security Hardened
+## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 21 — Stripe Integration, RAG Classifier Expansion, game8 Full Ingest (2026-04-22)
+
+- **Admin dashboard fixed** — all three admin routes (`/api/admin/stats`, `/api/admin/export`, `/api/admin/errors`) were using `NEXT_PUBLIC_SUPABASE_ANON_KEY`, which is blocked by RLS policies, causing all stats to silently return empty. Fixed by switching to `SUPABASE_SERVICE_ROLE_KEY`. User also added `SUPABASE_SERVICE_ROLE_KEY` to Vercel env vars and redeployed.
+
+- **Stripe subscription integration (code complete, env vars pending)**:
+  - `/api/stripe/checkout` — creates Stripe Checkout Session for $4.99/mo (subscription mode). Creates/retrieves Stripe customer, persists `stripe_customer_id`, includes `supabase_user_id` in metadata.
+  - `/api/stripe/webhook` — handles `checkout.session.completed` (→ tier=premium), `invoice.payment_succeeded` (keep premium), `customer.subscription.deleted` (→ tier=free, clears subscription ID). Verifies Stripe signature on every request.
+  - `/api/stripe/portal` — creates Stripe Billing Portal session so premium users can manage/cancel subscription.
+  - `/upgrade` page updated — real Subscribe button for signed-in free users, Manage Billing button for premium users, notify form kept for signed-out visitors only. "Coming Soon" badge removed.
+  - `/upgrade/success` — post-payment confirmation page that calls `refreshProfile()` after 2s delay to pick up webhook-updated tier.
+  - `AuthButton` updated — premium users see "Billing" link (amber, opens portal); free users see "Upgrade" link (red, goes to /upgrade).
+  - `auth-context.tsx` — added `refreshProfile()` function to `AuthState` interface and implementation.
+  - Supabase schema — added `stripe_customer_id TEXT` and `stripe_subscription_id TEXT` columns to `users` table, with index on `stripe_customer_id`.
+  - **Still needs**: `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` added to Vercel env vars + Stripe dashboard product/price/webhook setup.
+
+- **game8 full ingest complete** — 286 game8-guides pages (which contained tier-list / best-of / ranking content) were only 2 entries in the DB before. Now all 660 game8 pages are indexed: **17,798 game8 chunks** from 660 pages across 14 categories (guides, walkthrough, puzzles, bosses, weapons, armor, accessories, items, locations, skills, crafting, characters, challenges, abyss).
+
+- **7 new query classifiers** (34/34 unit tests passing — `scripts/test-classifiers.mjs`):
+  1. **Versus/comparison** (`X vs Y`, `better than`, `sword or spear`) → `null` (full search). Previously wrongly filtered to `item` type, missing tier-list/guide content.
+  2. **Food/buff/consumable** (`what food before a boss fight`, `best food for combat`) → `null`. Must come **before** boss classifier so food+boss co-occurrence doesn't route to boss.
+  3. **Camp/faction system** (`how does camp management work`, `upgrade my camp`) → `mechanic`.
+  4. **Mount/pet system** (`how do I get a horse`, `how do mounts work`) → `mechanic`.
+  5. **Endgame/NG+** (`after beating the game`, `new game+`, `endgame content`) → `mechanic`.
+  6. **List queries** (`list all bosses`, `every weapon in the game`) → `null` + `matchCount = 20` (was 8). Makes catalogue-style queries actually useful.
+  7. **Off-topic detection** (`weather forecast`, `who is the president`) → immediate short-circuit, skips Voyage + Claude entirely.
+
+- **RAG recommendation improvements** (from previous session, now with full game8 data):
+  - `isRecommendationQuery()` helper boosts `matchCount` by +4 (up to 12) for vague queries like "what are good swords".
+  - Recommendation pattern added to classifier (before item classifier) so "best swords" → `null` (full cross-type search) not `item`.
+
+- **DB content as of session 21**: ~111,905 total chunks (93,405 fextralife_wiki + 17,798 game8 + 516 wiki + 186 youtube).
 
 ### Session 20 — Cost Optimisations, Upgrade Page, Ad Labels (2026-04-16)
 
@@ -137,6 +169,9 @@ The app runs locally and has a working RAG pipeline, but needs content seeding a
 - [x] ~~**Content Ingestion Pipeline**~~ - `scripts/ingest-fextralife.ts` crawls wiki, chunks, embeds, upserts. **v2**: Added abyss-gear, npcs, collectibles, key-items, accessories categories; 2-level BFS crawl via `--deep`; idempotent re-runs via delete-before-insert. **v3**: `--changed-only` flag skips unchanged pages via SHA256 content hashing; CI-safe env loading. **v4**: Chunk splitting + overlap (500-char target, 150-char intra overlap, 120-char inter-section overlap). **v5 (2026-04-09)**: Split into 2-phase pipeline — `crawl-wiki.ts` saves wiki pages to local `wiki-cache/`, `ingest-from-cache.ts` chunks+embeds+upserts from cache. Re-chunking or re-embedding no longer requires re-crawling the site. `ingest-state.json` tracks what's been embedded so `--changed-only` skips already-ingested unchanged pages.
 - [x] **Automated Wiki Monitoring** - GitHub Actions workflow runs every Sunday, detects changed wiki pages via `page_hashes` table, re-embeds only what changed. Manual trigger available in GitHub UI.
 
+#### Ingest status (2026-04-22) — confirmed via Supabase
+`SELECT COUNT(*) FROM knowledge_chunks` returned approximately **111,905 chunks** (93,405 fextralife_wiki + 17,798 game8 + 516 wiki + 186 youtube). game8-guides 286 pages re-ingested this session — were previously only 2 entries.
+
 #### Ingest status (2026-04-15) — confirmed via Supabase
 `SELECT COUNT(*) FROM knowledge_chunks` returned **94,107 chunks** (verified live). Previous estimate of ~38,600 was outdated — game8 full ingest (session 14) and subsequent runs more than doubled the count.
 
@@ -216,7 +251,7 @@ All 4 homepage starter questions were debugged and fixed (see CHANGELOG v0.6.1 a
 - [x] **Error Boundaries & Error Dashboard** - `ErrorBoundary` class component wraps root layout. `error.tsx` handles Next.js route-level errors. Both log to `error_logs` Supabase table. Admin dashboard has a full error analysis section: **1h / 24h / 7d time filter**, sparkline bar chart, per-type breakdown cards, expandable rows with stack trace + JSON context.
 - [x] **Analytics Dashboard** - `/admin` (live at `https://crimson-guide.vercel.app/admin`) — overview stats incl. **cache hit rate %**, 7-day chart, tier usage, query rate stats (avg/min/hr/day), high-volume IP table, unanswered questions table. CSV exports for waitlist, users, content gaps.
 - [ ] **Content Management** - No admin interface for managing knowledge chunks
-- [ ] **Payment Integration** - Premium tier exists in schema but no Stripe/payment flow
+- [x] **Payment Integration** - Stripe checkout, webhook, billing portal, and upgrade/success pages all built. Code complete; needs Stripe env vars in Vercel + dashboard product/webhook setup to go live.
 
 ## Future Features (Planned)
 
@@ -306,7 +341,7 @@ See **[TODO_MANUAL.md](TODO_MANUAL.md)** for a checklist of accounts, keys, and 
 ### Tables
 - **`knowledge_chunks`** - Game content with vector embeddings (id, content, embedding, source_url, source_type, chapter, region, quest_name, content_type, character, spoiler_level)
 - **`queries`** - Query log (question, response, spoiler_tier, chunk_ids_used, tokens_used, client_ip)
-- **`users`** - User profiles (tier, queries_today, queries_today_reset_at)
+- **`users`** - User profiles (tier, queries_today, queries_today_reset_at, stripe_customer_id, stripe_subscription_id)
 - **`waitlist`** - Email waitlist for when signups are at capacity (id, email unique, created_at)
 
 ### RPC Functions
@@ -352,8 +387,15 @@ crimson-guide/
 # Required
 NEXT_PUBLIC_SUPABASE_URL=<your-supabase-url>
 NEXT_PUBLIC_SUPABASE_ANON_KEY=<your-supabase-anon-key>
+SUPABASE_SERVICE_ROLE_KEY=<your-supabase-service-role-key>   # Admin routes + ingest scripts
 ANTHROPIC_API_KEY=<your-claude-api-key>
 VOYAGE_API_KEY=<your-voyage-ai-key>
+
+# Stripe (code complete — needs setup in Stripe dashboard before going live)
+STRIPE_SECRET_KEY=<sk_live_...>
+STRIPE_WEBHOOK_SECRET=<whsec_...>
+STRIPE_PRICE_ID=<price_...>                        # $4.99/mo subscription price ID
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=<pk_live_...>
 
 # Optional (features activate when set)
 NEXT_PUBLIC_MAX_USERS=100

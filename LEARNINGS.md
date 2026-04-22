@@ -4,6 +4,35 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: Query Classifier Ordering & Edge Cases
+
+- **Food + boss co-occurrence breaks naive ordering**: A query like "what food should I eat before a boss fight" contains "fight" (a boss verb) AND food-related terms. If the food classifier comes AFTER the boss classifier, the query routes to boss content. Fix: food/consumable classifier must come **before** the boss classifier. General rule: classifiers that are easily confused with more-specific classifiers must precede them.
+- **Versus/comparison queries are a separate classifier, not a recommendation**: "Hwando vs Sielos Longsword" and "sword or spear which is better" contain item keywords that would filter to `content_type = "item"`. But these queries need tier-list/guide content from `mechanic` to answer which is better. Add an explicit versus classifier BEFORE the item classifier that returns `null` (full search). Pattern: `\b(vs\.?|versus)\b|better than\b|(sword|spear|...) (or|vs) \w`.
+- **Off-topic detection must not false-positive on game terms**: The off-topic guard must check for game context FIRST before applying the off-topic regex. A query like "how do I fight the boss" contains "fight" which might match off-topic patterns. Solution: check for any game noun (boss, weapon, skill, quest, abyss, etc.) first — if found, skip the off-topic check entirely.
+- **Off-topic check must come AFTER `randomNoInfo()` is defined**: In a function body, `const randomNoInfo = () => ...` is not hoisted. If the off-topic short-circuit calls `randomNoInfo()` before that const is declared, it will throw `ReferenceError`. Place the off-topic check immediately after `randomNoInfo` is assigned.
+- **List queries need a dramatically higher matchCount**: "List all bosses" needs 15–20 candidates to be useful; with the normal 8-chunk cap the response covers only a fraction of bosses. Add an `isListQuery()` helper and set `effectiveMatchCount = 20` for those queries. Normal recommendation query boost (+4) is insufficient for catalogue-style questions.
+- **Test your classifiers in isolation with a unit test file**: Create a `.mjs` unit test (e.g. `scripts/test-classifiers.mjs`) that runs the classifier functions against a matrix of expected inputs/outputs and prints ✅/❌. This catches ordering bugs and regex escaping errors before they hit the pipeline. Run with `node scripts/test-classifiers.mjs` — no build required, near-instant feedback.
+- **New system-level content types need their own classifier entry**: When adding game8 tier-list / guide content as `mechanic` type, ensure queries about camps, mounts, factions, and endgame are routed to `mechanic`. Without explicit entries, these fall through to `null` (fine for retrieval quality but wastes vector search time scanning all types). Each new game system you add content for should have a corresponding classifier entry.
+
+## RAG: Admin Dashboard + Service Role Key
+
+- **Anon key is blocked by RLS on admin-accessed tables**: The `NEXT_PUBLIC_SUPABASE_ANON_KEY` is blocked by RLS policies on sensitive tables like `users`, `queries`, and `error_logs`. Admin routes that use the anon key silently return empty arrays — no error, just 0 rows. **Fix: admin routes must use `SUPABASE_SERVICE_ROLE_KEY`** to bypass RLS. This key must be server-side only (never `NEXT_PUBLIC_`).
+- **Symptom is silent**: The admin dashboard shows "0 queries today", "0 users", "0 errors" even when data clearly exists. The Supabase JS client returns `{ data: [], error: null }` — the RLS policy silently filters all rows. There is no warning that results are being filtered.
+- **Service role key must be in Vercel env vars, not just `.env.local`**: Local dev works fine with `.env.local`, but Vercel won't see it unless explicitly added via Vercel dashboard → Settings → Environment Variables. After adding, a redeploy is required.
+
+## Stripe Integration with Supabase Auth
+
+- **Use `metadata.supabase_user_id` to bridge Stripe and Supabase**: Stripe webhooks don't know which Supabase user triggered the payment. Pass `supabase_user_id` in the Checkout Session `metadata` field at creation time. The webhook then reads `session.metadata.supabase_user_id` to update the correct user row.
+- **Persist `stripe_customer_id` on first checkout, reuse on subsequent checkouts**: Before creating a new Checkout Session, look up the user's `stripe_customer_id` in Supabase. If it exists, pass it as the `customer` param to Stripe — this links all subscriptions, invoices, and portal sessions to one Stripe customer. If not, let Stripe create a new customer and save the resulting ID back to Supabase.
+- **Raw request body is required for webhook signature verification**: `stripe.webhooks.constructEvent()` requires the raw, unparsed request body (not `req.json()`). Use `await req.text()` to get the raw string, then pass it alongside the `Stripe-Signature` header. If you pass a parsed JSON object, the HMAC signature will not match and every webhook call will be rejected.
+- **Billing Portal requires activation in Stripe dashboard**: The `/api/stripe/portal` route will fail with a Stripe API error until you enable the Customer Portal in Stripe Settings → Billing → Customer Portal. It's not on by default.
+- **`force-dynamic` is required on webhook routes**: Vercel may attempt to statically optimize API routes that have no dynamic data. Add `export const dynamic = "force-dynamic"` to webhook routes so they're always server-rendered and never cached.
+
+## RAG: Chunk Count vs DB Size Relationship
+
+- **~111k chunks is the current DB size** — classify queries that scan all types carefully. Full unfiltered vector search over 111k chunks is significantly more expensive (IO, latency) than filtered search over 10–15k chunks for a specific content type. Each new content type added should come with a corresponding classifier entry.
+- **game8 pages are numeric archive IDs in URLs** — `game8.co/games/Crimson-Desert/archives/584395`. URL-match keyword boost works on Fextralife (URLs contain page names like `/Hwando+Sword`) but NOT on game8 archive IDs. For game8 content, rely on content-start boosting (page title is prepended to chunk text during ingest) rather than URL matching.
+
 ## RAG: Chunk Splitting & Overlap
 
 - **Target chunk size ~500 chars for voyage-3.5-lite**: Larger chunks (>800 chars) dilute the embedding signal — the vector tries to represent too many concepts at once. Splitting into 500-char sub-chunks gives each embedding a focused meaning.
