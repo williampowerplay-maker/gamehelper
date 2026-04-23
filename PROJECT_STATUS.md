@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-22 (session 21)
+**Last updated:** 2026-04-22 (session 23 — intent resolver design spec)
 
 ## Overview
 
@@ -21,6 +21,21 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 23 — Real-Player Query Testing + Intent Resolver Design (2026-04-22)
+
+- **Real-player question battery** — ran 25 verified questions sourced from Steam Community discussions (app 3321460) and GameFAQs board 277232 against production (`crimson-guide.vercel.app/api/chat`). Questions preserved exact player phrasing including typos (ANTYMBRA), lowercasing, missing punctuation, and frustration patterns ("help", "stuck", "cant").
+- **Results: 9 solid passes / 5 partial / 11 fails (~36% pass rate)** — significantly lower than the 95% on the well-formed internal test bank because real players type vague, misspelled, or about-content-that-doesn't-exist questions.
+- **Failure patterns identified** (ranked by frequency):
+  1. **Walkthrough content ceiling** — every Chapter 5+ question deflected with "knowledge base only covers Chapters 1-4" (4+ failures)
+  2. **Entire subsystems missing** — fishing, parrying, save/exit, water gathering (3 failures)
+  3. **Typo breaks classifier** — "ANTYMBRA" → fail, "antumbra" → pass (character-sensitive regex)
+  4. **Vague queries deflect** — "any advice", "missable's", "trying to figure out gears" (3 failures)
+  5. **Lexical collision → wrong answer** — "NPCs missing everywhere" matched "Missing Companion" quest
+  6. **Bug/glitch questions** — no KB for bugs/workarounds (2 failures)
+  7. **Ambiguous meaning picked single interpretation** — "oongka stuck wearing a weird helm"
+  8. **Hallucination risk** — water gathering answer plausible but unverifiable
+- **Intent resolver design spec drafted** — new file `INTENT_RESOLVER_SPEC.md` captures the full proposal: 6 decision points with leans (placement/schema/clarification/state/caching/failure), cost envelope, revertability design (feature flag + additive code + additive schema + dedicated branch + graceful fallback), kill criteria, staged rollout (shadow → 10% → 100%). NOT BUILT — parked for future prioritisation. Explicit non-solves called out (content gaps, hallucination at generation, final Voyage scoring).
 
 ### Session 22 — Admin Polish, Cost Dashboard, Referral Program Design (2026-04-22)
 
@@ -300,6 +315,13 @@ Full design is spec'd. DB schema already deployed. Build order when ready:
 - One referrer per referred user (`UNIQUE(referred_id)` in DB)
 - Referrer without subscription → `reward_pending`, applied at their checkout
 - Multiple conversions before next billing: Stripe coupon replacement is idempotent for one free month; additional rewards tracked in DB for future stacking support
+
+### RAG / Intent Resolution (spec'd — build later)
+
+- [ ] **LLM-based Intent Resolver** — use Haiku as a pre-retrieval intent layer to handle typos, synonyms, vague queries, ambiguity, and to enable normalized/semantic caching. Designed to augment (not replace) the existing regex classifier. Full design — including the 6 decision options with leans, cost envelope, revertability design (feature flag + additive code + additive schema + dedicated branch), kill criteria, and staged rollout plan (shadow → 10% → 100%) — lives in `INTENT_RESOLVER_SPEC.md`.
+- **Why we want it:** real-player test battery showed ~36% pass rate on vague/ambiguous/typo'd questions vs 95% on well-formed named-entity questions. Resolver targets the gap the regex classifier can't close.
+- **Important non-solves (per spec):** does not fix content gaps (Chapter 5–11 missing walkthrough is a separate ingestion problem), does not prevent hallucinations at generation, does not change final Voyage scoring.
+- **Prerequisite:** decide whether to prioritise before or after Stripe launch / referral program / content gap fills.
 
 ### Community & Retention
 
