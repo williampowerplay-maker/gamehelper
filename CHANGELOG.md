@@ -4,6 +4,54 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.18.0] - 2026-04-23 (Session 25 — Phase 1b Boilerplate Deletion)
+
+### Retrieval quality — before/after
+- Pre-Phase-1b (post-session-24): 26.7% Recall@10 / MRR 0.182
+- **Post-Phase-1b: 26.7% / 0.182 (flat, zero regressions)**
+- No per-query deltas on any of the 15 eval queries
+- The eval is flat because deleted chunks weren't ranking in top-10 for our test queries — probes=10 had already sorted that out. Wins land in the broader corpus (arbitrary user queries) and IVFFlat cluster stability.
+
+### Phase 1b — fextralife boilerplate chunk deletion
+Scoped via iterative pattern analysis (30-sample spot-checks, 73% mixed-content threshold). Final tightened rule catches 4 safe patterns:
+- **p6** — login-prompt blocks (`anonymous` + `Sign in`/`Log in` co-occurrence)
+- **p7** — nav sidebar lists (≥3 of 5 nav keywords: General/World Information, Equipment, Character Information, Interactive Map)
+- **p1 ∧ p3** — MediaWiki footer + POPULAR WIKIS ad block co-occurrence
+- **p1 ∧ p5** — MediaWiki footer + Retrieved-from attribution co-occurrence
+
+**7,209 rows deleted** in 9s. Corpus: 70,761 → 63,552 (fextralife 56,489 → 49,280, −12.8%).
+
+### Explicitly excluded from Phase 1b (deferred to Phase 1d)
+- p1 alone, p3 alone, p5 alone — individual match on these patterns is unreliable; 30-sample audit showed many chunks have real item stats / skill descriptions / quest lore + trailing boilerplate concatenated
+- **p3 ∧ p5** at length ≥ 700: sampled 30, 22 contained real content (bow stats, faction lore, patch notes, key item descriptions). Phase 1d will handle these with an UPDATE + re-embed strategy, not DELETE.
+
+### Eval integrity fixes
+- Toll of Hernand had TWO broken expected_chunk_ids (pure login nav + pure sidebar nav). Re-seeded to `6f7b71cd` (kept, quest info box) + `862084c3` (bell walkthrough) + `eb1d1ee4` (bell-scaling steps). `retrieval_eval_backup_20260422` preserves pre-session-24 state.
+
+### New Phase 1d tracking doc
+`known_issues/phase1d_trailing_boilerplate.md` — full spec of the mixed-content "real + trailing footer" problem. Scope: ~6,429 chunks. Fix: find earliest sentinel string (`Retrieved from "https://`, `POPULAR WIKIS`, `Join the page discussion`, `FextraLife is part of the Valnet`, `Copyright © Valnet Inc`), truncate from that point, re-embed via Voyage. Cost estimate: ~$0.03 total. Example chunk: Oongka survivor `034f6c4f` (832 chars → ~300 real).
+
+### Safe-ops pattern confirmed (second execution)
+Same backup → stage → eval-collision-check → rollback-smoke-test → execute → re-eval pattern as session 24's Phase 1a. Zero errors across 2 consecutive mass-delete operations.
+
+### Files changed
+- `known_issues/phase1d_trailing_boilerplate.md` (new)
+- `PROJECT_STATUS.md` — session 25 block + current state snapshot table
+- Supabase `retrieval_eval` — Toll of Hernand expected_chunk_ids updated (2 of 3 replaced)
+- Supabase `knowledge_chunks` — 7,209 rows deleted
+- Supabase tables (new): `knowledge_chunks_backup_phase1b_20260423` (7,209 rows), `phase1b_to_delete_20260423` (7,209 IDs)
+
+### Cumulative retrieval scoreboard
+
+| Phase | Corpus | Recall@10 | MRR |
+|---|---:|---:|---:|
+| Pre-session-24 | 90,395 | 20.0% | 0.189 |
+| Post-Phase-1a (probes=1) | 70,761 | 20.0% | 0.165 |
+| Post-Phase-1a + probes=10 | 70,761 | 26.7% | 0.182 |
+| **Post-Phase-1b** | **63,552** | **26.7%** | **0.182** |
+
+---
+
 ## [0.17.0] - 2026-04-23 (Session 24 — Phase 1a URL Dedup + IVFFlat Tuning)
 
 ### Retrieval quality — before/after

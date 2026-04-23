@@ -1,6 +1,20 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-23 (session 24 — retrieval Phase 1a + IVFFlat tuning)
+**Last updated:** 2026-04-23 (session 25 — Phase 1b boilerplate deletion)
+
+## Current State Snapshot
+
+| Aspect | Value |
+|---|---|
+| Corpus | **63,552 chunks** (49,280 fextralife + 17,798 game8 + 516 wiki + 186 youtube) |
+| Retrieval Recall@10 | **26.7%** (15-query eval set) |
+| Retrieval MRR | **0.182** |
+| Vector index | IVFFlat lists=100, probes=**10** (persisted via `set_config` inside `match_knowledge_chunks()`) |
+| Phases completed | **1a** (URL dedup — 19,634 rows) · **1b** (boilerplate delete — 7,209 rows) |
+| Phase next | **1c** — content_type reclassification via Haiku |
+| Phase deferred | **1d** — trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` |
+| Phase final | REINDEX with `lists=237` after 1c + 1d complete |
+| Supabase backup tables | `knowledge_chunks_backup_20260422` (76,123 rows, pre-Phase-1a), `knowledge_chunks_backup_phase1b_20260423` (7,209 rows), `retrieval_eval_backup_20260422` (15 rows), `dedup_to_delete_20260422` (19,634 IDs), `phase1b_to_delete_20260423` (7,209 IDs). All droppable pre-launch once cleanup is locked in. |
 
 ## Overview
 
@@ -21,6 +35,56 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 25 — Phase 1b Boilerplate Deletion (2026-04-23)
+
+**Working from:** Phase 1a left structural pollution (Fextralife nav sidebars, MediaWiki footers, login-prompt blocks) as "canonical" chunks whose only content was navigation text. Goal was to delete those cleanly while not touching chunks with real content mixed in.
+
+#### Detection rule (finalised after iterating)
+Delete chunks where any of:
+- **p6** — `content ILIKE '%anonymous%' AND (%Sign in% OR %Log in%)` (login prompt block)
+- **p7** — nav sidebar: ≥3 of 5 nav keywords (General Information / World Information / Equipment / Character Information / Interactive Map)
+- **p1 ∧ p3** — MediaWiki footer + POPULAR WIKIS ad block
+- **p1 ∧ p5** — MediaWiki footer + `Retrieved from "https://...fextralife"` attribution
+
+Explicitly **excluded** from the rule:
+- **p1 alone** (MediaWiki only) — some chunks have MediaWiki breadcrumbs + real item stats (e.g. `/Equestrian_II`: "+2 Horse EXP Gain / Sells for 3.52")
+- **p5 alone** (Retrieved-from only) — same risk (Flame_Rush, Quick_Reload skill chunks have real content before footer)
+- **p3 ∧ p5** (POPULAR WIKIS + Retrieved-from) — 30-sample spot-check at length ≥ 700 showed **73% contain real content** (bow stats, skill descriptions, quest lore, patch notes, key item descriptions). Too dangerous for DELETE. Deferred to Phase 1d trailing-boilerplate stripper (UPDATE + re-embed).
+
+#### Execution
+- **7,209 rows deleted** (9s execution). 0 rows updated.
+- Total chunks: 70,761 → **63,552**. Fextralife subset: 56,489 → **49,280** (−12.8%).
+- Backups: `knowledge_chunks_backup_phase1b_20260423` (7,209 rows), `phase1b_to_delete_20260423` (7,209 IDs).
+- Rollback smoke-test passed before execution: DELETE victim → INSERT from backup → row_restored=true, count matches.
+- 15-sample spot-check of p7 matches: 15/15 confirmed pure navigation, 0% real content.
+- 10-sample spot-check of combined tightened set: 10/10 confirmed pure boilerplate.
+
+#### Eval collision handling (Path A revisited)
+Initial eval-collision check found 3 expected_chunk_ids in delete staging:
+- `/Toll_of_Hernand` had TWO broken eval seeds (both pure nav sidebar — `48c0f91f` was p6 login prompt, `edceb758` was p7 sidebar list). These seeds were never valid — scoring 0% was deserved because retrieval would have been finding navigation text. Replaced both with substantive chunks: `862084c3` (bell location walkthrough) and `eb1d1ee4` (bell-scaling detailed steps). Kept `6f7b71cd` (valid quest info box).
+- Oongka survivor `034f6c4f` was p3∧p5 matched. Triggered the broader 30-sample p3∧p5 audit that revealed 73% mixed-content rate → p3∧p5 removed from the rule entirely.
+
+#### Eval scoreboard — Phase 1b flat result
+
+| Metric | Post-Phase-1a (probes=10) | Post-Phase-1b | Δ |
+|---|---|---|---|
+| Recall@10 | 26.7% | **26.7%** | 0 |
+| MRR | 0.182 | **0.182** | 0 |
+
+**Zero per-query regressions.** Zero per-query improvements. Boilerplate we deleted wasn't already ranking in top-10 for any of the 15 eval queries — the probes=10 fix in session 24 had already sorted that out. Phase 1b's wins are in the broader corpus (arbitrary user queries), the reduced IVFFlat noise (cluster stability), and the 10.2% total corpus shrink over Phase 1a + 1b.
+
+#### Still-failing 9 queries
+Unchanged since session 24. Root cause is `content_type` mismatches (Phase 1c target) and trailing-boilerplate embedding dilution on survivors like Oongka (Phase 1d target). Neither is addressable by pure-boilerplate deletion.
+
+#### Phase 1d scoped
+New `known_issues/phase1d_trailing_boilerplate.md` documents the "real content + footer concatenated in same chunk" problem. ~6,429 candidate chunks. Proposed fix: find-sentinel-truncate-then-re-embed via Voyage (~$0.03 total cost). Sentinel priority list: `Retrieved from "https://` → `POPULAR WIKIS` → `Join the page discussion` → `FextraLife is part of the Valnet` → `Copyright © Valnet Inc`. Deferred to its own session.
+
+#### Files touched this session
+- `known_issues/phase1d_trailing_boilerplate.md` (new) — full spec
+- `retrieval_eval` (Supabase) — Toll of Hernand: 2/3 expected_chunk_ids replaced
+- `knowledge_chunks` (Supabase) — 7,209 rows deleted
+- `match_knowledge_chunks()` (Supabase) — unchanged from session 24 (probes=10 carries forward)
 
 ### Session 24 — Retrieval Diagnosis, URL Dedup (Phase 1a), IVFFlat Tuning (2026-04-23)
 
