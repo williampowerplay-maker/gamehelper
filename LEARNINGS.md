@@ -4,6 +4,12 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## Meta: Measure in Isolation Before Optimizing
+
+Hypotheses are cheap, measurements are truth. Every round in this project that produced a measurable win came from (1) forming a specific hypothesis, (2) making one change, (3) measuring against a stable eval set, (4) investigating regressions before proceeding. Every round that produced noise came from stacking fixes without measurement between them.
+
+---
+
 ## RAG: Boilerplate Deletion Without Destroying Mixed-Content Chunks (Session 25)
 
 - **Spot-check before committing to a pattern at scale**: what reads like "clearly boilerplate" in a 20-sample spot-check may be 73% false-positives at 1,000+ samples. Specifically, `POPULAR WIKIS + Retrieved-from` co-occurrence looks like pure-boilerplate at first but at length ≥ 700 is dominantly mixed-content (real game content at the top, Fextralife footer concatenated at the bottom). Always sample at the length band you're about to act on, not an arbitrary 20 rows across all lengths.
