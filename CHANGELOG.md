@@ -4,6 +4,60 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.17.0] - 2026-04-23 (Session 24 — Phase 1a URL Dedup + IVFFlat Tuning)
+
+### Retrieval quality — before/after
+- Pre-session baseline (post-revert): 20.0% Recall@10 / MRR 0.189 on expanded 15-query eval
+- **Post-session: 26.7% Recall@10 / MRR 0.182** (+6.7pp recall, MRR ≈ flat)
+- Myurdin: 0% → 67% (corpus dedup unblocked real fight content from nav-boilerplate noise)
+- New Game Plus: 67% → 0% → 67% (dedup regression from IVFFlat probes=1, recovered at probes=10)
+- Hearty Grilled Seafood: 0% → 33% (bonus from probes=10)
+
+### Eval expansion + classifier hygiene
+- `retrieval_eval` table expanded to 15 queries covering item/recipe/boss/character/exploration/quest/mechanic/puzzle/none
+- Fixed Q1 Myurdin (was pointing at nav boilerplate) and Q4 (was fabricated UUIDs) seeds
+- Removed region names (`hernand`, `demeniss`, `delesyia`, `pailune`) from `bossNames` in `scripts/run-eval.ts` and `src/app/api/chat/route.ts` — these had 0 boss-type chunks in DB and were false-positive triggering boss filter on region queries
+
+### Phase 1a — fextralife URL deduplication
+- Audit found **1,054 URLs with ≥2 content_types** (34,620 chunks affected), driven by the same page crawled under multiple category indexes
+- **8,576 byte-identical `(content, source_url)` groups** collapsed: keep MIN(id) per group, canonical type by priority `boss > quest > character > exploration > recipe > item > puzzle > mechanic`
+- **19,634 rows deleted** (76,123 → 56,489 fextralife chunks; 90,395 → 70,761 total), ~8s execution
+- Backups retained: `knowledge_chunks_backup_20260422`, `retrieval_eval_backup_20260422`, `dedup_to_delete_20260422`
+- **Rollback smoke-tested** before execution (DELETE 1 → restore 1 from backup → row_restored=true, count matches)
+- Eval collision handling: 4 queries' `expected_chunk_ids` had 3-UUID arrays where all 3 were byte-identical dupes of the survivor. Collapsed to single-UUID arrays pre-dedup (Path A): Oongka / Kailok / Faded Abyss Artifact / Reed Devil
+
+### IVFFlat index tuning — the key fix
+- **Project memory corrected**: `idx_chunks_embedding` is **IVFFlat lists=100**, not HNSW (docs had claimed HNSW since session 17)
+- Default `ivfflat.probes=1` scans only 1% of vectors — mass deletions shifted which cluster "won" for some queries, causing NG+ regression
+- **Fix**: added `PERFORM set_config('ivfflat.probes', '10', true)` inside `match_knowledge_chunks()` body
+  - Transaction-local, applied on every call, no change to function logic
+  - Required because Supabase blocks both `ALTER DATABASE ... SET ivfflat.probes` and `SET ivfflat.probes` as function attribute (permission denied); runtime `set_config` is the only persistent path
+- Probes=10 also improved Hearty Grilled Seafood query as a side-effect
+
+### Fextralife crawler / ingest bugs documented (not fixed this round)
+- `stripHtml()` in `scripts/crawl-wiki.ts` strips semantic `<nav>`/`<footer>` tags but Fextralife uses div-based navigation (`.col-sm-3`, `.wiki-navigation`, `.tagged-pages`) which passes through unstripped
+- `extractMainContent()` end-markers (`.side-bar-right`, `#fxt-footer`, etc.) can misfire when sidebar lives inside `#wiki-content-block`, dumping full-page text including boilerplate
+- `content_type` assigned per-page-per-category in `CATEGORIES` map — a page linked from multiple indexes (e.g. `/Bosses`, `/Quests`, `/Characters`) produces multiple cached JSON files under `wiki-cache/pages/<category>/`, all ingested separately with different types; `manifest.set(pageUrl, entry)` dedups the manifest but the already-written JSON files on disk still get ingested
+- Pollution estimate from earlier audit: 8,642 chunks (~9.25%) match at least one boilerplate string (MediaWiki footer, POPULAR WIKIS ad, Sign-in prompt, etc.)
+
+### Still-failing eval queries (Phase 1c targets)
+9 queries still 0% recall after Phase 1a + probes fix. All share a `content_type` mismatch where the ingest category doesn't match the classifier's filter choice. Phase 1c will reclassify chunks by content heuristics rather than ingest category.
+
+### Deferred to next rounds
+- **Phase 1b** (boilerplate chunk deletion) — detection query drafted, execution deferred so HNSW/IVFFlat index doesn't take a second disruption from mass deletions in one session
+- **Phase 1c** (content-based content_type reclassification) — scoped but not designed; 537 URLs already flagged for manual review in `dedup-preview/flagged-for-manual-review.txt`
+- **REINDEX** `idx_chunks_embedding` after Phase 1b completes — will also switch `lists=100 → lists=237` (correct sizing for 70K rows)
+
+### Files changed
+- `scripts/run-eval.ts`, `src/app/api/chat/route.ts` — bossNames cleanup
+- Supabase `match_knowledge_chunks()` function body — added `set_config` call
+- `retrieval_eval` table — 4 rows' `expected_chunk_ids` collapsed
+- `knowledge_chunks` table — 19,634 rows deleted
+- `dedup-preview/dedup-script.sql` (new, untracked) — full dedup SQL saved for reference
+- `dedup-preview/flagged-for-manual-review.txt` (new, untracked) — 537 URLs flagged for Phase 1c
+
+---
+
 ## [0.14.0] - 2026-04-14 (Sensitivity Sweep + Cache Purge — 95% Pass Rate)
 
 ### Per-Category Sensitivity Sweep (`scripts/test-sensitivity-by-category.ts`)

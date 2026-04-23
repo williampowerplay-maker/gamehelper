@@ -4,6 +4,44 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: IVFFlat Index Tuning (Session 24)
+
+- **Verify the index type before tuning** — we had documentation claiming HNSW since session 17 but `\d knowledge_chunks` showed **IVFFlat lists=100**. Wrong index type = wrong tuning knob. `SELECT indexdef FROM pg_indexes WHERE tablename='knowledge_chunks'` is the source of truth, not memory or old docs.
+- **IVFFlat `probes=1` default is too sparse** for 70K+ chunks with `lists=100`. Each query examines only 1% of vectors; deletions from specific clusters can shift which cluster "wins" for a given query, causing expected chunks to drop out of top-N. Bump to **probes=10** as a baseline; consider probes=20 if queries miss frequently.
+- **Supabase blocks `ALTER DATABASE ... SET ivfflat.probes`** and also blocks `SET ivfflat.probes = ...` as a function attribute (CREATE FUNCTION ... SET ivfflat.probes = 10). Permission denied. The only working persistent mechanism is `PERFORM set_config('ivfflat.probes', '10', true)` inside the function body — runtime, transaction-local, applied on every call.
+- **IVFFlat is sensitive to mass DELETEs** — the cluster assignments are baked into the index at build time, but the centroids shift their "best-matching-neighbors" ranking as members are removed. If you delete 10%+ of rows, expect per-query recall to drift in either direction. Schedule a REINDEX after large deletions.
+- **`lists` should be tuned to row count**: pgvector recommends `lists = rows / 1000` for up to 1M rows, `sqrt(rows)` above that. With 70K rows we should have `lists ≈ 237`; we have `lists=100` (undersized). REINDEX with the corrected `lists` deferred to end of cleanup phase so the rebuild happens against the final row count.
+
+## RAG: Corpus Pollution from Multi-Category Crawls (Session 24)
+
+- **Flat-URL wikis get double-ingested when the crawler enumerates by category**: if the same page (e.g. `/Myurdin`) is linked from `/Bosses`, `/Quests`, `/Characters`, and `/Skills` index pages, a category-scoped crawler will follow the link from each index and save four separate cached JSON files, each tagged with a different `content_type`. The downstream ingest then produces 4× the chunks, all byte-identical in content but distinguished only by the category they were discovered from.
+- **Symptoms**: a single URL with 5–7 distinct `content_type` labels. Running `GROUP BY source_url HAVING COUNT(DISTINCT content_type) > 1` quickly identifies the polluted set.
+- **Byte-identical cross-type dedup is safe**: collapse `(content, source_url)` groups that span multiple types to a single row. Pick the canonical type by a priority order; any priority is fine as long as it's deterministic. Content-type label on a deduped boilerplate chunk barely matters because it'll usually get deleted in the next phase (boilerplate removal).
+- **When `retrieval_eval.expected_chunk_ids` points at byte-identical dupes**, collapse the array to just the surviving UUID *before* the dedup runs. Otherwise the eval recall denominator stays at 3 while only 1 chunk remains, causing apparent recall regression when retrieval is actually fine.
+- **Semantic HTML5 nav stripping is insufficient for div-based wikis**: `stripHtml()` that removes `<nav>`/`<footer>`/`<header>` doesn't help when Fextralife wraps its sidebar and footer in `<div class="col-sm-3">` and similar class-based containers. Need CSS-class-aware end markers in `extractMainContent()` or a switch to a DOM parser that respects selectors.
+- **`extractMainContent()` end markers are fragile**: a regex that cuts content at `.side-bar-right` or `#fxt-footer` only works if that exact marker appears *after* the content start marker. If the sidebar div is nested inside the content wrapper, the cut-off triggers at the start of the sidebar and the real content is lost; OR if the marker doesn't appear at all, every byte of the page (including ads and footer) flows into the extracted text.
+- **URL-encoding variants are a duplicate-page vector**: `/New_Game_Plus` and `/New+Game+Plus` are both live on Fextralife as separate pages with slightly different chunking. Any URL-canonicalization pass should normalize both to one form before dedup.
+- **Interactive map deep-links proliferate**: `/Interactive+Map?id=N&code=mapA` with 32 different `id` values all produce near-identical chunks of map-nav text. Should be filtered at crawler or ingest time.
+
+## RAG: Eval Hygiene & Scorecard Methodology (Session 24)
+
+- **Measure recall on a fixed eval set, not ad-hoc queries**: a 15-query eval in a SQL table (`retrieval_eval` with `query text, expected_chunk_ids uuid[]`) is enough signal to detect 6pp-level regressions. Running it before and after every retrieval change surfaces accidental regressions immediately.
+- **"Expected chunk IDs" drift when the corpus changes**: every ingest, re-crawl, or dedup can invalidate the eval's expected IDs. Build a backup table of the eval BEFORE any destructive change: `CREATE TABLE retrieval_eval_backup_<date> AS SELECT * FROM retrieval_eval`.
+- **Eval seeds can be wrong in silent ways**: Q1 of our eval was pointing at a nav-boilerplate chunk that was easy to retrieve. It scored 100% recall but the retrieval was garbage. Spot-check eval seeds by reading the expected content — if it looks like "© 2012-2025 Fextralife Popular Wikis Elden Ring 4,426 pages", the seed is broken.
+- **Keep a Recall@10 + MRR scorecard across sessions**: MRR catches ranking regressions that Recall@10 misses (a chunk moving from rank 1 to rank 10 has the same Recall@10 but a 10× worse MRR). When one goes up and the other goes down, investigate the specific query.
+- **A single regressed query can tank MRR while Recall@10 stays flat**: Phase 1a dedup made Myurdin +67% and NG+ -67% — recall cancelled out at 20% flat, but MRR dropped 0.189 → 0.165 because NG+'s hit had been at rank 2 (RR=0.500) and Myurdin's new hits were at rank 7-8 (RR=0.143). Per-query deltas matter more than the mean.
+
+## RAG: Safe-Ops Checklist for Mass DELETEs (Session 24)
+
+Before running any bulk DELETE on a production table:
+1. **Backup the affected subset** (`CREATE TABLE <name>_backup_<date> AS SELECT ...`). Confirm row count equals live.
+2. **Stage the delete IDs in a temp table** (`CREATE TABLE <op>_to_delete_<date> AS SELECT id ...`). Makes rollback a trivial INSERT-FROM-backup and lets you re-audit what would be deleted without re-running the query logic.
+3. **Check for eval collisions** (any `retrieval_eval.expected_chunk_ids` in the delete staging). Stop and reconcile before proceeding.
+4. **Rollback smoke-test**: DELETE 1 sample row → INSERT it back from backup → confirm count matches and row contents restored. Catches backup-table schema mismatches or missing columns.
+5. **Execute with timestamp around the DELETE**: record `now()` before and after so you have a reliable execution-time measurement for future capacity planning.
+6. **Spot-check N samples from the "winners"** (rows that survive when dupes are collapsed). Verify the kept row contains real content, not boilerplate.
+7. **Re-run eval immediately after DELETE** — don't batch multiple destructive changes between evals, it makes regression attribution impossible.
+
 ## RAG: Query Classifier Ordering & Edge Cases
 
 - **Food + boss co-occurrence breaks naive ordering**: A query like "what food should I eat before a boss fight" contains "fight" (a boss verb) AND food-related terms. If the food classifier comes AFTER the boss classifier, the query routes to boss content. Fix: food/consumable classifier must come **before** the boss classifier. General rule: classifiers that are easily confused with more-specific classifiers must precede them.

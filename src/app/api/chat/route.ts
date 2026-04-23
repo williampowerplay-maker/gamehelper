@@ -114,10 +114,12 @@ function classifyContentType(question: string): string | null {
   // BOSS — fight-specific verbs + known boss names
   // Must come before mechanic/skill since "how do I beat X" is a boss question
   const bossNames = [
-    "kailok", "hornsplitter", "hernand", "ludvig", "gregor", "fortain",
+    "kailok", "hornsplitter", "ludvig", "gregor", "fortain",
     "gabriel", "lucian", "bastier", "walter", "lanford", "master du",
     "antumbra", "crimson warden", "crimson nightmare", "hexe marie",
-    "demeniss", "trukan", "delesyia", "pailune", "saigord", "staglord",
+    "trukan", "saigord", "staglord",
+    // Removed region names: hernand (region/city), demeniss (region), delesyia (region), pailune (region)
+    // — these had 0 boss-type chunks and caused false-positive boss filtering on quest/exploration queries
     "reed devil", "blinding flash", "grave walker", "icewalker",
     "white horn", "stoneback crab", "taming dragon",
     // game8 bosses

@@ -46,3 +46,10 @@ ingest-*.log
 
 # local wiki cache (crawl-wiki.ts output — do not commit, can be large)
 wiki-cache/
+
+# crawler logs (per-run, noisy)
+crawl-wiki.log
+crawl-wiki-err.log
+
+# claude code local workspace settings
+.claude/

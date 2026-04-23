@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-22 (session 23 — intent resolver design spec)
+**Last updated:** 2026-04-23 (session 24 — retrieval Phase 1a + IVFFlat tuning)
 
 ## Overview
 
@@ -21,6 +21,63 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 24 — Retrieval Diagnosis, URL Dedup (Phase 1a), IVFFlat Tuning (2026-04-23)
+
+**Working from:** retrieval was underperforming. Expanded eval set, built a 15-query scorecard, diagnosed fextralife corpus pollution, and executed Phase 1a of a multi-phase cleanup. Eval went from 20.0% → 26.7% Recall@10 (mean).
+
+#### Diagnosis
+- Expanded `retrieval_eval` table to 15 queries. Fixed Q1/Q4 eval seeds (bad UUIDs, nav-boilerplate targets). Established honest baseline of **20.0% Recall@10 / MRR 0.189**.
+- **Classifier bug fixed**: `bossNames` in both `scripts/run-eval.ts` and `src/app/api/chat/route.ts` contained region names (`hernand`, `demeniss`, `delesyia`, `pailune`) that had 0 boss-type chunks. Removed them; comment left in code marking the removal.
+- **Boost experiment reverted**: tried converting `content_type_filter` in `match_knowledge_chunks()` from hard WHERE filter to +0.08 boost. Dropped recall to 17.8% — reverted to original hard filter.
+- **Corpus audit**: discovered the fextralife ingest produces **1,054 URLs with multiple content_types** (34,620 chunks on those URLs), driven by the same URL being crawled under multiple category indexes (`/Bosses`, `/Quests`, `/Characters`, etc.). The same 764-char nav/footer boilerplate appears 5× on pages like `/Myurdin` with 5 different `content_type` labels.
+- **Crawler audit** (`scripts/crawl-wiki.ts`): `stripHtml()` strips `<nav>`, `<footer>`, `<header>` semantic tags but Fextralife uses div-based navigation (`.col-sm-3`, `.wiki-navigation`, `.tagged-pages`), which passes through. `extractMainContent()` end-markers can misfire when the sidebar appears inside `#wiki-content-block`. Content_type is assigned per-page per-category — a page linked from multiple indexes produces multiple cached JSON files with different types, all ingested.
+
+#### Phase 1a — URL deduplication (byte-identical cross-type collapse)
+- **Rule**: For each `(content, source_url)` group on a fextralife URL where identical text appears under multiple `content_type`s, keep ONE row. Canonical type picked by priority: `boss > quest > character > exploration > recipe > item > puzzle > mechanic`.
+- **Execution**: 8,576 byte-identical groups identified. Kept MIN(id) per group (UUID-string ordered, deterministic). **19,634 rows deleted.** 0 rows updated (kept row already had canonical type in every case). Execution time ~8s.
+- **Tables created**:
+  - `knowledge_chunks_backup_20260422` — full fextralife subset pre-dedup (76,123 rows)
+  - `retrieval_eval_backup_20260422` — pre-collapse eval (15 rows)
+  - `dedup_to_delete_20260422` — the 19,634 deleted IDs (retained for rollback/audit)
+- **Eval collision handling (Path A)**: 4 eval queries had expected_chunk_ids that were byte-identical dupes of each other. Before dedup, collapsed each to a single-UUID array pointing at the survivor: Oongka → `034f6c4f`, Kailok → `5bbe76d2`, Faded Abyss Artifact → `a417c884`, Reed Devil → `870a8c64`.
+- **Rollback smoke-test passed**: DELETE 1 chunk → INSERT from backup → row_restored=true, count matches.
+
+#### IVFFlat index tuning (the big surprise)
+- **Project memory was wrong**: `idx_chunks_embedding` is **IVFFlat lists=100**, NOT HNSW. Fixed in all docs.
+- **Phase 1a regression on NG+ (67% → 0%)** caused by IVFFlat `probes=1` default. Dedup removed byte-identical twins of an NG+ chunk on *other* URLs; with probes=1 (scanning 1% of vectors) the query cluster assignment shifted and the expected chunks dropped out of top-8.
+- **Fix**: added `PERFORM set_config('ivfflat.probes', '10', true)` inside `match_knowledge_chunks()`. Transaction-local, applies to every call, Supabase-compatible (ALTER DATABASE blocked, SET function attribute blocked, but runtime set_config works).
+- **Result at probes=10**: NG+ recovered (0% → 67%), Hearty Grilled Seafood unlocked (0% → 33%). No regressions.
+
+#### Eval scoreboard — end of session
+| Metric | Pre-Phase-1a | Post-dedup (probes=1) | Post-dedup + probes=10 |
+|---|---|---|---|
+| Recall@10 | 20.0% | 20.0% | **26.7%** |
+| MRR | 0.189 | 0.165 | 0.182 |
+| Myurdin | 0% | **67%** | 67% |
+| New Game Plus | 67% | 0% (regressed) | 67% (recovered) |
+| Hearty Grilled Seafood | 0% | 0% | **33%** |
+
+#### Still-failing eval queries (targets for Phase 1c — content-based retyping)
+These 9 queries still score 0% after Phase 1a + IVFFlat fix. All share a content_type mismatch: the Fextralife boss-fight / character / location page was ingested under a different category path, so its `content_type` doesn't match the classifier's hard WHERE filter:
+- `who is Oongka?` — survivor is `quest`-typed, classifier picks `character`
+- `how do I beat Kailok?` — survivor is `boss`-typed but Kailok_the_Hornsplitter has nav chunks filtering out the real content
+- `how do I beat the Reed Devil?` — same pattern
+- `how does the Faded Abyss Artifact work?` — survivor is `item`-typed, classifier picks `mechanic`
+- `what is the Toll of Hernand quest?`, `where is Greymane Camp?`, `where is the Sanctum of Temperance?`, `what are the best one-handed weapons?`, `what is the best body armor?`
+
+Phase 1c is the real boss-fight: reclassify chunks by content heuristics, not by the category index they came from.
+
+#### Pending work — Phase 1b (boilerplate deletion)
+Staged for next round, not executed yet. Will delete chunks matching boilerplate patterns: "Recent changes/Random page/MediaWiki", standalone "anonymous" login prompts, "Sign in to edit", Fextralife copyright footer, "POPULAR WIKIS", etc. Audit estimated ~8,642 chunks match at least one boilerplate string. Path sketched in-conversation but SQL/execution deferred.
+
+#### Files touched this session
+- `scripts/run-eval.ts` — bossNames cleanup (4 region names removed)
+- `src/app/api/chat/route.ts` — bossNames cleanup (same 4)
+- `match_knowledge_chunks()` Supabase function — `set_config('ivfflat.probes', '10', true)` added
+- `retrieval_eval` table — 4 rows collapsed to single-UUID arrays
+- `knowledge_chunks` — 19,634 rows deleted
+- `dedup-preview/` (new untracked dir) — `dedup-script.sql`, `flagged-for-manual-review.txt` (537 URLs for Phase 1c manual review)
 
 ### Session 23 — Real-Player Query Testing + Intent Resolver Design (2026-04-22)
 
