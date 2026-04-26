@@ -1,0 +1,2122 @@
+[
+  {
+    "query": "where is Greymane Camp?",
+    "classifier": "exploration",
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "214ffb73-58e8-4c98-b2cc-5bf3dede6005",
+      "91cfbf60-c57d-4873-b134-255e8eb3947b",
+      "17e6995f-b81b-4607-83c1-b66e0c4c8d63"
+    ],
+    "expected_chunks": [
+      {
+        "id": "214ffb73-58e8-4c98-b2cc-5bf3dede6005",
+        "rank": 10,
+        "in_top10": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 700,
+        "head": "Greymane Camp  ### Greymane Camp               The Greymane Camp is a small piece of land in the Hernand region. This camp is where Kliff will start his journey as he discovers the secrets of Pywel. T"
+      },
+      {
+        "id": "91cfbf60-c57d-4873-b134-255e8eb3947b",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 652,
+        "head": "Greymane Camp  [...] Greymanes who survived the attack. This is also where Kliff will reunite his comrades and other Greymane members.  ### Greymane Camp Information in Crimson Desert    The Greymane "
+      },
+      {
+        "id": "17e6995f-b81b-4607-83c1-b66e0c4c8d63",
+        "rank": 3,
+        "in_top10": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 378,
+        "head": "Greymane Camp  [...] have the capability to expand this camp with funds and resources, which you will acquire as you progress your journey.  ### NPCs in Greymane Camp       - Ronnie - Base Camp Food S"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "1b7a0c0b-3883-46a1-8559-bdacf00d074d",
+        "similarity": 1.45,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 553,
+        "head": "Greymane Camp  [...] with him and browse his wares to find a range of recipes, ingredients, and meals to purchase and eat on the go.  ### Private Stash in Crimson Desert    Added from the Version 1.00"
+      },
+      {
+        "rank": 2,
+        "id": "148a738a-5e57-478e-a643-0b75d70f5d16",
+        "similarity": 1.3199999999999998,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 623,
+        "head": "Greymane Camp  for farming, as well as the steps to plant and harvest the plant. However, you will be left with fresh produce that can be used in your meals.         The Ranching area is where you can"
+      },
+      {
+        "rank": 3,
+        "id": "17e6995f-b81b-4607-83c1-b66e0c4c8d63",
+        "similarity": 1.3,
+        "is_expected": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 378,
+        "head": "Greymane Camp  [...] have the capability to expand this camp with funds and resources, which you will acquire as you progress your journey.  ### NPCs in Greymane Camp       - Ronnie - Base Camp Food S"
+      },
+      {
+        "rank": 4,
+        "id": "6c84126d-ab6c-4336-a0ac-f383a150df81",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 609,
+        "head": "Greymane Camp  [...] Damiane through your dialogue with Barden Middler during the intro of the Greymane Camp after arriving at Howling Hill.  ### Unlocking the Closest Abyss Nexus to the Greymane Camp"
+      },
+      {
+        "rank": 5,
+        "id": "d5aa420b-4d23-4ebc-a418-cc2d1c7598f4",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 567,
+        "head": "Greymane Camp  - Complete the Chapter 4 - Mysterious Iron Pot Quests that take place at the Karin Quarry to obtain the Kuku Iron Pot    - Progress the Scholastone Quest and learn the Focused Force Pal"
+      },
+      {
+        "rank": 6,
+        "id": "2a54c290-ba47-464a-92d5-b6e4c3d3ba43",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 620,
+        "head": "Greymane Camp  [...] it back to the Abyss Nexus    - Place the plate on the fast travel pad and knock it down to push the piece in place.  ### Cooking in the Greymane Camp in Crimson Desert    You can"
+      },
+      {
+        "rank": 7,
+        "id": "7381e35b-2748-4a05-a864-9ebb3c46a129",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 728,
+        "head": "Greymane Camp  [...] supplies produced at the camp is collected and stored here. The Private Storage has a maximum capacity of 240 slots.  ### Farming and Ranching at the Greymane Camp in Crimson Dese"
+      },
+      {
+        "rank": 8,
+        "id": "272ffeec-43af-415b-a8bd-a30dab7b0b1b",
+        "similarity": 1.02346449333853,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane_Camp",
+        "len": 802,
+        "head": "Greymane Camp  [...] Main page - Recent changes - Random page - Help about MediaWiki  Home > World Information > Locations > Greymane Camp  ###  Greymane Camp   The Greymane Camp is a small piece of l"
+      },
+      {
+        "rank": 9,
+        "id": "b347d6b2-9f72-4d14-a3bb-e24cdd8b640b",
+        "similarity": 0.99667716076008,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane_Camp",
+        "len": 499,
+        "head": "Greymane Camp  Join the page discussionPOPULAR WIKISElden Ring4,426 pagesElden Ring Nightreign1,430 pagesExpedition 33977 pagesDark Souls 32,169 pagesAll WikisCategory: - Locations   - Home   - All Wi"
+      },
+      {
+        "rank": 10,
+        "id": "214ffb73-58e8-4c98-b2cc-5bf3dede6005",
+        "similarity": 0.987845953959713,
+        "is_expected": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Greymane+Camp",
+        "len": 700,
+        "head": "Greymane Camp  ### Greymane Camp               The Greymane Camp is a small piece of land in the Hernand region. This camp is where Kliff will start his journey as he discovers the secrets of Pywel. T"
+      }
+    ]
+  },
+  {
+    "query": "what is the Toll of Hernand quest?",
+    "classifier": "quest",
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "6f7b71cd-eb27-4d6e-ba78-1c83e4510b5a",
+      "862084c3-00d7-4618-bcb8-652a4dd93c8a",
+      "eb1d1ee4-48ff-408e-a685-53cb284b1780"
+    ],
+    "expected_chunks": [
+      {
+        "id": "6f7b71cd-eb27-4d6e-ba78-1c83e4510b5a",
+        "rank": 7,
+        "in_top10": true,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 264,
+        "head": "Toll of Hernand  ### Toll of Hernand           Faction  Pororin Forest Guardians  Quest Giver  n/a  Quest Location  City of Hernand  Requirements  n/a  Unlocks  Reveal the areas surrounding the bell  "
+      },
+      {
+        "id": "862084c3-00d7-4618-bcb8-652a4dd93c8a",
+        "rank": 8,
+        "in_top10": true,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll_of_Hernand",
+        "len": 668,
+        "head": "Toll of Hernand  [...] in Crimson Desert  - Go to the eastern edge of the city and climb up the tower. Ringing the bell will unlock the quest.  ###  Ringing the bell in the City of Hernand  The Toll o"
+      },
+      {
+        "id": "eb1d1ee4-48ff-408e-a685-53cb284b1780",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 402,
+        "head": "Toll of Hernand  bell is located at the top of the tower connected to a small house. Climb the roof of the house then scale the wall of the tower to reach the top. Ringing this bell will prompt a cuts"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "777d4414-16fb-40cc-8641-607215d24de8",
+        "similarity": 1.068576968398239,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 424,
+        "head": "Toll of Hernand  [...] Desert       - Go to the eastern edge of the city and climb up the tower. Ringing the bell will unlock the quest.  ### Ringing the bell in the City of Hernand    The Toll of Her"
+      },
+      {
+        "rank": 2,
+        "id": "7ec05e3a-9c11-43b8-8508-165e2091c1eb",
+        "similarity": 1.0633014835895,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll_of_Hernand",
+        "len": 292,
+        "head": "Toll of Hernand  [...] that players can complete to increase their relationship with a specific Faction and gain XP and various rewards.  ###  How to Unlock Toll of Hernand in Crimson Desert  - Go to "
+      },
+      {
+        "rank": 3,
+        "id": "cfdff932-dbdc-47c7-a410-ecdc60d18ca7",
+        "similarity": 1.057899573916173,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 296,
+        "head": "Toll of Hernand  [...] that players can complete to increase their relationship with a specific Faction and gain XP and various rewards.  ### How to Unlock Toll of Hernand in Crimson Desert       - Go"
+      },
+      {
+        "rank": 4,
+        "id": "0fe273d6-e7f5-48ce-ba6c-ae29e3971a3c",
+        "similarity": 1.0534405501747468,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll_of_Hernand",
+        "len": 814,
+        "head": "Toll of Hernand  They will reveal the nearby areas up to where the ringing of the bell can be heard and unlock knowledge entries and various points of interest.  Faction QuestsA Promise Without Ember "
+      },
+      {
+        "rank": 5,
+        "id": "97d38be9-9bb5-4be4-8215-1e45c88b1bc3",
+        "similarity": 1.05141260794327,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll_of_Hernand",
+        "len": 897,
+        "head": "Toll of Hernand  [...] changes - Random page - Help about MediaWiki  Home > World Information > Quests > Faction Quests > Toll of Hernand  ###  Toll of Hernand   Faction Pororin Forest Guardians Quest"
+      },
+      {
+        "rank": 6,
+        "id": "bbd0f40d-ed8a-4f1c-8bf1-17a0e08504c8",
+        "similarity": 1.031957246777848,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 809,
+        "head": "Toll of Hernand  ### Toll of Hernand           Faction  Pororin Forest Guardians  Quest Giver  n/a  Quest Location  City of Hernand  Requirements  n/a  Unlocks  Reveal the areas surrounding the bell  "
+      },
+      {
+        "rank": 7,
+        "id": "6f7b71cd-eb27-4d6e-ba78-1c83e4510b5a",
+        "similarity": 1.0250912085229889,
+        "is_expected": true,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll+of+Hernand",
+        "len": 264,
+        "head": "Toll of Hernand  ### Toll of Hernand           Faction  Pororin Forest Guardians  Quest Giver  n/a  Quest Location  City of Hernand  Requirements  n/a  Unlocks  Reveal the areas surrounding the bell  "
+      },
+      {
+        "rank": 8,
+        "id": "862084c3-00d7-4618-bcb8-652a4dd93c8a",
+        "similarity": 1.020834959795176,
+        "is_expected": true,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Toll_of_Hernand",
+        "len": 668,
+        "head": "Toll of Hernand  [...] in Crimson Desert  - Go to the eastern edge of the city and climb up the tower. Ringing the bell will unlock the quest.  ###  Ringing the bell in the City of Hernand  The Toll o"
+      },
+      {
+        "rank": 9,
+        "id": "b526eaf2-250b-4ea5-9292-4fa507828db2",
+        "similarity": 0.983382222249258,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Quests",
+        "len": 306,
+        "head": "Quests  [...] Notice: Blix  - Bounty Notice: Bianca  - Bounty Notice: Salvatore  - Bounty Notice: Warren  - Bounty Notice: Billy  ###  Toll of Pywel  - Toll of Hernand  - Toll of Scholastone  - Toll o"
+      },
+      {
+        "rank": 10,
+        "id": "0cc92660-d44e-43d6-ada1-19358f93d1f8",
+        "similarity": 0.977553223225667,
+        "is_expected": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faction_Quests",
+        "len": 618,
+        "head": "Faction Quests  in hidden locations throughout Pywel - No Reward Witches Tina's Request Tina at the Hernand tailor's shop appears to be in trouble. - Medium Bag  - Cloth Pieces Hernand Comissions Toll"
+      }
+    ]
+  },
+  {
+    "query": "how do I beat Myurdin?",
+    "classifier": "boss",
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "65c998dd-e295-49fa-89a3-e2e98319d757",
+      "2db5ef2d-ec5b-4960-a8dc-2c3547fd01ea",
+      "3d213428-f514-4ed2-b36b-34d16657b147"
+    ],
+    "expected_chunks": [
+      {
+        "id": "65c998dd-e295-49fa-89a3-e2e98319d757",
+        "rank": 8,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 875,
+        "head": "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact with it.  ### List of Myurdin Moves     | Move  | Details      "
+      },
+      {
+        "id": "2db5ef2d-ec5b-4960-a8dc-2c3547fd01ea",
+        "rank": 7,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 875,
+        "head": "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact with it.  ### List of Myurdin Moves     | Move  | Details      "
+      },
+      {
+        "id": "3d213428-f514-4ed2-b36b-34d16657b147",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 554,
+        "head": "How to Beat Myurdin  [...] down your health. We highly recommend using Fire Resistant Armor to mitigate the burn damage you take.  List of Armor  ### Avoid Flammable Barrels and Lava Areas   Myurdin w"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "f6b2d41b-25e2-4f9b-be30-5908455346a0",
+        "similarity": 0.975121602881194,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 517,
+        "head": "How to Beat Myurdin  [...] Related Guides     | Myurdin Boss Guides       | Can You Defeat Myurdin?  | How to Beat Myurdin (2nd Encounter)  ### Use Heavy Attacks and Grapple   You can breeze through M"
+      },
+      {
+        "rank": 2,
+        "id": "b1c6b300-2748-48d7-a7a2-f3baf45f8012",
+        "similarity": 0.975121602881194,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 517,
+        "head": "How to Beat Myurdin  [...] Related Guides     | Myurdin Boss Guides       | Can You Defeat Myurdin?  | How to Beat Myurdin (2nd Encounter)  ### Use Heavy Attacks and Grapple   You can breeze through M"
+      },
+      {
+        "rank": 3,
+        "id": "97460a66-c495-47a6-b323-4b0d0211080c",
+        "similarity": 0.946009679915252,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 377,
+        "head": "How to Beat Myurdin  [...] damage.  Keep in mind that you cannot use Grappling Skills against Myurdin in the second phase.  List of All Skills  ### Equip Fire Resistant Armor   Myurdin is able to imbu"
+      },
+      {
+        "rank": 4,
+        "id": "188fa85d-7948-4190-9b1f-91d768e09317",
+        "similarity": 0.946009679915252,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 377,
+        "head": "How to Beat Myurdin  [...] damage.  Keep in mind that you cannot use Grappling Skills against Myurdin in the second phase.  List of All Skills  ### Equip Fire Resistant Armor   Myurdin is able to imbu"
+      },
+      {
+        "rank": 5,
+        "id": "b6babfba-3095-4f6c-8360-a0d37fdd231a",
+        "similarity": 0.944675761840652,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 530,
+        "head": "How to Beat Myurdin  How to Beat Myurdin  class=\"archive-style-wrapper\"> You can defeat Myurdin by using Grappling Skills in the first phase and wearing fire-resistant armor in Crimson Desert. Check o"
+      },
+      {
+        "rank": 6,
+        "id": "6bff719a-cc9a-4a7e-9f60-e7ee8c8bd89d",
+        "similarity": 0.944675761840652,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 530,
+        "head": "How to Beat Myurdin  How to Beat Myurdin  class=\"archive-style-wrapper\"> You can defeat Myurdin by using Grappling Skills in the first phase and wearing fire-resistant armor in Crimson Desert. Check o"
+      },
+      {
+        "rank": 7,
+        "id": "2db5ef2d-ec5b-4960-a8dc-2c3547fd01ea",
+        "similarity": 0.9310030190053329,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 875,
+        "head": "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact with it.  ### List of Myurdin Moves     | Move  | Details      "
+      },
+      {
+        "rank": 8,
+        "id": "65c998dd-e295-49fa-89a3-e2e98319d757",
+        "similarity": 0.9310030190053329,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 875,
+        "head": "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact with it.  ### List of Myurdin Moves     | Move  | Details      "
+      },
+      {
+        "rank": 9,
+        "id": "fe3ad67c-ada1-4575-9afa-f0a839b64cf0",
+        "similarity": 0.9303353244665851,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 369,
+        "head": "How to Beat Myurdin  [...] slams on your position. As with the rest of his slam attacks, make sure to keep your distance and dodge sideways.  ### List of Main Quest Bosses   |  Myurdin   |  Matthias  "
+      },
+      {
+        "rank": 10,
+        "id": "49c69e39-45dd-4e1e-9bfd-3c6422ce38d1",
+        "similarity": 0.9303353244665851,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587676",
+        "len": 369,
+        "head": "How to Beat Myurdin  [...] slams on your position. As with the rest of his slam attacks, make sure to keep your distance and dodge sideways.  ### List of Main Quest Bosses   |  Myurdin   |  Matthias  "
+      }
+    ]
+  },
+  {
+    "query": "who is Oongka?",
+    "classifier": "character",
+    "fallback": false,
+    "recall": 1,
+    "expected_chunk_ids": [
+      "204d0beb-a5bc-451e-be3c-335196ce26e5",
+      "4b1d701e-c8a6-41a8-9115-b16223ac4c13",
+      "f0e3189f-1ed0-4585-bde4-cec7b6e76727"
+    ],
+    "expected_chunks": [
+      {
+        "id": "204d0beb-a5bc-451e-be3c-335196ce26e5",
+        "rank": 1,
+        "in_top10": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 389,
+        "head": "Oongka  Characters possess their own unique fighting styles, skills, and weapons, which gives players a different experience in exploration and combat.  A powerhouse of the Greymanes. Born of an orc t"
+      },
+      {
+        "id": "4b1d701e-c8a6-41a8-9115-b16223ac4c13",
+        "rank": 2,
+        "in_top10": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 336,
+        "head": "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's special moves.  Oongka is a character that embodies the high-"
+      },
+      {
+        "id": "f0e3189f-1ed0-4585-bde4-cec7b6e76727",
+        "rank": 5,
+        "in_top10": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 338,
+        "head": "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's special moves.    Oongka is a character that embodies the hig"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "204d0beb-a5bc-451e-be3c-335196ce26e5",
+        "similarity": 0.777146635225617,
+        "is_expected": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 389,
+        "head": "Oongka  Characters possess their own unique fighting styles, skills, and weapons, which gives players a different experience in exploration and combat.  A powerhouse of the Greymanes. Born of an orc t"
+      },
+      {
+        "rank": 2,
+        "id": "4b1d701e-c8a6-41a8-9115-b16223ac4c13",
+        "similarity": 0.771957011222843,
+        "is_expected": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 336,
+        "head": "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's special moves.  Oongka is a character that embodies the high-"
+      },
+      {
+        "rank": 3,
+        "id": "54387ed7-4336-44a5-bf30-0fe362ea7b1b",
+        "similarity": 0.770294247252093,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 389,
+        "head": "Oongka  [...] Main page - Recent changes - Random page - Help about MediaWiki  Home > Character Information > Characters > Oongka  ###  Oongka    Oongka Weapon Type  - Greataxe  - Greathammer  - Dual "
+      },
+      {
+        "rank": 4,
+        "id": "4b18da6f-f91e-4450-aad5-3da75ae331c0",
+        "similarity": 0.769719658510706,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 756,
+        "head": "Oongka  Senses  - Marksmanship  - Nature's Grasp  - Parry  - Pump Kick  - Quaking Fury  - Quaking Fury Proficiency  - Rage  - Raging Lightning  - Rampage  - Restrain  - Scatter Shot  - Slash  - Hack a"
+      },
+      {
+        "rank": 5,
+        "id": "f0e3189f-1ed0-4585-bde4-cec7b6e76727",
+        "similarity": 0.764042072765457,
+        "is_expected": true,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 338,
+        "head": "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's special moves.    Oongka is a character that embodies the hig"
+      },
+      {
+        "rank": 6,
+        "id": "96d43624-3e5b-40ad-bca5-10ea9e016135",
+        "similarity": 0.759794174445024,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 610,
+        "head": "Oongka  them. Other red nodes are also similar to the other characters, such as Frost Mantle, Flight, Swift Flight, Elemental Meteor Kick, and others.     Overall, Oongka is a combatant who makes use "
+      },
+      {
+        "rank": 7,
+        "id": "2d541fe5-272a-4ebf-833d-0edfd6d4adf4",
+        "similarity": 0.757443660954775,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 614,
+        "head": "Oongka  them. Other red nodes are also similar to the other characters, such as Frost Mantle, Flight, Swift Flight, Elemental Meteor Kick, and others.         Overall, Oongka is a combatant who makes "
+      },
+      {
+        "rank": 8,
+        "id": "f5c56170-35b7-4d01-9d7e-71ccedcffa62",
+        "similarity": 0.747924653539103,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 399,
+        "head": "Oongka  Characters possess their own unique fighting styles, skills, and weapons, which gives players a different experience in exploration and combat.            A powerhouse of the Greymanes. Born o"
+      },
+      {
+        "rank": 9,
+        "id": "f1a2baaa-a53b-44d1-a0b6-835740ce7017",
+        "similarity": 0.74548256060793,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 392,
+        "head": "Oongka  single targets. However, when it comes to dealing with agile targets, it is recommended to switch to Spears for faster attacks and better reach.  Like the other 2 characters, Oongka can also u"
+      },
+      {
+        "rank": 10,
+        "id": "1f43d548-0fc2-4322-8c33-8975965dc1ad",
+        "similarity": 0.744696494693192,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Oongka",
+        "len": 777,
+        "head": "Oongka  for faster attacks and better reach.    Like the other 2 characters, Oongka can also use a ranged weapon, and he starts out with a Hand Cannon. By unlocking Elemental Scatter Shot or Elemental"
+      }
+    ]
+  },
+  {
+    "query": "what stats does the Saint's Necklace have?",
+    "classifier": "item",
+    "fallback": false,
+    "recall": 1,
+    "expected_chunk_ids": [
+      "8ce34b87-fdcd-41d8-9ca3-d4b44a481e41",
+      "c3c8515b-5f97-49f4-bdc0-38e0e2f6cd58",
+      "d6cdf85e-1f79-4830-8598-1ef0953a6207"
+    ],
+    "expected_chunks": [
+      {
+        "id": "8ce34b87-fdcd-41d8-9ca3-d4b44a481e41",
+        "rank": 2,
+        "in_top10": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 651,
+        "head": "Saint's Necklace  ### Saint's Necklace           Necklaces           Defense   5         Vitality (Skill)                 A relic said to be an object belonging to a saint who served Solumen. By stabi"
+      },
+      {
+        "id": "c3c8515b-5f97-49f4-bdc0-38e0e2f6cd58",
+        "rank": 6,
+        "in_top10": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 352,
+        "head": "Saint's Necklace  [...] specialized gear slots and provide additional utility or character enhancement beyond standard weapons and armor.  ### Crimson Desert Saint's Necklace Stats & Effects    Saint'"
+      },
+      {
+        "id": "d6cdf85e-1f79-4830-8598-1ef0953a6207",
+        "rank": 3,
+        "in_top10": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 317,
+        "head": "Saint's Necklace  [...] Necklaces in Crimson Desert    When equipped, Saint's Necklace provides the following Stats and Effects    Defense: 5  ### Refinement for Saint's Necklace in Crimson Desert    "
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "384fc4e1-e633-4be4-8a1d-b15c890d9f08",
+        "similarity": 1.3199999999999998,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 227,
+        "head": "Saint's Necklace  How to Obtain / Where to Find: Found inside the Hillside Manor Strongbox. Defense: 5, Vitality (Skill) — rapidly restores depleted Stamina. A relic said to be an object belonging to "
+      },
+      {
+        "rank": 2,
+        "id": "8ce34b87-fdcd-41d8-9ca3-d4b44a481e41",
+        "similarity": 1.3199999999999998,
+        "is_expected": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 651,
+        "head": "Saint's Necklace  ### Saint's Necklace           Necklaces           Defense   5         Vitality (Skill)                 A relic said to be an object belonging to a saint who served Solumen. By stabi"
+      },
+      {
+        "rank": 3,
+        "id": "d6cdf85e-1f79-4830-8598-1ef0953a6207",
+        "similarity": 1.228917707341576,
+        "is_expected": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 317,
+        "head": "Saint's Necklace  [...] Necklaces in Crimson Desert    When equipped, Saint's Necklace provides the following Stats and Effects    Defense: 5  ### Refinement for Saint's Necklace in Crimson Desert    "
+      },
+      {
+        "rank": 4,
+        "id": "95ba6692-0b9c-4428-ab53-ef7afb6e0b63",
+        "similarity": 1.224882380671361,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint%27s_Necklace",
+        "len": 298,
+        "head": "Saint's Necklace  [...] Necklaces in Crimson Desert  When equipped, Saint's Necklace provides the following Stats and Effects  Defense: 5  ###  Refinement for Saint's Necklace in Crimson Desert  Saint"
+      },
+      {
+        "rank": 5,
+        "id": "352f5a34-51ea-4b56-9f6d-d4ca374187dd",
+        "similarity": 1.1964372396469118,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint%27s_Necklace",
+        "len": 347,
+        "head": "Saint's Necklace  [...] specialized gear slots and provide additional utility or character enhancement beyond standard weapons and armor.  ###  Crimson Desert Saint's Necklace Stats & Effects  Saint's"
+      },
+      {
+        "rank": 6,
+        "id": "c3c8515b-5f97-49f4-bdc0-38e0e2f6cd58",
+        "similarity": 1.192640623230953,
+        "is_expected": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint's+Necklace",
+        "len": 352,
+        "head": "Saint's Necklace  [...] specialized gear slots and provide additional utility or character enhancement beyond standard weapons and armor.  ### Crimson Desert Saint's Necklace Stats & Effects    Saint'"
+      },
+      {
+        "rank": 7,
+        "id": "52974970-95af-4393-87b4-f7804d8eabd3",
+        "similarity": 1.186838328838348,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Saint%27s_Necklace",
+        "len": 942,
+        "head": "Saint's Necklace  [...] Crimson Desert  Saint's Necklace cannot be improved upon at a Blacksmith.   Stats Materials Price +0 Defense: 5 - 2,500  ###  Crimson Desert Saint's Necklace Notes, Tips & Triv"
+      },
+      {
+        "rank": 8,
+        "id": "d2e83810-7694-4060-a880-ba8de4155cfa",
+        "similarity": 1.083086514472961,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Demeniss+Cathedral+Necklace",
+        "len": 813,
+        "head": "Demeniss Cathedral Necklace  Stats  Materials  Price  +0  Attack: 0 Critical Rate: Lv.0   27  +1  Attack: 1 Critical Rate: Lv.0  Small Bone x1  27  +2  Attack: 1 Critical Rate: Lv.1  Small Bone x3  27"
+      },
+      {
+        "rank": 9,
+        "id": "eea42ee2-1143-4280-a3f5-119e8a0b701a",
+        "similarity": 1.0774414777755739,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Demeniss_Cathedral_Necklace",
+        "len": 806,
+        "head": "Demeniss Cathedral Necklace  Stats Materials Price +0 Attack: 0 Critical Rate: Lv.0   27 +1 Attack: 1 Critical Rate: Lv.0 Small Bone x1 27 +2 Attack: 1 Critical Rate: Lv.1 Small Bone x3 27 +3 Attack: "
+      },
+      {
+        "rank": 10,
+        "id": "5a88ffb3-36c6-4553-89b0-20aaab7afe59",
+        "similarity": 1.066784584501173,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Engraved_Silver_Necklace",
+        "len": 805,
+        "head": "Engraved Silver Necklace  Stats Materials Price +0 Attack: 0 Critical Rate: Lv.0   500 +1 Attack: 1 Critical Rate: Lv.0 Small Bone x1 508 +2 Attack: 1 Critical Rate: Lv.1 Small Bone x3 532 +3 Attack: "
+      }
+    ]
+  },
+  {
+    "query": "what carries over in New Game Plus?",
+    "classifier": "mechanic",
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "465e2274-b554-42c8-a73a-056822946bd7",
+      "013dda9d-7dc8-4745-91cc-7ef5ef90e5a5",
+      "09c7c77e-5a26-41ef-bd12-f0fc86634009"
+    ],
+    "expected_chunks": [
+      {
+        "id": "465e2274-b554-42c8-a73a-056822946bd7",
+        "rank": 5,
+        "in_top10": true,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 488,
+        "head": "New Game Plus  [...] and complete all main quests. Though this will take a long time, it can definitely be achieved in one playthrough.  ### Replayability in Crimson Desert     Replaying Crimson Deser"
+      },
+      {
+        "id": "013dda9d-7dc8-4745-91cc-7ef5ef90e5a5",
+        "rank": 2,
+        "in_top10": true,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 728,
+        "head": "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ### Is There New Game Plus in Crimson Desert?     In Crimson Deser"
+      },
+      {
+        "id": "09c7c77e-5a26-41ef-bd12-f0fc86634009",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "quest",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New_Game_Plus",
+        "len": 726,
+        "head": "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ###  Is There New Game Plus in Crimson Desert?  In Crimson Desert,"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "ef87fc33-e235-490a-b65f-6f379e3b7bfe",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 451,
+        "head": "New Game Plus  New Game Plus in Crimson Desert is a feature that players can unlock upon completing the main story of the game. In this mode, players will begin a new playthrough while being able to k"
+      },
+      {
+        "rank": 2,
+        "id": "013dda9d-7dc8-4745-91cc-7ef5ef90e5a5",
+        "similarity": 1.3,
+        "is_expected": true,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 728,
+        "head": "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ### Is There New Game Plus in Crimson Desert?     In Crimson Deser"
+      },
+      {
+        "rank": 3,
+        "id": "535ab5a6-1980-4208-bafc-cb86d6d9166f",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 605,
+        "head": "New Game Plus  [...] the various Faction Quests and Challenges, fill up the Knowledge menu, or continue playing the different Minigames.  ### Are There Post-Game Quests in Crimson Desert     After com"
+      },
+      {
+        "rank": 4,
+        "id": "3ed2f24e-98df-4474-8d12-8615e656fe06",
+        "similarity": 1.3,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 497,
+        "head": "New Game Plus  [...] of the important NPCs in each region. After that, you have free roam to continue the side quests, or replay the game.  ### Getting 100% Achievements in Crimson Desert     To obtai"
+      },
+      {
+        "rank": 5,
+        "id": "465e2274-b554-42c8-a73a-056822946bd7",
+        "similarity": 1.3,
+        "is_expected": true,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/New+Game+Plus",
+        "len": 488,
+        "head": "New Game Plus  [...] and complete all main quests. Though this will take a long time, it can definitely be achieved in one playthrough.  ### Replayability in Crimson Desert     Replaying Crimson Deser"
+      },
+      {
+        "rank": 6,
+        "id": "66b8ea69-3f27-45fc-b335-27f68e77b218",
+        "similarity": 1.015965966697454,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588222",
+        "len": 297,
+        "head": "Is There New Game Plus?  Turn In Bounties  | Supply Chests Locations  | HUD Explained       | Is There New Game Plus?  | How to Slide  | What Are Unequippable Equipment?         | How to Tame Horses  "
+      },
+      {
+        "rank": 7,
+        "id": "6194b1d6-36de-407e-8128-0d991a53f814",
+        "similarity": 0.999355938357827,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588222",
+        "len": 275,
+        "head": "Is There New Game Plus?  Play Duo  | How to Infiltrate Guarded Areas       | Best Items to Keep, Buy, and Sell  | Wanted System Explained  | Best Side Quests to Complete       | What Are Mysterious En"
+      },
+      {
+        "rank": 8,
+        "id": "98052ab3-5791-48f7-a8e2-6d588aa51f97",
+        "similarity": 0.998125666268218,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588222",
+        "len": 331,
+        "head": "Is There New Game Plus?  | How to Mine Ores  | Mouse and Keyboard or Controller?       | How to Dye Armor  | Trading System Explained  | Why Does Your Lantern Glow Blue?       | Where to Turn In Bount"
+      },
+      {
+        "rank": 9,
+        "id": "1b576465-d68c-46f5-a270-99f06ebb8a60",
+        "similarity": 0.9613648869234219,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/585150",
+        "len": 296,
+        "head": "Can You Skip Cutscenes  Turn In Bounties  | Supply Chests Locations  | HUD Explained       | Is There New Game Plus?  | How to Slide  | What Are Unequippable Equipment?         | How to Tame Horses  |"
+      },
+      {
+        "rank": 10,
+        "id": "e1c90619-e594-4163-93dc-f437d1f1a978",
+        "similarity": 0.9595189606569989,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/586494",
+        "len": 292,
+        "head": "Is there Transmog?  Turn In Bounties  | Supply Chests Locations  | HUD Explained       | Is There New Game Plus?  | How to Slide  | What Are Unequippable Equipment?         | How to Tame Horses  | How"
+      }
+    ]
+  },
+  {
+    "query": "how does the Faded Abyss Artifact work?",
+    "classifier": "item",
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "a1cf377e-e5db-4d35-9b18-e673ce22f81c",
+      "58537084-621b-4347-ade8-babfb99f37a3",
+      "6db9fcd5-d8a1-4e51-b9d3-fb2309e881f9"
+    ],
+    "expected_chunks": [
+      {
+        "id": "a1cf377e-e5db-4d35-9b18-e673ce22f81c",
+        "rank": 4,
+        "in_top10": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded_Abyss_Artifact",
+        "len": 880,
+        "head": "Faded Abyss Artifact  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Gatherables > Faded Abyss Artifact  ###  Faded Abyss Artifact  Crafting Materials Abyss Item"
+      },
+      {
+        "id": "58537084-621b-4347-ade8-babfb99f37a3",
+        "rank": 8,
+        "in_top10": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded_Abyss_Artifact",
+        "len": 778,
+        "head": "Faded Abyss Artifact  [...] Stamina, Spirit, and Health from the Skills menu.  A rare Abyss Artifact that pulses with a strange, regressive power.  ###  Where to Find Faded Abyss Artifact in Crimson D"
+      },
+      {
+        "id": "6db9fcd5-d8a1-4e51-b9d3-fb2309e881f9",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "mechanic",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded_Abyss_Artifact",
+        "len": 920,
+        "head": "Faded Abyss Artifact  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Gatherables > Faded Abyss Artifact  ###  Faded Abyss Artifact  Crafting Materials Abyss Item"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "2ec9dc3e-01fc-4c93-a912-ab25399d7c57",
+        "similarity": 1.38,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 938,
+        "head": "Faded Abyss Artifact  [...] of Unchanging Will II    - Shield of Unchanging Will IV    - Under a Starlit Sky    - Under the Ashen Banner Pike  ### Crimson Desert Faded Abyss Artifact Notes, Tips & Tri"
+      },
+      {
+        "rank": 2,
+        "id": "453ab275-c404-4feb-8cfd-94799b391515",
+        "similarity": 1.38,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 819,
+        "head": "Faded Abyss Artifact  False Hellebore ♦ False Starwort ♦ Fang ♦ Feather ♦ Fennel ♦ Fig ♦ Fine Meat ♦ Fine Stone ♦ Fine Timber ♦ Fish Fillet ♦ Flax ♦ Fleece ♦ Fruit Fly ♦ Garlic ♦ Ginseng ♦ Grape ♦ Gra"
+      },
+      {
+        "rank": 3,
+        "id": "c4365240-34e3-4e73-bdb6-ff3bf1d5a01d",
+        "similarity": 1.38,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 405,
+        "head": "Faded Abyss Artifact  ♦ Tomato ♦ Tough Meat ♦ Turnip ♦ Water ♦ Water Strider ♦ Wheat ♦ White Lavender ♦ White Streaked butterfly ♦ Wild Garlic ♦ Wild Ginseng                              Join the page"
+      },
+      {
+        "rank": 4,
+        "id": "a1cf377e-e5db-4d35-9b18-e673ce22f81c",
+        "similarity": 1.105696297031421,
+        "is_expected": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded_Abyss_Artifact",
+        "len": 880,
+        "head": "Faded Abyss Artifact  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Gatherables > Faded Abyss Artifact  ###  Faded Abyss Artifact  Crafting Materials Abyss Item"
+      },
+      {
+        "rank": 5,
+        "id": "9700a3d4-b2db-4a4e-b142-8da090e63d5a",
+        "similarity": 1.096003997802262,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 1589,
+        "head": "Faded Abyss Artifact  How to Obtain / Where to Find: ### Where to Find Faded Abyss Artifact in Crimson Desert   Faded Abyss Artifact Gatherable can be found in the following locations:       - It can "
+      },
+      {
+        "rank": 6,
+        "id": "c454d854-263b-4f3b-a631-8bc8dda7cf89",
+        "similarity": 1.091512161240344,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 818,
+        "head": "Faded Abyss Artifact  ### Faded Abyss Artifact         Crafting Materials  Abyss Item                         Sells for   1.08                    An artifact that allows you to reclaim Abyss artifacts"
+      },
+      {
+        "rank": 7,
+        "id": "1631aa7d-a6be-440a-afca-1b7e983ebcee",
+        "similarity": 1.0906124819055218,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 818,
+        "head": "Faded Abyss Artifact  ### Faded Abyss Artifact         Crafting Materials  Abyss Item                         Sells for   1.08                    An artifact that allows you to reclaim Abyss artifacts"
+      },
+      {
+        "rank": 8,
+        "id": "58537084-621b-4347-ade8-babfb99f37a3",
+        "similarity": 1.0904431343078609,
+        "is_expected": true,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded_Abyss_Artifact",
+        "len": 778,
+        "head": "Faded Abyss Artifact  [...] Stamina, Spirit, and Health from the Skills menu.  A rare Abyss Artifact that pulses with a strange, regressive power.  ###  Where to Find Faded Abyss Artifact in Crimson D"
+      },
+      {
+        "rank": 9,
+        "id": "e3521647-2481-4f2f-8a05-9bb2170ca6fc",
+        "similarity": 1.0838035841222349,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 818,
+        "head": "Faded Abyss Artifact  [...] Stamina, Spirit, and Health from the Skills menu.  A rare Abyss Artifact that pulses with a strange, regressive power.  ### Where to Find Faded Abyss Artifact in Crimson De"
+      },
+      {
+        "rank": 10,
+        "id": "5e35438c-f604-40c5-a9b4-f6d1182a73c4",
+        "similarity": 1.0838035841222349,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+        "len": 818,
+        "head": "Faded Abyss Artifact  [...] Stamina, Spirit, and Health from the Skills menu.  A rare Abyss Artifact that pulses with a strange, regressive power.  ### Where to Find Faded Abyss Artifact in Crimson De"
+      }
+    ]
+  },
+  {
+    "query": "how do I beat Kailok?",
+    "classifier": "boss",
+    "fallback": false,
+    "recall": 0.3333333333333333,
+    "expected_chunk_ids": [
+      "5bbe76d2-3dc8-4e74-ac99-64c3bd3e80d0",
+      "7641dbc9-354c-40bc-ab53-95b72971e182",
+      "4d4594b8-1955-4703-b34f-2277a3954f56"
+    ],
+    "expected_chunks": [
+      {
+        "id": "5bbe76d2-3dc8-4e74-ac99-64c3bd3e80d0",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 818,
+        "head": "Kailok the Hornsplitter  Slash. You can interrupt this offensive move by blocking his attack with your shield, then do a heavy counterattack to attempt knocking him down.  BossesAntumbra's Sword Ator "
+      },
+      {
+        "id": "7641dbc9-354c-40bc-ab53-95b72971e182",
+        "rank": 9,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 814,
+        "head": "Kailok the Hornsplitter  and he plays a very offensive combat approach throughout the battle. It is recommended to fight Kailok the Hornsplitter with a defensive approach.  We also found a weakness wi"
+      },
+      {
+        "id": "4d4594b8-1955-4703-b34f-2277a3954f56",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 753,
+        "head": "Kailok the Hornsplitter  [...] page - Recent changes - Random page - Help about MediaWiki  Home > World Information > Bosses > Kailok the Hornsplitter  ###  Kailok the Hornsplitter   Location Goldleaf"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "7294db71-30be-42b0-a3df-3f7f3b5027c8",
+        "similarity": 0.917383800900949,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://www.youtube.com/watch?v=5M32DoUDmWY",
+        "len": 1436,
+        "head": "[FULL GUIDE: How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  Kailok the Hornsplitter Boss Guide:  This boss is very challenging but beatable with the right strategy.  DODGIN"
+      },
+      {
+        "rank": 2,
+        "id": "de326570-b203-40d6-a827-bbecd8dc521f",
+        "similarity": 0.875862050056458,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://www.youtube.com/watch?v=5M32DoUDmWY",
+        "len": 212,
+        "head": "[How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  KNOCKDOWNS: Knocking him down is one of the easier ways to deal damage and interrupts his combos. You can sometimes combo hi"
+      },
+      {
+        "rank": 3,
+        "id": "85241974-eb3c-466d-97b7-914d8112a8ab",
+        "similarity": 0.874824486662418,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://www.youtube.com/watch?v=5M32DoUDmWY",
+        "len": 402,
+        "head": "[How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  DODGING: Lock onto him with left bumper and press and hold the dodge button (circle/B). This gives you a huge dodge with a f"
+      },
+      {
+        "rank": 4,
+        "id": "c6ebe1fb-8389-4403-9f08-155c104adaff",
+        "similarity": 0.872267225885444,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://www.youtube.com/watch?v=5M32DoUDmWY",
+        "len": 225,
+        "head": "[How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  POSTURE BREAK: You will break his posture at least once during the fight. When this happens, spam quick attacks (don't use s"
+      },
+      {
+        "rank": 5,
+        "id": "2c99fe15-2476-4bd8-a620-d5971a8bac07",
+        "similarity": 0.8697479844093321,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/585808",
+        "len": 459,
+        "head": "How to Beat Hornsplitter  How to Beat Hornsplitter  class=\"archive-style-wrapper\"> You can defeat Kailok the Hornsplitter by using Force Palm to stagger him in Crimson Desert. Check out Kailok the Hor"
+      },
+      {
+        "rank": 6,
+        "id": "c09d5e52-64e4-45f6-9394-38e9d5515829",
+        "similarity": 0.8697479844093321,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/585808",
+        "len": 459,
+        "head": "How to Beat Hornsplitter  How to Beat Hornsplitter  class=\"archive-style-wrapper\"> You can defeat Kailok the Hornsplitter by using Force Palm to stagger him in Crimson Desert. Check out Kailok the Hor"
+      },
+      {
+        "rank": 7,
+        "id": "a6bf60ca-674a-4e06-989b-a056db8a8511",
+        "similarity": 0.844359488487244,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 687,
+        "head": "Kailok the Hornsplitter  to knock him down. Being patient with these opportunities and striking him when you can should efficiently lead you to defeat this boss.  Be cautious with his Overhead Strike "
+      },
+      {
+        "rank": 8,
+        "id": "887a3f12-041d-4409-ae40-d201f67fa812",
+        "similarity": 0.835894317626953,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 487,
+        "head": "Kailok the Hornsplitter  [...] by blocking any of the four slashes with your shield, then do a heavy counterattack to attempt knocking him down.  ###  Multi Slash  Considered as one of his primary att"
+      },
+      {
+        "rank": 9,
+        "id": "7641dbc9-354c-40bc-ab53-95b72971e182",
+        "similarity": 0.833303496039335,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 814,
+        "head": "Kailok the Hornsplitter  and he plays a very offensive combat approach throughout the battle. It is recommended to fight Kailok the Hornsplitter with a defensive approach.  We also found a weakness wi"
+      },
+      {
+        "rank": 10,
+        "id": "f50ed1da-96f3-47d0-9b63-5966a3666de7",
+        "similarity": 0.83222831083705,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Kailok_the_Hornsplitter",
+        "len": 331,
+        "head": "Kailok the Hornsplitter  is facing when launching this attack so you can evade it, and then dash forward and strike him once he is done with this offensive move.  Overall, it should be a fairly easy m"
+      }
+    ]
+  },
+  {
+    "query": "what are the best one-handed weapons?",
+    "classifier": null,
+    "fallback": false,
+    "recall": 0,
+    "expected_chunk_ids": [
+      "fa85ee79-1e19-4852-a738-2052a134b7a9",
+      "4bad19ac-a944-4157-b00c-eeb7a2ca3ef5",
+      "e5b04a96-b88d-4114-8e09-96bf470ea6df"
+    ],
+    "expected_chunks": [
+      {
+        "id": "fa85ee79-1e19-4852-a738-2052a134b7a9",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595314",
+        "len": 684,
+        "head": "Best One  [...] Fallen Kingdom's Rapier       | 8  | Royal Oath       | 9  | Double-Headed Axe of Greed       | 10  | The Grove's Thorn  ### 1. Fated Shadow     | Weapon  | StatsSpecial Effects     | "
+      },
+      {
+        "id": "4bad19ac-a944-4157-b00c-eeb7a2ca3ef5",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595314",
+        "len": 725,
+        "head": "Best One  [...] with three Abyss Gear slots that contains abyss gears focused on damage such as Beastbane, Swift, and Destruction.  ### Obtained at Snowhaven Hearth in Pailune  To get the Chillfallen "
+      },
+      {
+        "id": "e5b04a96-b88d-4114-8e09-96bf470ea6df",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595314",
+        "len": 699,
+        "head": "Best One  [...] the beach. The axe can be found next to a broken oak barrel that you need to move in order to take the weapon itself.  ### 10. The Grove&#39;s Thorn     | Weapon  | StatsSpecial Effect"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "75f622c0-fa53-431e-ba5e-029ab769008a",
+        "similarity": 1.079022748528566,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 566,
+        "head": "One-Handed Weapons  [...] heavy-looking hammer. Its well-balanced design is optimized for striking. A powerful swing can crush even armor.  ###  Error creating thumbnail: File missing Dueling Rapier E"
+      },
+      {
+        "rank": 2,
+        "id": "c3938f66-c00d-4cb8-aa22-a5d225b1e2d3",
+        "similarity": 1.072018087145433,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 261,
+        "head": "One-Handed Weapons  that symbolizes justice and determination. According to legend, this sword was made by Pailunese craftsmen using minerals that fell from the sky.  WeaponsBows Daggers Firearms Hand"
+      },
+      {
+        "rank": 3,
+        "id": "610cf69c-72f1-4144-b893-ce4aee671dfb",
+        "similarity": 1.06840608929379,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 603,
+        "head": "One-Handed Weapons  [...] yet destructive axe. Its lightweight design makes it easy to swing and highly effective at shattering enemy defenses.  ###  Error creating thumbnail: File missing Marching Ba"
+      },
+      {
+        "rank": 4,
+        "id": "ad1bab57-4b13-49ab-9244-375906282d76",
+        "similarity": 1.057706797259652,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 446,
+        "head": "One-Handed Weapons  [...] be light enough for one-handed use, it is more than capable of delivering a fatal attack. It vanished during transit.  ###  Error creating thumbnail: File missing Drakhan Ham"
+      },
+      {
+        "rank": 5,
+        "id": "4535582e-2a28-4ac6-bb5d-d891b2509326",
+        "similarity": 1.056191349256565,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 509,
+        "head": "One-Handed Weapons  [...] the jar shatters, the sound is like a scream. Perhaps it is the wailing of tormented souls, fleeing at last to freedom.  ###  Error creating thumbnail: File missing Maeve Axe"
+      },
+      {
+        "rank": 6,
+        "id": "6d148d79-8cef-4618-94fc-34233dc5019a",
+        "similarity": 1.0551631095908331,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 515,
+        "head": "One-Handed Weapons  [...] by nature and has plenty of resources from its rich forests. Though wooden, it rivals even the finest steel weapons.  ###  Error creating thumbnail: File missing Parashu Axe "
+      },
+      {
+        "rank": 7,
+        "id": "a0a24da7-be61-40e4-9d0f-21a4d7685bb0",
+        "similarity": 1.053890827794524,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed+Weapons",
+        "len": 344,
+        "head": "One-Handed Weapons  [...] be light enough for one-handed use, it is more than capable of delivering a fatal attack. It vanished during transit.  ###  Drakhan Hammer Attack   11         Attack Speed   "
+      },
+      {
+        "rank": 8,
+        "id": "f9e893d1-3951-47f0-8da4-b222a024fa5e",
+        "similarity": 1.052131219848254,
+        "is_expected": false,
+        "content_type": "character",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed_Weapons",
+        "len": 563,
+        "head": "One-Handed Weapons  [...] captain. Its rapier-style wire guard wraps around the hand, and it was called the White Wind—the captain's nickname.  ###  Error creating thumbnail: File missing Wolf's Fang "
+      },
+      {
+        "rank": 9,
+        "id": "cba6b00e-3d6b-4e39-a9b1-e26e10ce4ad7",
+        "similarity": 1.0508798001099109,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed+Weapons",
+        "len": 413,
+        "head": "One-Handed Weapons  [...] by nature and has plenty of resources from its rich forests. Though wooden, it rivals even the finest steel weapons.  ###  Parashu Axe Attack   10         Critical Rate   Lv."
+      },
+      {
+        "rank": 10,
+        "id": "b112809a-76d7-476f-be0d-7a39451a1833",
+        "similarity": 1.0506736880139411,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/One-Handed+Weapons",
+        "len": 584,
+        "head": "One-Handed Weapons  [...] head delivers powerful impact to a single point, and the leather-wrapped grip prevents slipping even on long marches.  ###  Knightlord's Sword Attack   10         Attack Spee"
+      }
+    ]
+  },
+  {
+    "query": "where is the Sanctum of Temperance?",
+    "classifier": "exploration",
+    "fallback": false,
+    "recall": 1,
+    "expected_chunk_ids": [
+      "a299bdad-7861-44a2-bf83-0ff41d5a8b6a",
+      "c036cb1c-4761-4d52-94ec-dad61a6168be"
+    ],
+    "expected_chunks": [
+      {
+        "id": "a299bdad-7861-44a2-bf83-0ff41d5a8b6a",
+        "rank": 7,
+        "in_top10": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum_of_Temperance",
+        "len": 945,
+        "head": "Sanctum of Temperance  [...] regions in Pywel. Players can discover various NPCs, obtain unique Items, and encounter ferocious Enemies and Bosses.  ###  Crimson Desert Sanctum of Temperance Location N"
+      },
+      {
+        "id": "c036cb1c-4761-4d52-94ec-dad61a6168be",
+        "rank": 2,
+        "in_top10": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum_of_Temperance",
+        "len": 831,
+        "head": "Sanctum of Temperance  [...] Recent changes - Random page - Help about MediaWiki  Home > World Information > Locations > Sanctum of Temperance  ###  Sanctum of Temperance [[File:&#160;|300px|alt=]] A "
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "6e0876d8-75d8-4f94-8d35-9c2d64c376f1",
+        "similarity": 1.0545009214280991,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum+of+Temperance",
+        "len": 406,
+        "head": "Sanctum of Temperance  ### Sanctum of Temperance           A place said to be imbued with spiritual power. It is known to have been created by someone in the past to restore the world and its providen"
+      },
+      {
+        "rank": 2,
+        "id": "c036cb1c-4761-4d52-94ec-dad61a6168be",
+        "similarity": 1.033291524652412,
+        "is_expected": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum_of_Temperance",
+        "len": 831,
+        "head": "Sanctum of Temperance  [...] Recent changes - Random page - Help about MediaWiki  Home > World Information > Locations > Sanctum of Temperance  ###  Sanctum of Temperance [[File:&#160;|300px|alt=]] A "
+      },
+      {
+        "rank": 3,
+        "id": "70a4e265-3cb1-4f80-a487-e0c605b6082a",
+        "similarity": 1.004644525412705,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum+of+Temperance",
+        "len": 704,
+        "head": "Sanctum of Temperance  ### Sanctum of Temperance           A place said to be imbued with spiritual power. It is known to have been created by someone in the past to restore the world and its providen"
+      },
+      {
+        "rank": 4,
+        "id": "6f9a7b7d-afcf-4c8a-bb0a-dbc1d7825498",
+        "similarity": 0.970553868942996,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum_of_Temperance",
+        "len": 812,
+        "head": "Sanctum of Temperance  - World- World Information - Locations - Greymane Camp - Abyss Nexus - Interactive Map - Factions - Quests- Main Quests - Faction Quests - Challenges  - Minigames - Mounts - NPC"
+      },
+      {
+        "rank": 5,
+        "id": "871aa0c6-14ec-45a4-a36c-57193ec1be97",
+        "similarity": 0.926984830768279,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/586877",
+        "len": 351,
+        "head": "All Sanctum Challenge Locations  can be found on top of a plateau far southeast of the City of Hernand, past Unicorn Cliff, close to the southeastern border of the Hernand region.   |   Sanctum of Tem"
+      },
+      {
+        "rank": 6,
+        "id": "0a6a2989-0fd9-43a9-b0eb-fba50ebcb003",
+        "similarity": 0.926984830768279,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/586877",
+        "len": 351,
+        "head": "All Sanctum Challenge Locations  can be found on top of a plateau far southeast of the City of Hernand, past Unicorn Cliff, close to the southeastern border of the Hernand region.   |   Sanctum of Tem"
+      },
+      {
+        "rank": 7,
+        "id": "a299bdad-7861-44a2-bf83-0ff41d5a8b6a",
+        "similarity": 0.921710702078905,
+        "is_expected": true,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum_of_Temperance",
+        "len": 945,
+        "head": "Sanctum of Temperance  [...] regions in Pywel. Players can discover various NPCs, obtain unique Items, and encounter ferocious Enemies and Bosses.  ###  Crimson Desert Sanctum of Temperance Location N"
+      },
+      {
+        "rank": 8,
+        "id": "19cc486f-530e-41f2-bcf3-70ae1602c631",
+        "similarity": 0.8811598800230209,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/586877",
+        "len": 312,
+        "head": "All Sanctum Challenge Locations  |        You can find the Sanctum of Temperance in the Pororin Forest in Hernand. Look for a crevice on the cliff to find its entrance.   |   Sanctum of Atonement     "
+      },
+      {
+        "rank": 9,
+        "id": "69f235b4-20c2-42ee-8951-bac26a61f2df",
+        "similarity": 0.8811598800230209,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/586877",
+        "len": 312,
+        "head": "All Sanctum Challenge Locations  |        You can find the Sanctum of Temperance in the Pororin Forest in Hernand. Look for a crevice on the cliff to find its entrance.   |   Sanctum of Atonement     "
+      },
+      {
+        "rank": 10,
+        "id": "72652ffc-90b4-4f25-a87a-eb25bd20f50a",
+        "similarity": 0.847090817191406,
+        "is_expected": false,
+        "content_type": "exploration",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Locations",
+        "len": 308,
+        "head": "Locations  [...] Winery    - Steel Mountains    - Bay of Steel    - Reventine Monastery Region    - Golden Plains    - Denn River  ### Sanctums       - Sanctum of Absolution    - Sanctum of Temperance"
+      }
+    ]
+  },
+  {
+    "query": "how do I beat the Reed Devil?",
+    "classifier": "boss",
+    "fallback": false,
+    "recall": 1,
+    "expected_chunk_ids": [
+      "c6f21822-1f53-4b19-9ca5-2b00ed7c607d",
+      "13e061aa-7b2d-499a-bd65-f4279091b0ed",
+      "a9b80316-f657-4f0f-9ff2-2f3fa110a094"
+    ],
+    "expected_chunks": [
+      {
+        "id": "c6f21822-1f53-4b19-9ca5-2b00ed7c607d",
+        "rank": 1,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 597,
+        "head": "Reed Devil  [...] can do a sidestep to either left or right to avoid getting hit by the daggers. You can dash in and strike him after.  ###  Summon Reed Devil Totem  The Reed Devil summons 5 totems th"
+      },
+      {
+        "id": "13e061aa-7b2d-499a-bd65-f4279091b0ed",
+        "rank": 8,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 628,
+        "head": "Reed Devil  [...] a backslide away from a far distance to the Reed Devil, and re-engage only when he is finished doing the Slashing Wave.  ###  Crimson Slash (Phase 2)  Considered as his strongest off"
+      },
+      {
+        "id": "a9b80316-f657-4f0f-9ff2-2f3fa110a094",
+        "rank": 10,
+        "in_top10": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/585774",
+        "len": 709,
+        "head": "How to Beat Reed Devil  multiple times. Make sure to parry this move whenever you can as it can easily fill up his stagger bar to provide you an opening for damage.       | Sword Wave  | Reed Devil te"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "c6f21822-1f53-4b19-9ca5-2b00ed7c607d",
+        "similarity": 1.141071183681488,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 597,
+        "head": "Reed Devil  [...] can do a sidestep to either left or right to avoid getting hit by the daggers. You can dash in and strike him after.  ###  Summon Reed Devil Totem  The Reed Devil summons 5 totems th"
+      },
+      {
+        "rank": 2,
+        "id": "41f5254f-21b2-4895-bd1a-2cbe66f7d344",
+        "similarity": 1.139105098354214,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 340,
+        "head": "Reed Devil  fatal blow. You can dash forth and re-engage in combat after you notice that the Reed Devil is done with doing the Slashing Wave or Crimson Slash.  Once you defeat the Reed Devil in battle"
+      },
+      {
+        "rank": 3,
+        "id": "ea44363b-37cc-4e5a-aa38-62a4545f08a2",
+        "similarity": 1.135573906898499,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 407,
+        "head": "Reed Devil  and being too offensive can open you to a lot of unnecessary instances of being hit by this boss and taking too much damage from its attacks.  In the first phase of the battle, it is recom"
+      },
+      {
+        "rank": 4,
+        "id": "3e10f7d9-6c7b-4d0f-806b-0b8bd92203c6",
+        "similarity": 1.128915871913188,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 486,
+        "head": "Reed Devil  first HP bar, he will summon the Reed Devil Totems, which will grant him invulnerability to attacks and freely slash you from random directions.  During this phase, your objective should b"
+      },
+      {
+        "rank": 5,
+        "id": "88823665-7f9b-417a-a209-a32107a3d073",
+        "similarity": 1.128829364443701,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 544,
+        "head": "Reed Devil  [...] twice, forming an X pattern. You can block this offensive move with your shield and then launch a counterattack after.  ###  Fury Slash  Reed Devil will furiously slash in an area, d"
+      },
+      {
+        "rank": 6,
+        "id": "59987162-f678-42ef-82e4-bd0d03fd7049",
+        "similarity": 1.127179921437508,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 590,
+        "head": "Reed Devil  patterns and attempt to strike it during the window that it recovers from attacks, or is taken down from receiving knockdown damage from you.  During the entire battle with the Reed Devil,"
+      },
+      {
+        "rank": 7,
+        "id": "75f3d034-0faa-49fc-96fb-e2fef72c6db3",
+        "similarity": 1.120199744111292,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 642,
+        "head": "Reed Devil  your HP as needed. After taking out all five totems, the Reed Devil will reappear and will re engage to you in combat with its second HP bar.  In the second phase of the combat, you may no"
+      },
+      {
+        "rank": 8,
+        "id": "13e061aa-7b2d-499a-bd65-f4279091b0ed",
+        "similarity": 1.118250448912334,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 628,
+        "head": "Reed Devil  [...] a backslide away from a far distance to the Reed Devil, and re-engage only when he is finished doing the Slashing Wave.  ###  Crimson Slash (Phase 2)  Considered as his strongest off"
+      },
+      {
+        "rank": 9,
+        "id": "ddc7eea3-88ec-4c5e-b758-a221f1150db1",
+        "similarity": 1.116668129960784,
+        "is_expected": false,
+        "content_type": "boss",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Reed_Devil",
+        "len": 398,
+        "head": "Reed Devil  [...] where Kliff figures to destroy its enchanted mask, and the Reed Devil flees away as his secret comes into light.  ###  Ronin Slash  The Reed Devil's primary attack is to draw his kat"
+      },
+      {
+        "rank": 10,
+        "id": "a9b80316-f657-4f0f-9ff2-2f3fa110a094",
+        "similarity": 1.113415026664734,
+        "is_expected": true,
+        "content_type": "boss",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/585774",
+        "len": 709,
+        "head": "How to Beat Reed Devil  multiple times. Make sure to parry this move whenever you can as it can easily fill up his stagger bar to provide you an opening for damage.       | Sword Wave  | Reed Devil te"
+      }
+    ]
+  },
+  {
+    "query": "how do I cook Haiden's Lesser Elixir?",
+    "classifier": "recipe",
+    "fallback": false,
+    "recall": 1,
+    "expected_chunk_ids": [
+      "15f97573-9a20-4b1f-8850-9b35c9d31c41",
+      "08500b9b-ff6d-49ca-a412-d9330366eb94",
+      "d1baf2e3-4e08-4528-93e3-0be70da1bc87"
+    ],
+    "expected_chunks": [
+      {
+        "id": "15f97573-9a20-4b1f-8850-9b35c9d31c41",
+        "rank": 5,
+        "in_top10": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 789,
+        "head": "Haiden's Lesser Elixir (Recipe)  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Cauldron Materials: Lesser Spirit Reagent x2 + Lesser Catalyst x1 + E"
+      },
+      {
+        "id": "08500b9b-ff6d-49ca-a412-d9330366eb94",
+        "rank": 3,
+        "in_top10": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 623,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] house with potions and alchemy jars at the front. The recipe can be picked up from the table in the middle of the room.  ### Crimson Desert Haiden's Lesser Elixi"
+      },
+      {
+        "id": "d1baf2e3-4e08-4528-93e3-0be70da1bc87",
+        "rank": 4,
+        "in_top10": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 508,
+        "head": "Haiden's Lesser Elixir (Recipe)  [IMG]  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Cauldron Materials: Lesser Spirit Reagent x2 + Lesser Catalyst"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "4c0c5dc9-6280-4a09-92e2-8fe8a2cc0a07",
+        "similarity": 1.1443034815788269,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 492,
+        "head": "Haiden's Lesser Elixir (Recipe)  WIKISElden Ring4,426 pagesElden Ring Nightreign1,430 pagesExpedition 33977 pagesDark Souls 32,169 pagesAll WikisCategory: - Crafting Manuals   - Home   - All Wikis   -"
+      },
+      {
+        "rank": 2,
+        "id": "8685e333-6a1f-4922-a052-dd82f48c8462",
+        "similarity": 1.132770735736308,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 885,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] Random page - Help about MediaWiki  Home > Equipment > Items > Crafting Manuals > Haiden's Lesser Elixir (Recipe)  ###  Haiden's Lesser Elixir (Recipe) Lesser El"
+      },
+      {
+        "rank": 3,
+        "id": "08500b9b-ff6d-49ca-a412-d9330366eb94",
+        "similarity": 1.1302356946187428,
+        "is_expected": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 623,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] house with potions and alchemy jars at the front. The recipe can be picked up from the table in the middle of the room.  ### Crimson Desert Haiden's Lesser Elixi"
+      },
+      {
+        "rank": 4,
+        "id": "d1baf2e3-4e08-4528-93e3-0be70da1bc87",
+        "similarity": 1.129112284183502,
+        "is_expected": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 508,
+        "head": "Haiden's Lesser Elixir (Recipe)  [IMG]  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Cauldron Materials: Lesser Spirit Reagent x2 + Lesser Catalyst"
+      },
+      {
+        "rank": 5,
+        "id": "15f97573-9a20-4b1f-8850-9b35c9d31c41",
+        "similarity": 1.124313454627991,
+        "is_expected": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 789,
+        "head": "Haiden's Lesser Elixir (Recipe)  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Cauldron Materials: Lesser Spirit Reagent x2 + Lesser Catalyst x1 + E"
+      },
+      {
+        "rank": 6,
+        "id": "0083a2d3-705f-4302-b762-d53edffbffef",
+        "similarity": 1.1239722988622018,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 622,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] house with potions and alchemy jars at the front. The recipe can be picked up from the table in the middle of the room.  ###  Crimson Desert Haiden's Lesser Elix"
+      },
+      {
+        "rank": 7,
+        "id": "c148ee5d-4919-4a0e-8f17-5d45bee26ebe",
+        "similarity": 1.121754944376795,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 446,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] crafting new Meals, Elixirs, Tools, and more. They can be obtained through purchasing from Vendors or exploring Pywel.  ###  Where to Find Haiden's Lesser Elixir"
+      },
+      {
+        "rank": 8,
+        "id": "75999bcd-3521-400a-923c-dac0a7cd90a2",
+        "similarity": 1.117082454897387,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden's+Lesser+Elixir+(Recipe)",
+        "len": 433,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] crafting new Meals, Elixirs, Tools, and more. They can be obtained through purchasing from Vendors or exploring Pywel.  ### Where to Find Haiden's Lesser Elixir "
+      },
+      {
+        "rank": 9,
+        "id": "f6ccda90-d7da-4d29-ad5e-85a2cc06d1f0",
+        "similarity": 1.1151561981253428,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 501,
+        "head": "Haiden's Lesser Elixir (Recipe)  New Game Plus - Trophy & Achievement Guide - Crafting Guide - All Bell Locations - All Abyss Artifact Locations - How to Get More Inventory Slots                 -    "
+      },
+      {
+        "rank": 10,
+        "id": "7def54f1-340a-40f7-be44-b226f6510ea9",
+        "similarity": 1.1006753993839549,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Haiden%27s_Lesser_Elixir_(Recipe)",
+        "len": 609,
+        "head": "Haiden's Lesser Elixir (Recipe)  [...] No Spirit Consumption Drinking this elixir boosts your confidence for a period of time, letting you forget fear.  ###  Crimson Desert Haiden's Lesser Elixir (Rec"
+      }
+    ]
+  },
+  {
+    "query": "how do I cook Hearty Grilled Seafood?",
+    "classifier": "recipe",
+    "fallback": false,
+    "recall": 0.3333333333333333,
+    "expected_chunk_ids": [
+      "2cf3d55f-e575-47b6-a012-14ab07f502c5",
+      "16e4fca1-9815-4a42-b6b4-f95497ad943e",
+      "6147dcf9-ba63-4c00-b8fc-97540f70fd98"
+    ],
+    "expected_chunks": [
+      {
+        "id": "2cf3d55f-e575-47b6-a012-14ab07f502c5",
+        "rank": 2,
+        "in_top10": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Seafood",
+        "len": 933,
+        "head": "Hearty Grilled Seafood  [...] Grilled Seafood can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Squid x10  ###  Crimson Desert Hearty Grilled Seafood Notes, Tips & Tri"
+      },
+      {
+        "id": "16e4fca1-9815-4a42-b6b4-f95497ad943e",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Seafood",
+        "len": 908,
+        "head": "Hearty Grilled Seafood  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Recovery Items > Hearty Grilled Seafood  ###  Hearty Grilled Seafood  Provisions  Health: "
+      },
+      {
+        "id": "6147dcf9-ba63-4c00-b8fc-97540f70fd98",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty+Grilled+Seafood",
+        "len": 839,
+        "head": "Hearty Grilled Seafood  ### Hearty Grilled Seafood         Provisions         Health: +240.0                 Sells for   36                    A dish of grilled seafood. The smoky aroma and briny esse"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "968ea368-50a3-45d6-bab1-190e650776e6",
+        "similarity": 1.27576831817629,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Seafood",
+        "len": 320,
+        "head": "Hearty Grilled Seafood  [...] The smoky aroma and briny essence of the sea combine to whet the appetite, finished with only a light seasoning.  ###  Where to Find Hearty Grilled Seafood in Crimson Des"
+      },
+      {
+        "rank": 2,
+        "id": "2cf3d55f-e575-47b6-a012-14ab07f502c5",
+        "similarity": 1.248163657541181,
+        "is_expected": true,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Seafood",
+        "len": 933,
+        "head": "Hearty Grilled Seafood  [...] Grilled Seafood can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Squid x10  ###  Crimson Desert Hearty Grilled Seafood Notes, Tips & Tri"
+      },
+      {
+        "rank": 3,
+        "id": "383ac07c-9a9a-4dbe-a6c6-e4e689f69578",
+        "similarity": 1.193762797489011,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Large_Grilled_Fish",
+        "len": 948,
+        "head": "Hearty Large Grilled Fish  [...] Grilled Fish can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Striped Marlin x10  ###  Crimson Desert Hearty Large Grilled Fish Notes"
+      },
+      {
+        "rank": 4,
+        "id": "3e55c87d-d394-4e8f-81f2-9820fe8aedaa",
+        "similarity": 1.169077912027972,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Large_Grilled_Fish",
+        "len": 339,
+        "head": "Hearty Large Grilled Fish  [...] cuts of large fish. Precise heat control is essential, and its hearty flavor makes it a popular choice at feasts.  ###  Where to Find Hearty Large Grilled Fish in Crim"
+      },
+      {
+        "rank": 5,
+        "id": "9675505e-ea0b-4ba5-b5ff-9c60d616c9dc",
+        "similarity": 1.168551662650617,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty+Large+Grilled+Fish",
+        "len": 345,
+        "head": "Hearty Large Grilled Fish  [...] cuts of large fish. Precise heat control is essential, and its hearty flavor makes it a popular choice at feasts.  ### Where to Find Hearty Large Grilled Fish in Crims"
+      },
+      {
+        "rank": 6,
+        "id": "027baa53-391e-4073-ba40-3f59c89db5cd",
+        "similarity": 1.16765616325663,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Fish",
+        "len": 937,
+        "head": "Hearty Grilled Fish  [...] Grilled Fish can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Northern Pike x10  ###  Crimson Desert Hearty Grilled Fish Notes, Tips & Triv"
+      },
+      {
+        "rank": 7,
+        "id": "be556633-7881-444c-970e-8d7f8e6bf16e",
+        "similarity": 1.158070225292134,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty+Large+Grilled+Fish",
+        "len": 224,
+        "head": "Hearty Large Grilled Fish  ### Where to Find Hearty Large Grilled Fish in Crimson Desert    Hearty Large Grilled Fish can be cooked at the Cooking Field Tool. It required the following Ingredientes   "
+      },
+      {
+        "rank": 8,
+        "id": "8d0d22e4-3cb0-48ae-a706-e86158a22ed3",
+        "similarity": 1.1547889691842879,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty+Large+Grilled+Fish",
+        "len": 499,
+        "head": "Hearty Large Grilled Fish  How to Obtain / Where to Find: ### Where to Find Hearty Large Grilled Fish in Crimson Desert   Hearty Large Grilled Fish can be cooked at the Cooking Field Tool. It required"
+      },
+      {
+        "rank": 9,
+        "id": "7a8adbbc-8799-42ba-854c-9735d3ee94cd",
+        "similarity": 1.148462391266253,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty+Large+Grilled+Fish",
+        "len": 314,
+        "head": "Hearty Large Grilled Fish  [...] Grilled Fish can be cooked at the Cooking Field Tool. It required the following Ingredientes       - Striped Marlin x10  ### How to Use Hearty Large Grilled Fish in Cr"
+      },
+      {
+        "rank": 10,
+        "id": "24c2d040-e86a-4440-94ca-e88c4ee70b8f",
+        "similarity": 1.145920074958783,
+        "is_expected": false,
+        "content_type": "recipe",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Hearty_Grilled_Fish",
+        "len": 321,
+        "head": "Hearty Grilled Fish  [...] and grilled to perfection. It is crispy on the outside and tender on the inside, releasing a subtle, savory aroma.  ###  Where to Find Hearty Grilled Fish in Crimson Desert "
+      }
+    ]
+  },
+  {
+    "query": "how do I solve the Strongbox puzzle?",
+    "classifier": "puzzle",
+    "fallback": false,
+    "recall": 0.3333333333333333,
+    "expected_chunk_ids": [
+      "82c9161e-317c-41b6-8f74-6a933228f7f4",
+      "8f8cdd79-2ee2-4926-9e71-c1b96cd631dc",
+      "3784b780-2cf0-4e95-8a13-606846d02c8c"
+    ],
+    "expected_chunks": [
+      {
+        "id": "82c9161e-317c-41b6-8f74-6a933228f7f4",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 869,
+        "head": "All Strongbox Puzzle Solutions  [...] square ← ・Bottom center square ↑ ・Bottom right square ← Reward: Karanda's Necklace  Western Court Strongbox Solution  ### Reventine Monastery Strongbox    | Stron"
+      },
+      {
+        "id": "8f8cdd79-2ee2-4926-9e71-c1b96cd631dc",
+        "rank": 3,
+        "in_top10": true,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 862,
+        "head": "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Engraved Gold Earring  Lioncrest Manor Strongbox Solution  ### Mudridge Cabin Strongbox    | Strongb"
+      },
+      {
+        "id": "3784b780-2cf0-4e95-8a13-606846d02c8c",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 785,
+        "head": "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Sungrove Manor Key  Sungrove Manor Strongbox Solution  ### Western Court Strongbox    | Strongbox Lo"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "ab3ba0b6-ef96-4b07-a61b-8f554eb85003",
+        "similarity": 0.999679985008238,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 655,
+        "head": "All Strongbox Puzzle Solutions  [...] Solution: Press the buttons in this order: ・1・1・2・2・2・3・3・3 Reward: Ancient Earring  Azerian Manor Strongbox Solution  ### Sungrove Manor Strongbox    | Strongbox"
+      },
+      {
+        "rank": 2,
+        "id": "68368bc1-5870-4212-8a80-be61885ab360",
+        "similarity": 0.990915403366093,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 730,
+        "head": "All Strongbox Puzzle Solutions  [...] Key ・5. Top 3rd Key ・6. Bottom 1st Key ・7. Top 3rd Key Reward: Recipe: Lavish Meal  Hernand Castle Strongbox Solution  ### Lioncrest Manor Strongbox    | Strongbo"
+      },
+      {
+        "rank": 3,
+        "id": "8f8cdd79-2ee2-4926-9e71-c1b96cd631dc",
+        "similarity": 0.985424262174153,
+        "is_expected": true,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 862,
+        "head": "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Engraved Gold Earring  Lioncrest Manor Strongbox Solution  ### Mudridge Cabin Strongbox    | Strongb"
+      },
+      {
+        "rank": 4,
+        "id": "4ad135e0-2e65-4c23-8a99-cf16462ba0ab",
+        "similarity": 0.9791227663086299,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588428",
+        "len": 440,
+        "head": "Sungrove Manor Strongbox Solution  [...] obtain its rewards in this guide!  List of Contents  - Solution - Location - How to Enter - Rewards - Related Guides  ### How to Solve Sungrove Manor Strongbox"
+      },
+      {
+        "rank": 5,
+        "id": "3d113448-e70b-4b44-b034-127eeafb527a",
+        "similarity": 0.946228012217762,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588256",
+        "len": 535,
+        "head": "Mudridge Cabin Strongbox Solution  [...] obtain its rewards in this guide!  List of Contents  - Solution - Location - How to Enter - Rewards - Related Guides  ### How to Solve Mudridge Cabin Strongbox"
+      },
+      {
+        "rank": 6,
+        "id": "7481a8e0-e20b-4d22-be54-cb690745c14e",
+        "similarity": 0.9394962632355861,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/588428",
+        "len": 317,
+        "head": "Sungrove Manor Strongbox Solution  [...] only need to rotate each square to match the final image above. You can take as many turns as you need to solve this.  ### 2nd Floor of Sungrove Manor   | Stro"
+      },
+      {
+        "rank": 7,
+        "id": "c33a5daa-ae7b-408f-80e2-e35ee3b1eb1c",
+        "similarity": 0.938090190716701,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://www.youtube.com/watch?v=LJPOqTyJa98",
+        "len": 1581,
+        "head": "[FULL GUIDE: All Strongbox Puzzle Locations and Solutions for Hernandian - Dan Allen Gaming]  All Strongbox Puzzle Locations and Solutions — Hernandian:  PREPARATION: Bring a mask (buy from the guy wh"
+      },
+      {
+        "rank": 8,
+        "id": "867fae43-bcf0-4712-9796-f1ab2d96bd96",
+        "similarity": 0.936134266853337,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 674,
+        "head": "All Strongbox Puzzle Solutions  [...] 1st Key ・6. Bottom 3rd Key ・7. Bottom 4th Key Reward: Stellen Manor Closet Key  Stellen Manor Strongbox 1 Solution  ### Stellen Manor Strongbox 2    | Strongbox L"
+      },
+      {
+        "rank": 9,
+        "id": "64efc2d4-dba4-4e35-9c58-a6e913055743",
+        "similarity": 0.9317690987449361,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/587754",
+        "len": 777,
+        "head": "All Strongbox Puzzle Solutions  [...] Wheel: Scroll 4 times ・5th Wheel: Scroll 3 times Reward: Finely Crafted Gold Ring  Stellen Manor Strongbox 2 Solution  ### City of Demeniss Strongbox 1    | Stron"
+      },
+      {
+        "rank": 10,
+        "id": "86ff2081-ce88-4780-b18a-90acbd4c9a38",
+        "similarity": 0.9295570289560591,
+        "is_expected": false,
+        "content_type": "puzzle",
+        "source_url": "https://www.youtube.com/watch?v=LJPOqTyJa98",
+        "len": 249,
+        "head": "[All Strongbox Puzzle Locations and Solutions for Hernandian - Dan Allen Gaming]  STRONGBOX 1 — OWL PUZZLE (in town): The easiest one. Follow the owl symbol prompts on each tile. After solving, equip "
+      }
+    ]
+  },
+  {
+    "query": "what is the best body armor?",
+    "classifier": null,
+    "fallback": false,
+    "recall": 0.6666666666666666,
+    "expected_chunk_ids": [
+      "25ac6d8d-c309-43ec-a7dd-ce3754a28433",
+      "044597b3-3cf5-4e14-9829-c0e6ccfa9d19",
+      "4996070d-5be9-42a5-a04c-8e8583699af0"
+    ],
+    "expected_chunks": [
+      {
+        "id": "25ac6d8d-c309-43ec-a7dd-ce3754a28433",
+        "rank": 7,
+        "in_top10": true,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 593,
+        "head": "Best Body Armor  [...] defense stats but it has an Aegis abyss gear that grants Damage Reduction, increases the overall defenses for Oongka.  ### Meta Guides     | Best Ways to Farm Money  | Best Skil"
+      },
+      {
+        "id": "044597b3-3cf5-4e14-9829-c0e6ccfa9d19",
+        "rank": null,
+        "in_top10": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 573,
+        "head": "Best Body Armor  [...] Both sets provide a high raw defense stat and are equipped with defensive Abyss Gears that increase their defenses.  ### Best Body Armor for Oongka     |  Valortread Plate Armor"
+      },
+      {
+        "id": "4996070d-5be9-42a5-a04c-8e8583699af0",
+        "rank": 5,
+        "in_top10": true,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 552,
+        "head": "Best Body Armor  [...] armor for Kliff, Damiane, and Oongka!  List of Contents  - Best Body Armor - Kliff - Damiane - Oongka - Related Guides  ### Best Body Armor for Kliff     |  Kuku Flame-Resistant"
+      }
+    ],
+    "top10": [
+      {
+        "rank": 1,
+        "id": "2224d7cd-837b-4d3f-81c1-f5f54cebd9eb",
+        "similarity": 1.038269823348247,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Ynitium+Leather+Armor",
+        "len": 150,
+        "head": "Ynitium Leather Armor  Ynitium Leather Armor           Body Armor        Defense   3         Refinement   ❙❙❙❙❙❙❙❙❙❙         Lightning Resistance Lv.1"
+      },
+      {
+        "rank": 2,
+        "id": "5cca8da5-a686-48a6-bd49-dc5f5a400c5c",
+        "similarity": 1.030612016040445,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Weasel+Leather+Armor",
+        "len": 148,
+        "head": "Weasel Leather Armor  Weasel Leather Armor           Body Armor        Defense   3         Refinement   ❙❙❙❙❙❙❙❙❙❙         Lightning Resistance Lv.1"
+      },
+      {
+        "rank": 3,
+        "id": "d140583c-2946-48d8-9350-a8d7405738ae",
+        "similarity": 1.030273700066617,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Grey_Wolf_Leather_Armor",
+        "len": 312,
+        "head": "Grey Wolf Leather Armor  [...] metal pauldrons reinforce vital areas. It doesn't hinder mobility, making it well suited for long trips and ambushes.  ###  Crimson Desert Grey Wolf Leather Armor Body A"
+      },
+      {
+        "rank": 4,
+        "id": "f0e1fd45-bbcd-4699-9a5e-a85c88c1b78a",
+        "similarity": 1.0295935329673749,
+        "is_expected": false,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 264,
+        "head": "Best Body Armor  Best Body Armor  class=\"archive-style-wrapper\"> This is a list of the best body armor in Crimson Desert. Learn all the best body armor for Kliff, Damiane, and Oongka!  List of Content"
+      },
+      {
+        "rank": 5,
+        "id": "4996070d-5be9-42a5-a04c-8e8583699af0",
+        "similarity": 1.029303437152608,
+        "is_expected": true,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 552,
+        "head": "Best Body Armor  [...] armor for Kliff, Damiane, and Oongka!  List of Contents  - Best Body Armor - Kliff - Damiane - Oongka - Related Guides  ### Best Body Armor for Kliff     |  Kuku Flame-Resistant"
+      },
+      {
+        "rank": 6,
+        "id": "0f4c852c-8668-4c28-a6f0-5ac7e7dde225",
+        "similarity": 1.028679891149991,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Elegant+Carmine+Leather+Armor",
+        "len": 499,
+        "head": "Elegant Carmine Leather Armor  Elegant Carmine Leather Armor           Body Armor        Defense             Lightning Resistance Lv.1     A formal leather armor designed to maintain elegance even in "
+      },
+      {
+        "rank": 7,
+        "id": "25ac6d8d-c309-43ec-a7dd-ce3754a28433",
+        "similarity": 1.0253493841096581,
+        "is_expected": true,
+        "content_type": "mechanic",
+        "source_url": "https://game8.co/games/Crimson-Desert/archives/595875",
+        "len": 593,
+        "head": "Best Body Armor  [...] defense stats but it has an Aegis abyss gear that grants Damage Reduction, increases the overall defenses for Oongka.  ### Meta Guides     | Best Ways to Farm Money  | Best Skil"
+      },
+      {
+        "rank": 8,
+        "id": "fce85258-e64f-4190-8981-37d1bc51da94",
+        "similarity": 1.0244803668403741,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Grey+Wolf+Leather+Armor",
+        "len": 156,
+        "head": "Grey Wolf Leather Armor  Grey Wolf Leather Armor           Body Armor        Defense    9          Refinement   ❙❙❙❙❙❙❙❙❙❙         Lightning Resistance Lv.1"
+      },
+      {
+        "rank": 9,
+        "id": "85e41dc2-d86f-492b-ad68-a5ce39d2e141",
+        "similarity": 1.024441323809783,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Belkandor_Plate_Armor",
+        "len": 310,
+        "head": "Belkandor Plate Armor  [...] his deeds. The torso and waist are constructed from multiple overlapping plates, ensuring no gaps open during movement.  ###  Crimson Desert Belkandor Plate Armor Body Arm"
+      },
+      {
+        "rank": 10,
+        "id": "284e171a-c7b3-4df1-814e-78f8a6f59444",
+        "similarity": 1.023660641262033,
+        "is_expected": false,
+        "content_type": "item",
+        "source_url": "https://crimsondesert.wiki.fextralife.com/Unyielding+Warrior's+Plate+Armor",
+        "len": 138,
+        "head": "Unyielding Warrior's Plate Armor  Unyielding Warrior's Plate Armor           Body Armor        Defense   4         Refinement   ❙❙❙❙❙❙❙❙❙❙"
+      }
+    ]
+  }
+]

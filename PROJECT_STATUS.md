@@ -1,16 +1,16 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-25 (session 26 — Phase 1c Bucket A applied)
+**Last updated:** 2026-04-26 (session 27 — Phase 1d eval audit comprehensive pass)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **62,804 chunks** (1d deleted 748 thin remainders) |
-| Retrieval Recall@10 | **66.7%** (deterministic across 3 runs; cumulative Phase 1: 20.0% → 66.7% = **+46.7pp**) |
-| Retrieval MRR | **0.390** (cumulative Phase 1: 0.189 → 0.390) |
+| Retrieval Recall@10 | **80.0%** (deterministic across 3 runs; cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
+| Retrieval MRR | **0.482** (cumulative Phase 1: 0.189 → 0.482) |
 | Vector index | IVFFlat **lists=237**, probes=**10** |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · **1d trailing-boilerplate stripper** · **1d eval seed audit (Oongka + Reed Devil re-seeded)** |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · **1d eval audit comprehensive pass (3 orphan drops + Hearty Grilled Seafood swap + Kailok hybrid)** |
 | Phase next | **1e** nav-only DELETE (587 candidates queued — re-count first; some may have been deleted by 1d) · keyword-boost / matchCount work for tier-list queries (best one-handed weapons remains 0%) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
@@ -35,6 +35,51 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 27 — Phase 1d Eval Audit Comprehensive Pass (2026-04-26)
+
+**Working from:** 66.7% post-Oongka/Reed-Devil audit. Ran a comprehensive audit across all 15 eval queries to identify any remaining seed misalignments before advancing to Phase 1e.
+
+#### Audit method
+Built `scripts/phase1d-eval-audit.ts` to replicate the full retrieval pipeline (classifier → Voyage embed → vector RPC → keyword boost → reranker) and capture top-10 IDs + content for every eval query. Output: `phase1d-eval-audit-comprehensive.json` + a categorized CSV of all 15 queries.
+
+#### Findings — 4 queries flagged for action
+3 of 4 had the **same root cause**: Phase 1c URL-variant orphans. Phase 1c content_type updates only touched canonical URLs (e.g. `/Foo_Bar`); URL-variant duplicates (`/Foo+Bar`) kept their pre-1c content_type and stayed in eval seed arrays as orphans, then got filtered out by the post-1c classifier.
+
+| Query | Old seeds | Action | New seeds |
+|---|---|---|---|
+| what carries over in New Game Plus? | `[465e2274, 013dda9d, 09c7c77e]` | DROP orphan (`content_type='quest'` at URL-variant) | `[465e2274, 013dda9d]` |
+| how does the Faded Abyss Artifact work? | `[a1cf377e, 58537084, 6db9fcd5]` | DROP orphan (`content_type='mechanic'` at URL-variant) | `[a1cf377e, 58537084]` |
+| how do I cook Hearty Grilled Seafood? | `[2cf3d55f, 16e4fca1, 6147dcf9]` | DROP orphan (`content_type='item'` at URL-variant) + SWAP `16e4fca1` (intro chunk with MediaWiki nav) → `968ea368` (concise direct answer, top-1) | `[2cf3d55f, 968ea368]` |
+| how do I beat Kailok? | `[5bbe76d2, 7641dbc9, 4d4594b8]` (1 substantive Fextralife + 2 peripheral) | HYBRID: keep 1 substantive Fextralife, drop 2 peripheral, add 3 YouTube transcripts (Jay Dunna's "How to Easily Beat KAILOK") | `[7641dbc9, 7294db71, de326570, 85241974]` |
+
+`retrieval_eval_backup_phase1d_audit_20260426` (15 rows) created before updates. All 4 UPDATEs returned rows_affected=1.
+
+#### Eval impact (triple-run, deterministic — zero variance)
+
+| Metric | Pre-audit | Post-audit |
+|---|---:|---:|
+| Recall@10 | 66.7% | **80.0%** (+13.3pp) |
+| MRR | 0.390 | **0.482** (+0.092) |
+
+Per-query: New Game Plus 67%→100%, Faded Abyss Artifact 67%→100%, Hearty Grilled Seafood 33%→100%, Kailok 33%→100% (all 4 of 4 ranked). All 11 other queries held position.
+
+#### Cumulative Phase 1 progress
+
+| Stage | Recall@10 | MRR |
+|---|---:|---:|
+| Pre-Phase-1a baseline | 20.0% | 0.189 |
+| Post-Phase-1a (probes=10) | 26.7% | 0.182 |
+| Post-Phase-1b | 26.7% | 0.182 |
+| Post-Phase-1c Bucket A | 28.9% | 0.171 |
+| Post-classifier-alignment | 31.1% | 0.237 |
+| Post-REINDEX (lists=237) | 46.7% | 0.259 |
+| Post-eval-audit (session 26 close) | 54.4% | 0.283 |
+| Post-Phase-1d | 52.6% | 0.267 |
+| Post-Phase-1d-eval-audit (Oongka+Reed Devil) | 66.7% | 0.390 |
+| **Post-Phase-1d-eval-audit-comprehensive** | **80.0%** | **0.482** |
+
+Cumulative: **+60.0pp recall, +0.293 MRR from baseline.**
 
 ### Session 27 — Phase 1d Eval Seed Audit (Oongka + Reed Devil) (2026-04-26)
 

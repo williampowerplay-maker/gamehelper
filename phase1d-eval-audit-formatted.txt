@@ -1,0 +1,298 @@
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: where is Greymane Camp?
+Classifier: exploration | Recall: 67%
+
+Expected seeds (3):
+  [214ffb73] rank 10 | exploration | len=700 | /Greymane+Camp
+    "Greymane Camp  ### Greymane Camp               The Greymane Camp is a small piece of land in the Hernand region. This camp is where Kliff wi..."
+  [91cfbf60] NOT IN TOP-10 | exploration | len=652 | /Greymane+Camp
+    "Greymane Camp  [...] Greymanes who survived the attack. This is also where Kliff will reunite his comrades and other Greymane members.  ### ..."
+  [17e6995f] rank 3 | exploration | len=378 | /Greymane+Camp
+    "Greymane Camp  [...] have the capability to expand this camp with funds and resources, which you will acquire as you progress your journey. ..."
+
+Actual top-3:
+     #1 [1b7a0c0b] sim=1.450 | exploration | len=553 | /Greymane+Camp
+       "Greymane Camp  [...] with him and browse his wares to find a range of recipes, ingredients, and meals to purchase and eat on the go.  ### Pr..."
+     #2 [148a738a] sim=1.320 | exploration | len=623 | /Greymane+Camp
+       "Greymane Camp  for farming, as well as the steps to plant and harvest the plant. However, you will be left with fresh produce that can be us..."
+  ✅ EXPECTED #3 [17e6995f] sim=1.300 | exploration | len=378 | /Greymane+Camp
+       "Greymane Camp  [...] have the capability to expand this camp with funds and resources, which you will acquire as you progress your journey. ..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: what is the Toll of Hernand quest?
+Classifier: quest | Recall: 67%
+
+Expected seeds (3):
+  [6f7b71cd] rank 7 | quest | len=264 | /Toll+of+Hernand
+    "Toll of Hernand  ### Toll of Hernand           Faction  Pororin Forest Guardians  Quest Giver  n/a  Quest Location  City of Hernand  Require..."
+  [862084c3] rank 8 | quest | len=668 | /Toll_of_Hernand
+    "Toll of Hernand  [...] in Crimson Desert  - Go to the eastern edge of the city and climb up the tower. Ringing the bell will unlock the ques..."
+  [eb1d1ee4] NOT IN TOP-10 | quest | len=402 | /Toll+of+Hernand
+    "Toll of Hernand  bell is located at the top of the tower connected to a small house. Climb the roof of the house then scale the wall of the ..."
+
+Actual top-3:
+     #1 [777d4414] sim=1.069 | quest | len=424 | /Toll+of+Hernand
+       "Toll of Hernand  [...] Desert       - Go to the eastern edge of the city and climb up the tower. Ringing the bell will unlock the quest.  ##..."
+     #2 [7ec05e3a] sim=1.063 | quest | len=292 | /Toll_of_Hernand
+       "Toll of Hernand  [...] that players can complete to increase their relationship with a specific Faction and gain XP and various rewards.  ##..."
+     #3 [cfdff932] sim=1.058 | quest | len=296 | /Toll+of+Hernand
+       "Toll of Hernand  [...] that players can complete to increase their relationship with a specific Faction and gain XP and various rewards.  ##..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I beat Myurdin?
+Classifier: boss | Recall: 67%
+
+Expected seeds (3):
+  [65c998dd] rank 8 | boss | len=875 | /games/Crimson-Desert/archives/587676
+    "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact wit..."
+  [2db5ef2d] rank 7 | boss | len=875 | /games/Crimson-Desert/archives/587676
+    "How to Beat Myurdin  [...] ground which can deal massive DoT when exposed for long. Be sure to immediately roll after getting in contact wit..."
+  [3d213428] NOT IN TOP-10 | boss | len=554 | /games/Crimson-Desert/archives/587676
+    "How to Beat Myurdin  [...] down your health. We highly recommend using Fire Resistant Armor to mitigate the burn damage you take.  List of A..."
+
+Actual top-3:
+     #1 [f6b2d41b] sim=0.975 | boss | len=517 | /games/Crimson-Desert/archives/587676
+       "How to Beat Myurdin  [...] Related Guides     | Myurdin Boss Guides       | Can You Defeat Myurdin?  | How to Beat Myurdin (2nd Encounter)  ..."
+     #2 [b1c6b300] sim=0.975 | boss | len=517 | /games/Crimson-Desert/archives/587676
+       "How to Beat Myurdin  [...] Related Guides     | Myurdin Boss Guides       | Can You Defeat Myurdin?  | How to Beat Myurdin (2nd Encounter)  ..."
+     #3 [97460a66] sim=0.946 | boss | len=377 | /games/Crimson-Desert/archives/587676
+       "How to Beat Myurdin  [...] damage.  Keep in mind that you cannot use Grappling Skills against Myurdin in the second phase.  List of All Skil..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: who is Oongka?
+Classifier: character | Recall: 100%
+
+Expected seeds (3):
+  [204d0beb] rank 1 | character | len=389 | /Oongka
+    "Oongka  Characters possess their own unique fighting styles, skills, and weapons, which gives players a different experience in exploration ..."
+  [4b1d701e] rank 2 | character | len=336 | /Oongka
+    "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's s..."
+  [f0e3189f] rank 5 | character | len=338 | /Oongka
+    "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's s..."
+
+Actual top-3:
+  ✅ EXPECTED #1 [204d0beb] sim=0.777 | character | len=389 | /Oongka
+       "Oongka  Characters possess their own unique fighting styles, skills, and weapons, which gives players a different experience in exploration ..."
+  ✅ EXPECTED #2 [4b1d701e] sim=0.772 | character | len=336 | /Oongka
+       "Oongka  find Ludwig, which is directly tied to the main quest Ludwig's Whereabouts. This is also the fight where you can test out Oongka's s..."
+     #3 [54387ed7] sim=0.770 | character | len=389 | /Oongka
+       "Oongka  [...] Main page - Recent changes - Random page - Help about MediaWiki  Home > Character Information > Characters > Oongka  ###  Oong..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: what stats does the Saint's Necklace have?
+Classifier: item | Recall: 100%
+
+Expected seeds (3):
+  [8ce34b87] rank 2 | item | len=651 | /Saint's+Necklace
+    "Saint's Necklace  ### Saint's Necklace           Necklaces           Defense   5         Vitality (Skill)                 A relic said to be..."
+  [c3c8515b] rank 6 | item | len=352 | /Saint's+Necklace
+    "Saint's Necklace  [...] specialized gear slots and provide additional utility or character enhancement beyond standard weapons and armor.  #..."
+  [d6cdf85e] rank 3 | item | len=317 | /Saint's+Necklace
+    "Saint's Necklace  [...] Necklaces in Crimson Desert    When equipped, Saint's Necklace provides the following Stats and Effects    Defense: ..."
+
+Actual top-3:
+     #1 [384fc4e1] sim=1.320 | item | len=227 | /Saint's+Necklace
+       "Saint's Necklace  How to Obtain / Where to Find: Found inside the Hillside Manor Strongbox. Defense: 5, Vitality (Skill) — rapidly restores ..."
+  ✅ EXPECTED #2 [8ce34b87] sim=1.320 | item | len=651 | /Saint's+Necklace
+       "Saint's Necklace  ### Saint's Necklace           Necklaces           Defense   5         Vitality (Skill)                 A relic said to be..."
+  ✅ EXPECTED #3 [d6cdf85e] sim=1.229 | item | len=317 | /Saint's+Necklace
+       "Saint's Necklace  [...] Necklaces in Crimson Desert    When equipped, Saint's Necklace provides the following Stats and Effects    Defense: ..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: what carries over in New Game Plus?
+Classifier: mechanic | Recall: 67%
+
+Expected seeds (3):
+  [465e2274] rank 5 | mechanic | len=488 | /New+Game+Plus
+    "New Game Plus  [...] and complete all main quests. Though this will take a long time, it can definitely be achieved in one playthrough.  ###..."
+  [013dda9d] rank 2 | mechanic | len=728 | /New+Game+Plus
+    "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ### Is..."
+  [09c7c77e] NOT IN TOP-10 | quest | len=726 | /New_Game_Plus
+    "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ###  I..."
+
+Actual top-3:
+     #1 [ef87fc33] sim=1.300 | mechanic | len=451 | /New+Game+Plus
+       "New Game Plus  New Game Plus in Crimson Desert is a feature that players can unlock upon completing the main story of the game. In this mode..."
+  ✅ EXPECTED #2 [013dda9d] sim=1.300 | mechanic | len=728 | /New+Game+Plus
+       "New Game Plus  [...] in aa new playthrough, Enemies and Bosses that are encountered will now be much stronger and tougher to defeat.  ### Is..."
+     #3 [535ab5a6] sim=1.300 | mechanic | len=605 | /New+Game+Plus
+       "New Game Plus  [...] the various Faction Quests and Challenges, fill up the Knowledge menu, or continue playing the different Minigames.  ##..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how does the Faded Abyss Artifact work?
+Classifier: item | Recall: 67%
+
+Expected seeds (3):
+  [a1cf377e] rank 4 | item | len=880 | /Faded_Abyss_Artifact
+    "Faded Abyss Artifact  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Gatherables > Faded Abyss Artifa..."
+  [58537084] rank 8 | item | len=778 | /Faded_Abyss_Artifact
+    "Faded Abyss Artifact  [...] Stamina, Spirit, and Health from the Skills menu.  A rare Abyss Artifact that pulses with a strange, regressive ..."
+  [6db9fcd5] NOT IN TOP-10 | mechanic | len=920 | /Faded_Abyss_Artifact
+    "Faded Abyss Artifact  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Gatherables > Faded Abyss Artifa..."
+
+Actual top-3:
+     #1 [2ec9dc3e] sim=1.380 | item | len=938 | /Faded+Abyss+Artifact
+       "Faded Abyss Artifact  [...] of Unchanging Will II    - Shield of Unchanging Will IV    - Under a Starlit Sky    - Under the Ashen Banner Pik..."
+     #2 [453ab275] sim=1.380 | item | len=819 | /Faded+Abyss+Artifact
+       "Faded Abyss Artifact  False Hellebore ♦ False Starwort ♦ Fang ♦ Feather ♦ Fennel ♦ Fig ♦ Fine Meat ♦ Fine Stone ♦ Fine Timber ♦ Fish Fillet ..."
+     #3 [c4365240] sim=1.380 | item | len=405 | /Faded+Abyss+Artifact
+       "Faded Abyss Artifact  ♦ Tomato ♦ Tough Meat ♦ Turnip ♦ Water ♦ Water Strider ♦ Wheat ♦ White Lavender ♦ White Streaked butterfly ♦ Wild Garl..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I beat Kailok?
+Classifier: boss | Recall: 33%
+
+Expected seeds (3):
+  [5bbe76d2] NOT IN TOP-10 | boss | len=818 | /Kailok_the_Hornsplitter
+    "Kailok the Hornsplitter  Slash. You can interrupt this offensive move by blocking his attack with your shield, then do a heavy counterattack..."
+  [7641dbc9] rank 9 | boss | len=814 | /Kailok_the_Hornsplitter
+    "Kailok the Hornsplitter  and he plays a very offensive combat approach throughout the battle. It is recommended to fight Kailok the Hornspli..."
+  [4d4594b8] NOT IN TOP-10 | boss | len=753 | /Kailok_the_Hornsplitter
+    "Kailok the Hornsplitter  [...] page - Recent changes - Random page - Help about MediaWiki  Home > World Information > Bosses > Kailok the Ho..."
+
+Actual top-3:
+     #1 [7294db71] sim=0.917 | boss | len=1436 | /watch?v=5M32DoUDmWY
+       "[FULL GUIDE: How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  Kailok the Hornsplitter Boss Guide:  This boss is ve..."
+     #2 [de326570] sim=0.876 | boss | len=212 | /watch?v=5M32DoUDmWY
+       "[How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  KNOCKDOWNS: Knocking him down is one of the easier ways to deal ..."
+     #3 [85241974] sim=0.875 | boss | len=402 | /watch?v=5M32DoUDmWY
+       "[How to Easily Beat KAILOK the Hornsplitter in Crimson Desert - Jay Dunna]  DODGING: Lock onto him with left bumper and press and hold the d..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: what are the best one-handed weapons?
+Classifier: none | Recall: 0%
+
+Expected seeds (3):
+  [fa85ee79] NOT IN TOP-10 | mechanic | len=684 | /games/Crimson-Desert/archives/595314
+    "Best One  [...] Fallen Kingdom's Rapier       | 8  | Royal Oath       | 9  | Double-Headed Axe of Greed       | 10  | The Grove's Thorn  ###..."
+  [4bad19ac] NOT IN TOP-10 | mechanic | len=725 | /games/Crimson-Desert/archives/595314
+    "Best One  [...] with three Abyss Gear slots that contains abyss gears focused on damage such as Beastbane, Swift, and Destruction.  ### Obta..."
+  [e5b04a96] NOT IN TOP-10 | mechanic | len=699 | /games/Crimson-Desert/archives/595314
+    "Best One  [...] the beach. The axe can be found next to a broken oak barrel that you need to move in order to take the weapon itself.  ### 1..."
+
+Actual top-3:
+     #1 [75f622c0] sim=1.079 | character | len=566 | /One-Handed_Weapons
+       "One-Handed Weapons  [...] heavy-looking hammer. Its well-balanced design is optimized for striking. A powerful swing can crush even armor.  ..."
+     #2 [c3938f66] sim=1.072 | character | len=261 | /One-Handed_Weapons
+       "One-Handed Weapons  that symbolizes justice and determination. According to legend, this sword was made by Pailunese craftsmen using mineral..."
+     #3 [610cf69c] sim=1.068 | character | len=603 | /One-Handed_Weapons
+       "One-Handed Weapons  [...] yet destructive axe. Its lightweight design makes it easy to swing and highly effective at shattering enemy defens..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: where is the Sanctum of Temperance?
+Classifier: exploration | Recall: 100%
+
+Expected seeds (2):
+  [a299bdad] rank 7 | exploration | len=945 | /Sanctum_of_Temperance
+    "Sanctum of Temperance  [...] regions in Pywel. Players can discover various NPCs, obtain unique Items, and encounter ferocious Enemies and B..."
+  [c036cb1c] rank 2 | exploration | len=831 | /Sanctum_of_Temperance
+    "Sanctum of Temperance  [...] Recent changes - Random page - Help about MediaWiki  Home > World Information > Locations > Sanctum of Temperan..."
+
+Actual top-3:
+     #1 [6e0876d8] sim=1.055 | exploration | len=406 | /Sanctum+of+Temperance
+       "Sanctum of Temperance  ### Sanctum of Temperance           A place said to be imbued with spiritual power. It is known to have been created ..."
+  ✅ EXPECTED #2 [c036cb1c] sim=1.033 | exploration | len=831 | /Sanctum_of_Temperance
+       "Sanctum of Temperance  [...] Recent changes - Random page - Help about MediaWiki  Home > World Information > Locations > Sanctum of Temperan..."
+     #3 [70a4e265] sim=1.005 | exploration | len=704 | /Sanctum+of+Temperance
+       "Sanctum of Temperance  ### Sanctum of Temperance           A place said to be imbued with spiritual power. It is known to have been created ..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I beat the Reed Devil?
+Classifier: boss | Recall: 100%
+
+Expected seeds (3):
+  [c6f21822] rank 1 | boss | len=597 | /Reed_Devil
+    "Reed Devil  [...] can do a sidestep to either left or right to avoid getting hit by the daggers. You can dash in and strike him after.  ### ..."
+  [13e061aa] rank 8 | boss | len=628 | /Reed_Devil
+    "Reed Devil  [...] a backslide away from a far distance to the Reed Devil, and re-engage only when he is finished doing the Slashing Wave.  #..."
+  [a9b80316] rank 10 | boss | len=709 | /games/Crimson-Desert/archives/585774
+    "How to Beat Reed Devil  multiple times. Make sure to parry this move whenever you can as it can easily fill up his stagger bar to provide yo..."
+
+Actual top-3:
+  ✅ EXPECTED #1 [c6f21822] sim=1.141 | boss | len=597 | /Reed_Devil
+       "Reed Devil  [...] can do a sidestep to either left or right to avoid getting hit by the daggers. You can dash in and strike him after.  ### ..."
+     #2 [41f5254f] sim=1.139 | boss | len=340 | /Reed_Devil
+       "Reed Devil  fatal blow. You can dash forth and re-engage in combat after you notice that the Reed Devil is done with doing the Slashing Wave..."
+     #3 [ea44363b] sim=1.136 | boss | len=407 | /Reed_Devil
+       "Reed Devil  and being too offensive can open you to a lot of unnecessary instances of being hit by this boss and taking too much damage from..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I cook Haiden's Lesser Elixir?
+Classifier: recipe | Recall: 100%
+
+Expected seeds (3):
+  [15f97573] rank 5 | recipe | len=789 | /Haiden's+Lesser+Elixir+(Recipe)
+    "Haiden's Lesser Elixir (Recipe)  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Cauldron ..."
+  [08500b9b] rank 3 | recipe | len=623 | /Haiden's+Lesser+Elixir+(Recipe)
+    "Haiden's Lesser Elixir (Recipe)  [...] house with potions and alchemy jars at the front. The recipe can be picked up from the table in the m..."
+  [d1baf2e3] rank 4 | recipe | len=508 | /Haiden's+Lesser+Elixir+(Recipe)
+    "Haiden's Lesser Elixir (Recipe)  [IMG]  ### Haiden's Lesser Elixir (Recipe) Lesser Elixirs               [Crafting Method] Required Tool: Ca..."
+
+Actual top-3:
+     #1 [4c0c5dc9] sim=1.144 | recipe | len=492 | /Haiden%27s_Lesser_Elixir_(Recipe)
+       "Haiden's Lesser Elixir (Recipe)  WIKISElden Ring4,426 pagesElden Ring Nightreign1,430 pagesExpedition 33977 pagesDark Souls 32,169 pagesAll ..."
+     #2 [8685e333] sim=1.133 | recipe | len=885 | /Haiden%27s_Lesser_Elixir_(Recipe)
+       "Haiden's Lesser Elixir (Recipe)  [...] Random page - Help about MediaWiki  Home > Equipment > Items > Crafting Manuals > Haiden's Lesser Eli..."
+  ✅ EXPECTED #3 [08500b9b] sim=1.130 | recipe | len=623 | /Haiden's+Lesser+Elixir+(Recipe)
+       "Haiden's Lesser Elixir (Recipe)  [...] house with potions and alchemy jars at the front. The recipe can be picked up from the table in the m..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I cook Hearty Grilled Seafood?
+Classifier: recipe | Recall: 33%
+
+Expected seeds (3):
+  [2cf3d55f] rank 2 | recipe | len=933 | /Hearty_Grilled_Seafood
+    "Hearty Grilled Seafood  [...] Grilled Seafood can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Squid x10  ..."
+  [16e4fca1] NOT IN TOP-10 | recipe | len=908 | /Hearty_Grilled_Seafood
+    "Hearty Grilled Seafood  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Items > Recovery Items > Hearty Grille..."
+  [6147dcf9] NOT IN TOP-10 | item | len=839 | /Hearty+Grilled+Seafood
+    "Hearty Grilled Seafood  ### Hearty Grilled Seafood         Provisions         Health: +240.0                 Sells for   36                 ..."
+
+Actual top-3:
+     #1 [968ea368] sim=1.276 | recipe | len=320 | /Hearty_Grilled_Seafood
+       "Hearty Grilled Seafood  [...] The smoky aroma and briny essence of the sea combine to whet the appetite, finished with only a light seasonin..."
+  ✅ EXPECTED #2 [2cf3d55f] sim=1.248 | recipe | len=933 | /Hearty_Grilled_Seafood
+       "Hearty Grilled Seafood  [...] Grilled Seafood can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Squid x10  ..."
+     #3 [383ac07c] sim=1.194 | recipe | len=948 | /Hearty_Large_Grilled_Fish
+       "Hearty Large Grilled Fish  [...] Grilled Fish can be cooked at the Cooking Field Tool. It required the following Ingredientes  - Striped Mar..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: how do I solve the Strongbox puzzle?
+Classifier: puzzle | Recall: 33%
+
+Expected seeds (3):
+  [82c9161e] NOT IN TOP-10 | puzzle | len=869 | /games/Crimson-Desert/archives/587754
+    "All Strongbox Puzzle Solutions  [...] square ← ・Bottom center square ↑ ・Bottom right square ← Reward: Karanda's Necklace  Western Court Stro..."
+  [8f8cdd79] rank 3 | puzzle | len=862 | /games/Crimson-Desert/archives/587754
+    "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Engraved Gold Earring  Lioncrest Manor S..."
+  [3784b780] NOT IN TOP-10 | puzzle | len=785 | /games/Crimson-Desert/archives/587754
+    "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Sungrove Manor Key  Sungrove Manor Stron..."
+
+Actual top-3:
+     #1 [ab3ba0b6] sim=1.000 | puzzle | len=655 | /games/Crimson-Desert/archives/587754
+       "All Strongbox Puzzle Solutions  [...] Solution: Press the buttons in this order: ・1・1・2・2・2・3・3・3 Reward: Ancient Earring  Azerian Manor Str..."
+     #2 [68368bc1] sim=0.991 | puzzle | len=730 | /games/Crimson-Desert/archives/587754
+       "All Strongbox Puzzle Solutions  [...] Key ・5. Top 3rd Key ・6. Bottom 1st Key ・7. Top 3rd Key Reward: Recipe: Lavish Meal  Hernand Castle Str..."
+  ✅ EXPECTED #3 [8f8cdd79] sim=0.985 | puzzle | len=862 | /games/Crimson-Desert/archives/587754
+       "All Strongbox Puzzle Solutions  [...] You can take as many turns as you need to solve this. Reward: Engraved Gold Earring  Lioncrest Manor S..."
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+QUERY: what is the best body armor?
+Classifier: none | Recall: 67%
+
+Expected seeds (3):
+  [25ac6d8d] rank 7 | mechanic | len=593 | /games/Crimson-Desert/archives/595875
+    "Best Body Armor  [...] defense stats but it has an Aegis abyss gear that grants Damage Reduction, increases the overall defenses for Oongka...."
+  [044597b3] NOT IN TOP-10 | mechanic | len=573 | /games/Crimson-Desert/archives/595875
+    "Best Body Armor  [...] Both sets provide a high raw defense stat and are equipped with defensive Abyss Gears that increase their defenses.  ..."
+  [4996070d] rank 5 | mechanic | len=552 | /games/Crimson-Desert/archives/595875
+    "Best Body Armor  [...] armor for Kliff, Damiane, and Oongka!  List of Contents  - Best Body Armor - Kliff - Damiane - Oongka - Related Guide..."
+
+Actual top-3:
+     #1 [2224d7cd] sim=1.038 | item | len=150 | /Ynitium+Leather+Armor
+       "Ynitium Leather Armor  Ynitium Leather Armor           Body Armor        Defense   3         Refinement   ❙❙❙❙❙❙❙❙❙❙         Lightning Resis..."
+     #2 [5cca8da5] sim=1.031 | item | len=148 | /Weasel+Leather+Armor
+       "Weasel Leather Armor  Weasel Leather Armor           Body Armor        Defense   3         Refinement   ❙❙❙❙❙❙❙❙❙❙         Lightning Resista..."
+     #3 [d140583c] sim=1.030 | item | len=312 | /Grey_Wolf_Leather_Armor
+       "Grey Wolf Leather Armor  [...] metal pauldrons reinforce vital areas. It doesn't hinder mobility, making it well suited for long trips and a..."

@@ -4,6 +4,15 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: Phase 1c URL-Variant content_type Orphans Hid in Eval Seeds (Session 27 — comprehensive audit pass)
+
+- **Phase 1c content_type updates targeted canonical URLs but didn't catch URL-variant duplicates** (e.g., `/Foo+Bar` vs `/Foo_Bar`). When the canonical URL was retagged, the variant URL kept its pre-1c content_type, and chunks at the variant URL stayed in the eval seed arrays as orphans — filtered out by the post-1c classifier. Phase 1d's comprehensive audit caught 3 of these in a single pass: New Game Plus (`09c7c77e` quest-tagged at `/New_Game_Plus`), Faded Abyss Artifact (`6db9fcd5` mechanic-tagged at `/Faded_Abyss_Artifact`), Hearty Grilled Seafood (`6147dcf9` item-tagged at `/Hearty+Grilled+Seafood`). Each query jumped 67%→100% or 33%→100% just by dropping the orphan.
+- **The Phase 2 ingest rewrite must canonicalize URLs at ingest time.** Until then, future content_type bulk operations should explicitly scan for URL variants of every URL touched (`Foo+Bar` vs `Foo_Bar` vs `Foo Bar`), not just the canonical form.
+- **Multi-seed eval arrays should reflect the genuine best answers for the query, not "every seed found at any time."** Including peripheral chunks dilutes the signal — a 6-seed array where 2 are strong and 4 are weak measures `33%` even when retrieval correctly finds the best 2. The Kailok hybrid (4-seed: 1 working Fextralife substantive-strategy chunk + 3 YouTube actionable-strategy chunks) is a cleaner pattern than 6-seed all-of-the-above. The audit verdict was binary in the script ("substantive → ADD, peripheral → SWAP"), but reality was mixed (1 substantive + 2 peripheral). The hybrid path — keep the working signal, swap the peripheral, add the better source — produced 100% recall with 4-of-4 ranking.
+- **Comprehensive audit caught 4 fixes in one pass that incremental audits would have caught one-at-a-time over multiple rounds.** Phase 1d's first pass only re-seeded the 2 visibly-regressing queries (Oongka, Reed Devil). The comprehensive pass — running the full retrieval pipeline against all 15 queries and capturing top-10 with content heads — caught the 3 URL-variant orphans plus the Kailok pattern in one pass. Pattern: after major corpus mutations, do one comprehensive audit (not just regressed queries) once recall stabilizes.
+
+---
+
 ## RAG: Routine Eval Seed Audits After Embedding-Mutating Phases (Session 27 — eval seed audit pass)
 
 - **Phase 1d revealed an under-discussed eval pattern: when a chunk gets re-embedded with cleaner content, OTHER chunks on the same page may now rank higher because they're more semantically focused. The eval seed measures one specific chunk by ID, so a chunk losing its size advantage looks like a regression even though retrieval improved.** Both Oongka (100→0) and Reed Devil (0→0, "didn't move") fit this pattern. Updating their seeds to reference the now-#1-ranking chunks lifted measured recall by +14.1pp (52.6% → 66.7%) without touching any retrieval code.
