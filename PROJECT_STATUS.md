@@ -7,11 +7,11 @@
 | Aspect | Value |
 |---|---|
 | Corpus | **62,804 chunks** (1d deleted 748 thin remainders) |
-| Retrieval Recall@10 | **52.6%** (mean of 3 runs; Oongka eval-seed artifact masks ~6pp of real wins — see session 26 notes) |
-| Retrieval MRR | **0.267** |
-| Vector index | IVFFlat **lists=237**, probes=**10** (no REINDEX yet post-1d's 2,914 inserts; may be needed if drift appears) |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit · **1d trailing-boilerplate stripper (2,914 truncated + re-embedded, 748 deleted)** |
-| Phase next | **eval seed audit pass on Oongka** (Phase 1d surfaced better chunks; current single-seed measures the wrong thing) · **1e** nav-only DELETE (587 candidates queued) · keyword-boost / matchCount for tier-list queries |
+| Retrieval Recall@10 | **66.7%** (deterministic across 3 runs; cumulative Phase 1: 20.0% → 66.7% = **+46.7pp**) |
+| Retrieval MRR | **0.390** (cumulative Phase 1: 0.189 → 0.390) |
+| Vector index | IVFFlat **lists=237**, probes=**10** |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · **1d trailing-boilerplate stripper** · **1d eval seed audit (Oongka + Reed Devil re-seeded)** |
+| Phase next | **1e** nav-only DELETE (587 candidates queued — re-count first; some may have been deleted by 1d) · keyword-boost / matchCount work for tier-list queries (best one-handed weapons remains 0%) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
@@ -35,6 +35,55 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 27 — Phase 1d Eval Seed Audit (Oongka + Reed Devil) (2026-04-26)
+
+**Working from:** Phase 1d completed cleanly but produced an apparent −1.8pp regression. Per-query analysis showed Oongka 100→0 was an eval-seed artifact (better chunks now ranked higher) and Reed Devil's "didn't move" was a misdiagnosis (its seeds weren't in 1d's candidate set, never had a chance to move via 1d).
+
+#### Diagnosis findings
+- **Reed Devil**: `phase1d_candidates_20260426` LEFT JOIN showed all 3 expected_chunk_ids had `action = NULL` — they had no sentinel string, weren't candidates. The chunks were always good seeds; they just weren't ranking in top-10 because OTHER chunks ranked higher. Top-10 contained 9 `/Reed_Devil` chunks + 1 game8 "How to Beat Reed Devil" — all real strategy content. Same pattern as Oongka: seeds measured the wrong specific chunks.
+- **Oongka**: same pattern. Seed `034f6c4f` was the post-1d truncated (832→249) chunk; its size advantage that was making it rank #1 disappeared. New top-3 had "A powerhouse of the Greymanes...", "Oongka is a character that..." — definitional answers.
+
+#### Both seed updates applied
+| Query | Old seed | New seeds |
+|---|---|---|
+| who is Oongka? | `[034f6c4f]` (1, post-1d-truncated skill list) | `[204d0beb, 4b1d701e, f0e3189f]` (3, definitional descriptions) |
+| how do I beat the Reed Devil? | `[870a8c64, 8d800d70, 1a327e41]` (3, but didn't rank) | `[c6f21822, 13e061aa, a9b80316]` (3, phase-1 + phase-2 strategy + game8 canonical) |
+
+`retrieval_eval_backup_phase1d_20260426` (15 rows) created before update.
+
+#### Key nuance: new seeds were never re-embedded by Phase 1d
+All 6 new seed chunks have `re_embedded_at = NULL` — they had no trailing boilerplate, so weren't 1d candidates. They've always existed and always ranked where they rank now. **Phase 1d caused the *previously-#1* chunks to lose their boilerplate-padding size advantage**, which let these always-good chunks rise to top positions. The seeds aren't "1d-improved chunks", they're "always-good chunks the eval finally points at."
+
+#### Eval impact (triple-run, deterministic)
+
+| Metric | Pre-audit | Post-audit |
+|---|---:|---:|
+| Recall@10 | 52.6% (mean) | **66.7%** (all 3 runs) |
+| MRR | 0.267 | **0.390** |
+
+Per-query: Oongka 0%→100% (RR=1.000), Reed Devil 0%→100% (RR=1.000). All other queries held position.
+
+#### Cumulative Phase 1 progress
+
+| Stage | Recall@10 | MRR |
+|---|---:|---:|
+| Pre-Phase-1a baseline | 20.0% | 0.189 |
+| Post-Phase-1a (probes=10) | 26.7% | 0.182 |
+| Post-Phase-1b | 26.7% | 0.182 |
+| Post-Phase-1c Bucket A | 28.9% | 0.171 |
+| Post-classifier-alignment | 31.1% | 0.237 |
+| Post-REINDEX (lists=237) | 46.7% | 0.259 |
+| Post-eval-audit (session 26 close) | 54.4% | 0.283 |
+| Post-Phase-1d | 52.6% | 0.267 |
+| **Post-Phase-1d-eval-audit** | **66.7%** | **0.390** |
+
+**Net Phase 1: +46.7pp recall, +0.201 MRR, eval stable across 3 runs.**
+
+#### Files changed
+- Supabase: `retrieval_eval` (Oongka + Reed Devil rows updated), `retrieval_eval_backup_phase1d_20260426` created
+- `LEARNINGS.md` — eval seed sensitivity to embedding-mutating phases
+- `PROJECT_STATUS.md` — this block
 
 ### Session 27 — Phase 1d Trailing-Boilerplate Stripper (2026-04-26)
 

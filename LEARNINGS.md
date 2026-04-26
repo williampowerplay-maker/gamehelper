@@ -4,6 +4,16 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: Routine Eval Seed Audits After Embedding-Mutating Phases (Session 27 — eval seed audit pass)
+
+- **Phase 1d revealed an under-discussed eval pattern: when a chunk gets re-embedded with cleaner content, OTHER chunks on the same page may now rank higher because they're more semantically focused. The eval seed measures one specific chunk by ID, so a chunk losing its size advantage looks like a regression even though retrieval improved.** Both Oongka (100→0) and Reed Devil (0→0, "didn't move") fit this pattern. Updating their seeds to reference the now-#1-ranking chunks lifted measured recall by +14.1pp (52.6% → 66.7%) without touching any retrieval code.
+- **Routine eval seed audits should follow any phase that touches embeddings, not just any phase that changes content_type.** Pattern checklist after an embedding mutation: (1) for each query whose recall dropped, check if expected chunks were in the mutation's candidate set, (2) pull the new top-10 and visually compare to seeds, (3) if top-10 has better content than the seeds, re-seed.
+- **The "didn't move" diagnosis can be a misdiagnosis.** Reed Devil was the predicted Phase 1d target. When it stayed at 0% after 1d, my first read was "Phase 1d didn't help here, must be a different problem." Wrong. The diagnostic LEFT JOIN on `phase1d_candidates_20260426` revealed Reed Devil's seeds had `action = NULL` — they had no sentinel strings, were never 1d candidates. The reason recall stayed 0% was the eval was already wrong (had been wrong since session-26's seed audit didn't catch it), and 1d wasn't going to fix it because it didn't touch those chunks. **Always pull the candidate-set membership check before drawing conclusions about why a query "didn't move."**
+- **Eval seeds for `re_embedded_at = NULL` chunks are paradoxically more reliable than seeds for re-embedded chunks.** New Oongka seeds (`204d0beb`, etc.) and new Reed Devil seeds (`c6f21822`, etc.) all have `re_embedded_at = NULL` — they were untouched by Phase 1d. They've always existed. Their ranking improved because the previously-#1 chunks lost their boilerplate-padding size advantage. **Stable seeds = chunks that haven't been mutated. Unstable seeds = chunks that have been mutated.** This argues for biasing eval seeds toward "untouched substantive content" chunks where possible.
+- **Multi-seed arrays absorb embedding shifts gracefully.** Reed Devil pre-audit seeds were 3 chunks but they all happened to be the same kind of chunk (info-box / boss-list-tail / specific-skill). Post-audit seeds span phase-1 strategy + phase-2 strategy + game8 canonical — three different framings of the answer. If any retrieval round causes one chunk's embedding to shift, the others still cover the query.
+
+---
+
 ## RAG: Phase 1d Trailing-Boilerplate Stripper Worked, But Surfaced Eval Sensitivity (Session 27)
 
 - **Trailing-boilerplate stripping requires per-chunk truncation logic, not bulk deletion.** The 150-char minimum-after-truncation threshold cleanly separated "thin remainder = page title only or sibling-link nav" (DELETE) from "real content with trailing footer" (TRUNCATE + re-embed). 0/20 DELETE-bucket spot-check showed any real content lost. 2,914 truncated, 748 deleted, 0 failures, 42 sec wall time, $0.006 Voyage cost.

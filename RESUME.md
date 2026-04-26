@@ -4,10 +4,10 @@ Last updated: end of session 27 (2026-04-26). Read this first when resuming work
 
 ## Current State
 
-- **Recall@10: 52.6% (mean of 3 runs)** — Phase 1d's Oongka eval-seed artifact masks ~6pp of real wins
-- **MRR: 0.267**
-- **Cumulative Phase 1 lift: +32.6pp recall measured** (real lift ~+39pp after Oongka seed re-audit)
-- **Last session 27 commit on `main`: see `git log` — session 27 covers Phase 1d**
+- **Recall@10: 66.7% (deterministic across 3 runs)**
+- **MRR: 0.390**
+- **Cumulative Phase 1 lift: +46.7pp recall** from baseline 20.0%
+- **Last session 27 commit on `main`: see `git log` — session 27 covers Phase 1d + eval audit**
 - **Repo:** `williampowerplay-maker/gamehelper`
 - **Working directory:** `C:\Users\William Power\Claude Desktop Working Files\Game AI Helper\crimson-guide`
 
@@ -47,7 +47,7 @@ git pull
 npx tsx scripts/run-eval.ts
 ```
 
-**Expected output:** `Recall@10: 52.6%–53.3%   MRR: 0.256–0.290`. Slight run-to-run variance from IVFFlat probe scan + Saint's Necklace flake. If you see numbers outside this band, **something has changed — investigate before proceeding**.
+**Expected output:** `Recall@10: 66.7%   MRR: 0.390`. Deterministic across consecutive runs. If you see different numbers, **something has changed in the corpus, classifier, or eval seeds — investigate before proceeding**.
 
 ## API key location
 
@@ -57,23 +57,21 @@ npx tsx scripts/run-eval.ts
 
 ## First action when resuming — pick ONE
 
-### Option A — Oongka eval seed re-audit (HIGH PRIORITY, low effort)
-- **Trigger:** Phase 1d truncated Oongka's expected_chunk_id from 832→249 chars. Better Oongka chunks now rank above it.
-- **Method:** pull top 5 chunks at /Oongka URL ordered by content length, pick 2-3 that best answer "who is Oongka?" (likely `204d0beb`, `4b1d701e`, `f0e3189f` based on session-27 dry-run), update `retrieval_eval` row.
-- **Eval impact:** ~+7pp recall (100% on Oongka instead of 0%). Brings cumulative to ~59-60%.
-- **Wall time:** 5 min. No DB schema changes, just one UPDATE row.
-
-### Option B — Phase 1e nav-only deletion
-- **Scope:** 587 URLs already queued in `phase1e_nav_only_candidates_20260425`. Note: Phase 1d may have shrunk this set since some were among the 748 deletes — re-count first.
-- **Method:** DELETE FROM knowledge_chunks WHERE source_url IN (SELECT source_url FROM phase1e_nav_only_candidates_20260425). Add backup first.
+### Option A — Phase 1e nav-only deletion
+- **Scope:** 587 URLs queued in `phase1e_nav_only_candidates_20260425`. **Re-count first** — some may have been deleted by Phase 1d's 748 thin-remainder deletes.
+- **Method:** backup affected chunks → DELETE FROM knowledge_chunks WHERE source_url IN (SELECT source_url FROM phase1e_nav_only_candidates_20260425).
 - **Wall time:** seconds
-- **Eval signal:** likely flat — these are nav-only chunks that shouldn't be ranking anyway.
+- **Eval signal:** likely flat — these are nav-only chunks that shouldn't be ranking anyway. Real wins are corpus shrinkage (less IVFFlat noise) and reduced fallback noise.
 
-### Option C — Tier-list retrieval work
+### Option B — Tier-list retrieval work
 - **Trigger:** "best one-handed weapons" still 0% with seed `fa85ee79` (the literal ranked weapon list)
 - **Hypothesis:** null-classifier pool=8 is too narrow for tier-list queries; need keyword boost on "best" + matchCount tuning
 - **Files:** `src/app/api/chat/route.ts` `isRecommendationQuery()` and pool sizing
 - **Eval signal:** would unlock both "best one-handed weapons" and potentially raise "best body armor" higher than 67%.
+
+### Option C — Diagnose Kailok (33% mid-pool)
+- **Status:** 33% recall — only 1 of 3 expected chunks ranks
+- **Approach:** check whether the other 2 expected seeds are also in the same kind of "exists but doesn't rank" pattern as Oongka/Reed Devil (would mean another seed-audit) or whether they're genuinely thin/unfindable
 
 ## Anything else to know cold
 
