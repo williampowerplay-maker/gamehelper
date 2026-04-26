@@ -117,11 +117,11 @@ function classifyContentType(question: string): string | null {
     "kailok", "hornsplitter", "ludvig", "gregor", "fortain",
     "gabriel", "lucian", "bastier", "walter", "lanford", "master du",
     "antumbra", "crimson warden", "crimson nightmare", "hexe marie",
-    "trukan", "saigord", "staglord",
+    "trukan", "saigord", "staglord", "saigord the staglord",
     // Removed region names: hernand (region/city), demeniss (region), delesyia (region), pailune (region)
     // — these had 0 boss-type chunks and caused false-positive boss filtering on quest/exploration queries
     "reed devil", "blinding flash", "grave walker", "icewalker",
-    "white horn", "stoneback crab", "taming dragon",
+    "white horn", "stoneback crab", "queen stoneback crab", "taming dragon",
     // game8 bosses
     "tenebrum", "crowcaller", "draven", "cassius", "kearush", "myurdin",
     "excavatron", "staglord", "priscus", "muskan", "cubewalker", "lithus",
@@ -130,6 +130,13 @@ function classifyContentType(question: string): string | null {
     "abyss kutum", "kutum",
     // additional confirmed bosses
     "goyen", "matthias", "white bear", "t'rukan",
+    // Phase 1c retags (session 26) — confirmed in corpus content_type='boss'
+    "lava myurdin", "ator", "ator archon",
+    "marni's clockwork mantis", "marni's excavatron",
+    "awakened lucian bastier", "awakened ludvig", "one armed ludvig",
+    "new moon reaper", "full moon reaper", "half moon reaper",
+    "beloth the darksworn", "dreadnought", "thunder tank", "turbine",
+    "pororin forest guardians", "fundamentalist goblins", "golden star",
   ];
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
@@ -152,10 +159,11 @@ function classifyContentType(question: string): string | null {
   // MOUNT / PET — system and how-to guides live in mechanic
   if (/\b(mount(s)? (system|guide|tips?|unlock|how|work)|how (do i|to|do) (get|obtain|unlock|tame|ride|use) (a |the )?(mount|horse|pet|steed)|how do(es)? (mounts?|horses?|pets?) work|pet (system|guide|combat|unlock|how)|horse (guide|system|tips?|riding|unlock|taming)|riding (system|guide|tips?)|best (mount|horse|pet)\b)\b/.test(q)) return "mechanic";
 
-  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
-  // Must come BEFORE item so "Focused Shot skill" → mechanic, not item via "shot"
-  // Also catches puzzle/upgrade/healing queries whose guide content is content_type "mechanic"
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
+  // EXPLORATION — location/navigation/dungeon queries
+  // Moved ABOVE ITEM and MECHANIC (session 26 classifier alignment): "where is the Sanctum of Temperance?"
+  // was being eaten by getItemPhrases' `where (is|are) the` pattern. Sanctum/sanctorum keywords added
+  // since several Sanctum_of_X locations are now `exploration`-tagged post-Phase-1c.
+  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|sanctum|sanctorum|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
 
   // RECOMMENDATION / COMPARISON — "what are good swords", "best weapons to get", "is X worth it"
   // These need cross-type search: tier lists live in mechanic (game8 guides), stats in item.
@@ -170,23 +178,27 @@ function classifyContentType(question: string): string | null {
   if (/\bbest\b.{1,25}\b(weapon|sword|bow|spear|axe|dagger|staff|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories)\b/.test(q)) return null;
 
   // ITEM — gear/equipment/drop questions (weapons, armor, abyss-gear, accessories all stored as "item")
-  // NOTE: currency (gold bars, silver) and "best X" queries are intentionally NOT filtered here
-  // because that info often lives in beginner-guides (mechanic content_type). Full vector search
-  // across all content types finds it better than a filtered item-only search.
-  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|enhance)\b/;
-  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm|obtain)|how (do i|to) (acquire|obtain|get|find)|where to (find|get|buy|obtain)|where (is|are) the|how to get)\b/;
+  // Moved ABOVE MECHANIC (session 26 classifier alignment): "how does the Faded Abyss Artifact work?"
+  // was being caught by mechanic's `abyss artifact` + `how does .+ work` patterns despite the page being
+  // item-tagged post-Phase-1c. `artifact` added to itemKeywords so the artifact pages route correctly.
+  // `where (is|are) the` removed from getItemPhrases — that's a location query (handled in EXPLORATION above).
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|artifact|drop|loot|reward|obtain|enhance)\b/;
+  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm|obtain)|how (do i|to) (acquire|obtain|get|find)|where to (find|get|buy|obtain)|how to get)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
-  // EXPLORATION — location/navigation/dungeon queries
-  // Catches "how do I get to X", dungeon names, and navigation questions
-  // Note: "ruins" alone removed — too broad, catches puzzle queries. Use more specific patterns.
-  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
+  // SKILL/MECHANIC — "what does X skill do", "how does X work", system questions, challenges, travel
+  // Now fires AFTER exploration+recommendation+item (session 26). Order rationale: exploration handles
+  // `where is` queries; recommendation null-returns broad "best X" queries; item handles artifact/
+  // equipment queries via the `artifact` keyword. Mechanic catches genuine system queries because no
+  // item/exploration keyword fires first for system terms (skill/stamina/grapple/etc).
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
 
   // QUEST — story/objective keywords
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
 
   // CHARACTER/NPC — lore/story character questions
-  if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
+  // Added "who are" (session 26): catches "who are the Greymanes" / "who are the X clan".
+  if (/\b(who is|who are|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
 
   return null; // ambiguous — no filter, full vector search
 }

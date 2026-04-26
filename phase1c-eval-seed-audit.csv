@@ -1,0 +1,38 @@
+query,current_seed_id,current_seed_quality,alternative_id,alternative_quality,recommend_replace_with,rationale
+"what stats does the Saint's Necklace have?",8ce34b87,answers,,,,Current seed has Defense:5/Vitality stats inline. Plus 2 other seeds (c3c8515b/d6cdf85e) confirm. Eval at 100% — keep.
+"what stats does the Saint's Necklace have?",c3c8515b,answers,,,,Stats and Effects section. Keep.
+"what stats does the Saint's Necklace have?",d6cdf85e,answers,,,,Defense:5 + Refinement section. Keep.
+"where is Greymane Camp?",214ffb73,partial,,,,Describes camp purpose but not its location. Greymane Camp page itself doesn't have a clean 'where is' chunk — every chunk is about what's there. Acceptable seed.
+"where is Greymane Camp?",91cfbf60,partial,,,,Same — describes camp activities. Acceptable.
+"where is Greymane Camp?",17e6995f,partial,,,,NPCs in Greymane Camp listing. Tangential to 'where is' but on the page. Acceptable.
+"how do I beat Myurdin?",65c998dd,answers,,,,How to Beat Myurdin from game8 with Slam moves. Excellent seed.
+"how do I beat Myurdin?",2db5ef2d,answers,,,,Identical chunk (game8 dup). Keep.
+"how do I beat Myurdin?",3d213428,answers,,,,Fire Resistant Armor + Lava advice. Keep.
+"who is Oongka?",034f6c4f,partial,,a1cf377e or other Oongka chunks better,LEAVE for now,Current seed has skill list + nav-ish content. Eval was 100% at probes=10/lists=237 so the chunk IS retrievable. Could broaden to 2-3 chunks but not strictly necessary.
+"what is the Toll of Hernand quest?",6f7b71cd,thin,,,,264 chars — quest infobox (Faction/Quest Giver/Location/Rewards). Substantive but minimal.
+"what is the Toll of Hernand quest?",862084c3,answers,,,,668 chars — Ringing the bell walkthrough. Excellent seed.
+"what is the Toll of Hernand quest?",eb1d1ee4,answers,,,,402 chars — bell scaling steps + cutscene description. Keep.
+"how do I solve the Strongbox puzzle?",82c9161e,answers,,,,Reventine Monastery Strongbox solution. Keep.
+"how do I solve the Strongbox puzzle?",8f8cdd79,answers,,,,Lioncrest Manor Strongbox solution. Keep.
+"how do I solve the Strongbox puzzle?",3784b780,answers,,,,Western Court Strongbox solution. Keep.
+"what are the best one-handed weapons?",d3b136eb,boilerplate,4bad19ac or e5b04a96,partial,REPLACE,Current seed `d3b136eb` is the page nav menu ('How to Level Up Your Horse / How to Hire Comrades' etc). Zero weapon content. The other two seeds (4bad19ac Chillfallen Sword + e5b04a96 The Grove's Thorn) are real content. Replace `d3b136eb` with a weapons-content chunk.
+"what are the best one-handed weapons?",4bad19ac,answers,,,,Chillfallen Sword location/abyss gear text. Keep.
+"what are the best one-handed weapons?",e5b04a96,answers,,,,Grove's Thorn stats. Keep.
+"what is the best body armor?",25ac6d8d,partial,,,,Has Aegis abyss gear info + Meta Guides nav. Keep — directly relevant.
+"what is the best body armor?",044597b3,answers,,,,Best Body Armor for Oongka section. Keep.
+"what is the best body armor?",4996070d,answers,,,,List of Contents + Best Body Armor for Kliff with Kuku armor. Keep.
+"where is the Sanctum of Temperance?",a299bdad,partial,,,,Tail-end nav listing of locations + 'Notes/Tips/Trivia' placeholder. Page identification only.
+"where is the Sanctum of Temperance?",c036cb1c,answers,,,,'A place said to be imbued with spiritual power...' — actual description. Keep.
+"where is the Sanctum of Temperance?",bc491aa4,boilerplate,,,POSSIBLE REPLACE,Pure location nav-list ('Calphade North Gate / Northern Depot / Outpost...'). Could replace with a chunk that actually describes Sanctum of Temperance location/access.
+"what carries over in New Game Plus?",465e2274,answers,,,,'Replayability in Crimson Desert' section. Keep.
+"what carries over in New Game Plus?",013dda9d,answers,,,,'Is There New Game Plus' overview. Keep.
+"what carries over in New Game Plus?",09c7c77e,answers,,,,Same as 013dda9d but at /New_Game_Plus URL variant. Keep.
+"how do I beat the Reed Devil?",870a8c64,answers,8d800d70 better,answers (longer),REPLACE_OR_ADD,Current 870a8c64 has Swift Stab observation skill. 8d800d70 has Crimson Slash counter-strategy + better strategic content. Keep current + ADD 8d800d70 + 1a327e41 (location/drops summary).
+"how do I beat Kailok?",5bbe76d2,partial,7641dbc9 or 4d4594b8,answers,REPLACE_OR_ADD,Current 5bbe76d2 has Slash counterattack + bossNames nav-list trailing. 7641dbc9 has full strategy rationale; 4d4594b8 has Location/Drops summary. Add at least one.
+"how does the Faded Abyss Artifact work?",a417c884,boilerplate,a1cf377e + 58537084 + 6db9fcd5,answers,REPLACE,Current a417c884 has zero functional description — trailing items + 'Notes/Tips/Trivia goes here' placeholder + nav-list of Gatherables. Replacements: a1cf377e (item-tagged 880-char functional description), 58537084 (item-tagged 'Where to Find' + Challenges), 6db9fcd5 (mechanic-tagged duplicate of functional content for filter robustness).
+"how do I cook Haiden's Lesser Elixir?",15f97573,answers,,,,Crafting Method + Materials. Keep.
+"how do I cook Haiden's Lesser Elixir?",08500b9b,answers,,,,Where to find recipe + Crafting Method. Keep.
+"how do I cook Haiden's Lesser Elixir?",d1baf2e3,answers,,,,Same crafting info + ingredients. Keep.
+"how do I cook Hearty Grilled Seafood?",2cf3d55f,partial,,,,Cooking Field Tool + Squid x10 + Notes/Tips placeholder. Keep — has the recipe.
+"how do I cook Hearty Grilled Seafood?",16e4fca1,answers,,,,'Hearty Grilled Seafood' Provisions / Health: +240 / cooking description. Keep.
+"how do I cook Hearty Grilled Seafood?",6147dcf9,answers,,,,Same content at +URL variant. Keep.

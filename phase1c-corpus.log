@@ -1,0 +1,3395 @@
+[phase1c] Anthropic key resolved (length=108).
+[phase1c] Loaded 3793 records from ./phase1c-corpus-urls.json
+[phase1c] Classifying with concurrency=4…
+[phase1c] WARN slow 3796ms: Blackwing Leather Gloves
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Palmar_Pill: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2193ms: Jackals' Leather Helm
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hyena Helm: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Witters Plate Helm: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 100/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Golden-Knotted Ancestral Bow: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hyde Crossbow: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ator's Finger: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Crow Brothers' Dagger: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Delesyian Dagger: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Falconne Pistol: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Delesyian Ornamental Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Blue Scout Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Freesword's Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Axiom_Bracelet: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Khaled Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 200/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED North Wind Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bruna's_Note: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Purple Scout Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Fee_Notice: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shield of a Blossoming Spring Day: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Shield of Betrayal: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Thorny Warspike Large Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Twisted Thorns: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Alabaster Halberd: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lost_Letter: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Noble's_Hat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Royal_Delivery_Note: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bekker Halberd: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 300/3793
+[phase1c] FAILED Blazing Spear: HTTP 429
+[phase1c] FAILED Tales_of_Sunset_Valley: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Turnali's_Smithy_Flyer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Celeste Halberd: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Cog Destroyer Spear: HTTP 429
+[phase1c] FAILED Crow Whisperer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED NPCs: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hope after the Draught: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sealed Abyss Artifacts: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rulupee: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Billy: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bluemont_Manor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2713ms: Interactive Map
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bremer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 400/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Boris: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Precipice of Echoes Ruins: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dahlia: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Annabella: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED White_Lion_Necklace: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Worn_Ring: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Magic_Scythe: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small_Drum: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Tools_1_Tools_Gallery: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The_Claw: HTTP 429
+[phase1c] Progress: 500/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2859ms: Wooden_Lantern
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wooden_Pitchfork: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Battered_Meat_And_Fish: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Colette_Azerian: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Filling_Marinated_Meat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2706ms: Filling_Vegetable_Rice_Cake
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Garred: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Groks: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hearty_Battered_Meat_And_Fish: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hernandian Parish of Solumen: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 600/3793
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Damiane Skills: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Aerial Stab: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Unarmed Combat Proficiency: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Turning Slash Proficiency: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Progress: 700/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Resources: HTTP 429
+[phase1c] FAILED Lightning Surge: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Echoing Forward Slash: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Focused Force Palm: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Nature's Veil: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shield Toss Proficiency: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Tornado Kick: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Storm Pillar: HTTP 429
+[phase1c] FAILED Lightning Strike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Quaking Fury: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lightning Pulse: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Explosive Strike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 800/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Battered Fish: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Chewy Rice Cakes: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hearty Small Grilled Fish: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED FAQs: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Game_Progress_Route: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED White_Horn: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Mystical_Key: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Abyss_Artifact: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Polar_Opposites: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 900/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rumors_from_the_Sawmill: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dagger_of_Dark_Pursuit: HTTP 429
+[phase1c] FAILED Adeion_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Goddess_of_Abundance: HTTP 429
+[phase1c] FAILED Mining_Knuckledrill: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2010ms: Subcontent:Faction_Quests_5_Delesyia
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Path_of_Serpents_(Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sanctorum_of_Insight_(Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Spire_of_Ringing_Truth_(Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bow_Aimed_at_Fate_I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Vilancia_Pistol: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2376ms: Ground-Shaking_Impact_I
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Keeping_Balance_on_the_Wind: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Flash: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2607ms: Animal_Meat
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 3076ms: Hunter's_Discipline
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 1000/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Mistum_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Northern_Fighter's_Chain_Mail: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Official_Knight's_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2078ms: Plate_Armor_of_Cursed_Soul
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Pillager's_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Plate_Gloves_of_the_Fallen_Kingdom: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rafferty_Leather_Shoes: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Russmore_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 1100/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Scholastone_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Scorchflame_Plate_Gloves: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shadowleaf_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Silver_Plate_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Health: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Status_Effects: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Toll of Delesyia: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bruna's Request: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Serge's Request: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ethereal Pathway (Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Progress: 1200/3793
+[phase1c] FAILED Sword of Trials V: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Factions: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED End of the Shadow: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Under a Starlit Sky: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Mystical Key: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Abyss without Balance: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Reward for Their Sweat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dance with the Devil: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bleed Bandit: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rock Paper Scissors: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dark_Worshiper's_Staff: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Delesyian_Musket: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 1300/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Demenissian_Contribution_Banner_Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Desert_Hammer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dewhaven_Shotgun: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Drakhan_Hammer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Electro-Mecha_Spear: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Factions_1_Duchy_of_Hernand: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Subcontent:Locations_2_Locations_Gallery: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sunrise_Plains_Bandit_Camp: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The_Missing_Seal: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Turbine: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Vellua_Fishermen's_Guild: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Walter_Lanford: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2772ms: Whispering_Grotto
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Words_Left_by_the_Riverside: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bear_Hide_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Belkandor_Plate_Cloak: HTTP 429
+[phase1c] Progress: 1400/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] WARN slow 3820ms: Belui_Leather_Boots
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 5480ms: Savage Woodland Spirit Killer
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Blackwing Leather Armor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Jackals' Leather Armor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Jack Cloth Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ynitium Leather Armor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Autumn Banquet Cloth Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 1500/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Executioner of Darkness Plate Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Frozen Heart Plate Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Old_Friend: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2035ms: Traces_in_the_Manor
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2128ms: Seed_of_Unease
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hope_After_the_Draught: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bustling_Hill: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The_Words_of_Alustin: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Unwelcomed_Guests: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Equinsher_Saddlery: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2007ms: Scholastone_Institute
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Spire_of_the_Stars: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Yann: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wycliffe_Mappery: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED All_Abyss_Artifact_Locations: HTTP 429
+[phase1c] Progress: 1600/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Parvel Greatsword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Warspike Spear: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Sanguine Knell: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small Black Bears' Banner Pike: HTTP 429
+[phase1c] FAILED Small Banner Pike: HTTP 429
+[phase1c] FAILED Small Demenissian Noble's Banner: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small Hernandian Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small Musket of Demeniss Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Valgash's Incomplete Work: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Tiny Greymane Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Windland_Heights: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2038ms: Bay_of_Steel
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 1700/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED All Bell Locations: HTTP 429
+[phase1c] FAILED Seal of Greed - Goldleaf Merchant Guild: HTTP 429
+[phase1c] FAILED Filling Fish Porridge: HTTP 429
+[phase1c] FAILED Filling Marinated Meat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Filling Grilled Fruit: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Filling Vegetable Rice Cake: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Progress: 1800/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2409ms: Root's End
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2327ms: Sword of Trials III
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sliding down the Slope: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Vessel of Dark Pursuit: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rampaging Infinite Arrows: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Goddess of Abundance: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Toll of Calphade: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Elenore Rapier: HTTP 429
+[phase1c] WARN slow 2092ms: Blacksteel_Lattua_Plate_Boots
+[phase1c] Progress: 1900/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 5794ms: Blackwing_Leather_Gloves
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Walkthrough_7_Chapter_6:_Cracks_in_the_Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Theoric: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Tina: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wheat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED White_Wood_Bow: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Armed_Combat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Damiane_Skills: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Evasive_Slash: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Explosive_Strike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Focused_Charged_Shot: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2000/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Forward_Slash: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Imbue_Element: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Imbue_Elements: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED World_Information: HTTP 429
+[phase1c] FAILED Steel_Mountains_Ruins: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Blinding_Flash: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Faction_Quests: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Fan-Blade_Greataxe: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Fated_Shadow: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Gamma_Barrel_Cannon: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Azure_Moon_Labyrinth: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Gregor, the Helbred of Carnage: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Black_Forest: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Bluemont_Cask_House: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Kuku Flame Spear: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Calphade_North_Gate: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] WARN slow 2901ms: Calphade_Siege_Armory
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2100/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dawn_Cave: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium Caliburn Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium Dusksong Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Forentin_Lodge: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium Faceless Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium Hernandian Banner Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Finely Crafted Gold Ring: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Demeniss Cathedral Ring: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Mark of Darkness: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Rogue's_Mace: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rosemond_Pistol: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sandpeak_Gold_Mine: HTTP 429
+[phase1c] Progress: 2200/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shield_of_Sacrifice: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shield_of_the_Phantom: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Andrew's_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 3683ms: Ashad_Plate_Cloak
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ashad_Plate_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ashen_Wolf's_Leather_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] WARN slow 2266ms: Barrette_Cloth_Boots
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Silver_Wolf_Mountain: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:All_Abyss_Artifact_Locations_2_Demeniss: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Survivor's_Solitude: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hearty_Grilled_Seafood: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hearty_Marinated_Meat: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Marina: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Otto: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Recovery_Items: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2300/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Satisfying_Grilled_Bird_Meat: HTTP 429
+[phase1c] FAILED Satisfying_Grilled_Fish: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sealed_Abyss_Artifact_(Equipment): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sealed_Abyss_Artifact_(Trespassing): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shrubby_Sophora: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2321ms: Boren_Leather_Headgear
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 3985ms: Bread_Plate
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Canta_Plate_Cloak: HTTP 429
+[phase1c] FAILED Canta_Plate_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Cassius_Morten: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Demenissian_Gold-Decorated_Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Erik: HTTP 429
+[phase1c] FAILED Fortain_the_Cursed_Knight: HTTP 429
+[phase1c] WARN slow 3166ms: Gabriel_Caliburn
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Half_Moon_Reaper: HTTP 429
+[phase1c] FAILED Hay: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2500ms: Hernandian_Barding
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2400/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hernandian_Parish_of_Solumen: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2221ms: House_Grace
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Kharonso_Troll_Alliance: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The Scrapfold: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED In Ashes: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED New Journey: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hernand Castle: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Muckroot Ranch: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Missing Companion: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dissipated Smoke: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Darroch: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rumors from the Sawmill: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Octavius: HTTP 429
+[phase1c] Progress: 2500/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Kiln Repair at the Kilnden Workshop: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hernand Sewers: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wyvern Blaster: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Alabaster Curved Sword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Alabaster Mace: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Competition Sword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Crude Club: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Lanford Hammer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Inquisitor's Rapier: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Key Items: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Marching Baton: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] FAILED Peltree Sword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sorcerer's Massage Stick: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sword of the Wolf: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Thalwynd Hammer: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2600/3793
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wells Sword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Where_the_Light_Leads: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The_Greymanes'_New_Fangs: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bounty_Notice:_Jeffrey: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bounty_Notice:_Billy: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Troubled_Count: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The_Crimson_Nightmare_(Quest): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hollow Visage: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bekker Greataxe: HTTP 429
+[phase1c] FAILED Bolton Plate Armor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Canta Plate Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED St Halssius Priest's Leather Footwear: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sunset Reed Cloth Gloves: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Abyssbane III: HTTP 429
+[phase1c] WARN slow 2024ms: Ancient Reckoning
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2700/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Aptitude III: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Beastbane I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Companionship I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Equestrian II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Flameward I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 5095ms: Fortification I
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Haste II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Frostward III: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater Destruction: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater Flameward: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater Malicebane: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 2800/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Karmic Pulse: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ledgermain III: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rising Torrent: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shockward III: HTTP 429
+[phase1c] WARN slow 4081ms: Shockward I
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bright_Red_Dye_(Recipe): HTTP 429
+[phase1c] FAILED Drish_Cloth_Cap: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sanctum of Temperance: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sanctum of Benediction: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Steel Grip Against the Chest: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Blessing of the Forest I: HTTP 429
+[phase1c] FAILED Sydmon Dagger: HTTP 429
+[phase1c] FAILED Between Herbs and Poisons: HTTP 400
+[phase1c] FAILED Stamina Recovery I: HTTP 400
+[phase1c] FAILED Camp Bjornlund: HTTP 400
+[phase1c] FAILED Five-Finger Mountain: HTTP 400
+[phase1c] FAILED Second-Finger Cave: HTTP 400
+[phase1c] FAILED Silverwolf Cave: HTTP 400
+[phase1c] FAILED Reventine Monastery: HTTP 400
+[phase1c] FAILED Reventine Winery: HTTP 400
+[phase1c] FAILED Steel Mountains: HTTP 400
+[phase1c] FAILED Bay of Steel: HTTP 400
+[phase1c] FAILED Reventine Monastery Region: HTTP 400
+[phase1c] FAILED Golden Plains: HTTP 400
+[phase1c] FAILED Denn River: HTTP 400
+[phase1c] FAILED Sandpeak Gold Mine: HTTP 400
+[phase1c] FAILED Crimson Mountains Gold Mine: HTTP 400
+[phase1c] FAILED Cliffside Gold Mine: HTTP 400
+[phase1c] FAILED Desert Lake Gold Mine: HTTP 400
+[phase1c] FAILED Corridor of the Void: HTTP 400
+[phase1c] FAILED Remaining Chains: HTTP 400
+[phase1c] FAILED Return of the Greymane: HTTP 400
+[phase1c] FAILED Small Predator: HTTP 400
+[phase1c] Progress: 2900/3793
+[phase1c] FAILED Hills of No Return: HTTP 400
+[phase1c] FAILED Unfamiliar Lands: HTTP 400
+[phase1c] FAILED The Herder's Lament: HTTP 400
+[phase1c] FAILED Leon Roberts: HTTP 400
+[phase1c] FAILED Aldric: HTTP 400
+[phase1c] FAILED Devan: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Words Left by the Riverside: HTTP 400
+[phase1c] FAILED Ross's Request: HTTP 400
+[phase1c] FAILED Main Quests: HTTP 400
+[phase1c] FAILED Reward for their Sweat: HTTP 400
+[phase1c] FAILED The Greymanes' New Fangs: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Carl's Request: HTTP 400
+[phase1c] FAILED Ronnie's Request: HTTP 400
+[phase1c] FAILED Tranan's Request: HTTP 400
+[phase1c] FAILED Ronald's Request: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Hillside Manor: HTTP 400
+[phase1c] FAILED Rhett's Request: HTTP 400
+[phase1c] FAILED Bounty Notice: Warren: HTTP 400
+[phase1c] FAILED Bounty Notice: Billy: HTTP 400
+[phase1c] FAILED Bounty Notice: Simon de Montfort: HTTP 400
+[phase1c] FAILED Bounty Notice: Salvatore: HTTP 400
+[phase1c] FAILED Bounty Notice: Blix: HTTP 400
+[phase1c] FAILED Bounty Notice: Alessio: HTTP 400
+[phase1c] FAILED Bounty Notice: Bianca: HTTP 400
+[phase1c] FAILED Arm Wrestling: HTTP 400
+[phase1c] FAILED Weapon Duel: Spear: HTTP 400
+[phase1c] FAILED Chewy Rice Cakes (Recipe): HTTP 400
+[phase1c] FAILED Fishball Soup (Recipe): HTTP 400
+[phase1c] FAILED Fish Porridge (Recipe): HTTP 400
+[phase1c] FAILED Meat and Vegetable Porridge (Recipe): HTTP 400
+[phase1c] FAILED Wine (Recipe): HTTP 400
+[phase1c] FAILED Fishing Rod: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Strongbox with Wheels: HTTP 400
+[phase1c] FAILED Chance to Make a Fortune: HTTP 400
+[phase1c] FAILED Halssius Trading Post: HTTP 400
+[phase1c] FAILED A rumor in Ivynook: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Howling Hills: HTTP 400
+[phase1c] FAILED Unarmed Duel: Boxing: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Embernest Beacon: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Southern Bandits: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Brightening the Spirits: HTTP 400
+[phase1c] FAILED Sunrise Plains: HTTP 400
+[phase1c] FAILED The Abyss: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Wycliffe Mappery: HTTP 400
+[phase1c] FAILED House Serkis: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Abyss Cresset of Meandering Hills: HTTP 400
+[phase1c] FAILED House Celeste: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED House Roberts: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Stolen Quarry: HTTP 400
+[phase1c] FAILED Emberwind Workshop: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Springtide Mill: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Unwelcomed Guests: HTTP 400
+[phase1c] FAILED Exposed Plot: HTTP 400
+[phase1c] FAILED Goldleaf Merchant Guild: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Unicorn Cliff: HTTP 400
+[phase1c] FAILED Hornsplitter's Guards: HTTP 400
+[phase1c] FAILED Interactive Map: HTTP 400
+[phase1c] FAILED Specter's Hideout: HTTP 400
+[phase1c] FAILED The Crimson Nightmare (Quest): HTTP 400
+[phase1c] FAILED Fort Perwin: HTTP 400
+[phase1c] Progress: 3000/3793
+[phase1c] FAILED Crimson Nightmare: HTTP 400
+[phase1c] FAILED Shadow's Touch I: HTTP 400
+[phase1c] FAILED Windland Heights: HTTP 400
+[phase1c] FAILED Inksworth Bindery: HTTP 400
+[phase1c] FAILED Pailunese Riteblade: HTTP 400
+[phase1c] FAILED Scholastone Archive: HTTP 400
+[phase1c] FAILED Supply Tent: HTTP 400
+[phase1c] FAILED Bleed Bandits: HTTP 400
+[phase1c] FAILED Ancient Rift: HTTP 400
+[phase1c] FAILED Anvil Basin: HTTP 400
+[phase1c] FAILED Anvil Hill Cave: HTTP 400
+[phase1c] FAILED Anvil Riverside: HTTP 400
+[phase1c] FAILED Arboria Castle: HTTP 400
+[phase1c] FAILED Arboria Forest: HTTP 400
+[phase1c] FAILED Arroweye Posthouse: HTTP 400
+[phase1c] FAILED Arboria Craftshop: HTTP 400
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Spearhead Posthouse: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED The Argent Peaks: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2311ms: Vilkom Outpost
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Warspike Spearmaker: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3100/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Guides_and_Walkthrough: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Walkthrough_2_Chapter_1:_The_First_Encounter: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Honey: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Fang: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Orange-Barred_Sulphur_Butterfly: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2464ms: Abyss_Cell
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sealed_Abyss_Artifact_(Desperate_Rescue): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bounty_Notice_-_Billy: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Pailunese Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lizard Leather Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Plate Cloak of Cursed Soul: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sahazhad Plate Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Solas Plate Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wanderer of Faith Leather Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED White Bloodwind Cloth Cloak: HTTP 429
+[phase1c] Progress: 3200/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 3059ms: Ceramic_Water_Pot
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Glazed_Bowl: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Metal_Bowl: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2467ms: Scales
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2029ms: Wide-Mouthed_Water_Bottle
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Wooden_Plate: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Tauria_Curved_Sword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Dark_Ringleader's_Leather_Gloves: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Sanctum_of_Atonement: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Awakened_Lucian_Bastier: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bleed_Bandits: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bolton_Plate_Armor: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Goblin_King's_Treasure_Dagger: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Gorthak_Greataxe: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greathammer_of_Fire: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Altar of Solitude (Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3300/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2049ms: Nest of Valor (Challenge)
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Loop of Life (Challenge): HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hollow_Visage: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Ancient_Mine_Site_Ruins_I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Invisible_Longsword: HTTP 429
+[phase1c] WARN slow 3133ms: Iris_Longsword
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Trukan the Ascended: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Damaged Bowl: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Icy White Glass Lamp: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Interactive Map: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Grain Bowl: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Peach: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lean Meat: HTTP 429
+[phase1c] Progress: 3400/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Unarmed_Combat_Proficiency: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2472ms: Brice
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Elowen: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shot Contest: Gun: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 4724ms: Cloth Pieces
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Balton Longsword: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Chewy_Rice_Cakes: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Crafting_Guide_2_Alchemy: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Subcontent:Crafting_Guide_6_Kuku_Pot: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2572ms: Medium_Hernandian_Banner_Pike
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium_Heavy_Silence_Banner_Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Medium_Wells_Banner_Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2219ms: Propeller_Spear
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rune-Engraved_Rock: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shaman's_Staff: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 3222ms: Small_Delesyian_Banner_Pike
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3500/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small_Calphadean_Banner_Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Small_Hellhounds_Banner_Pike: HTTP 429
+[phase1c] FAILED Small_Royal_Hunting_Ground_Banner_Pike: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Destruction_III: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Energy_Drain_II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Fortification_II: HTTP 429
+[phase1c] FAILED Fortitude_II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater_Abyssbane: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater_Flameward: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Greater_Malicebane: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Haste_II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Hound's_Claws: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Insight_I: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3600/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Primalbane_II: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Spirit_Transference: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Goldleaves'_Short_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2105ms: Goyen's_Plate_Boots
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Grey_Wolf_Leather_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Helfryn_Leather_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Icewing_Plate_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Iguana_Rider_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Kadallon's_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Katitz_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Kuku_Rishi's_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lasian_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Leather_Cloak_of_the_Fallen_Kingdom: HTTP 429
+[phase1c] WARN slow 6551ms: Leather_Cloak_of_Earth's_Honor
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3700/3793
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Light_of_the_Battlefield_Plate_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lizard_Leather_Cloak: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Lutia_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Matia_Leather_Boots: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Blue_Scout_Cloak: HTTP 429
+[phase1c] FAILED Bolton_Leather_Boots: HTTP 429
+[phase1c] FAILED Mallet: HTTP 429
+[phase1c] FAILED Master_Du: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Bekker_Shield: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Rocca's_Hill_Beacon: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 2s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] FAILED Shabby_Horse_Saddle: HTTP 429
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 3793/3793
+
+────────────────────────────────────────────────────────────
+Total classified:    3231
+Failed:              562
+Unparseable:         0
+
+Distribution (new_content_type):
+  item            1667
+  <failed>        562
+  uncertain       480
+  quest           279
+  exploration     273
+  mechanic        235
+  recipe          146
+  character       92
+  boss            50
+  puzzle          9
+
+Change rate:                                39.8% (1285/3231)
+Uncertain (nav-only, delete candidates):    479 (14.8%)
+Uncertain (genuinely thin/mixed, manual):   1 (0.0%)
+
+Disagreement breakdown (sorted desc):
+  character → item               221
+  character → exploration        147
+  character → uncertain          139
+  quest → uncertain              138
+  mechanic → uncertain           99
+  item → recipe                  51
+  recipe → item                  47
+  item → uncertain               45
+  mechanic → item                41
+  character → quest              39
+  quest → exploration            37
+  mechanic → quest               35
+  recipe → character             30
+  recipe → uncertain             27
+  character → boss               24
+  boss → uncertain               22
+  character → mechanic           18
+  mechanic → exploration         13
+  item → quest                   11
+  quest → character              11
+  exploration → uncertain        10
+  quest → item                   10
+  quest → puzzle                 9
+  item → mechanic                8
+  recipe → quest                 8
+  mechanic → character           6
+  quest → mechanic               6
+  exploration → item             6
+  recipe → mechanic              4
+  mechanic → recipe              4
+  boss → mechanic                4
+  mechanic → boss                4
+  recipe → exploration           3
+  quest → boss                   3
+  character → recipe             2
+  quest → recipe                 2
+  recipe → boss                  1
+
+15 random disagreement samples:
+  - Interactive Map
+      character → uncertain [reason: nav-only page with interactive map tool, no specific subject content]
+      "Interactive Map  [...] quests, wares, and more. Check the map to find their exact location and also …"
+  - Competition_Sword
+      character → item
+      "Competition Sword  [...] Ore x6 Abyss Artifact x1 24,828 +10 Attack: 30 Critical Rate: Lv.2 Aeserion…"
+  - Muskan
+      character → boss
+      "Muskan  punch. Once you have successfully avoided his series of punches, move close to him and use y…"
+  - Interactive Map
+      character → uncertain [reason: nav-only page with map interface, no specific subject content]
+      "Interactive Map  [...] quests, wares, and more. Check the map to find their exact location and also …"
+  - Satisfying Fish Porridge
+      item → recipe
+      "Satisfying Fish Porridge  ### Satisfying Fish Porridge         Provisions         Health: +420.0 Ice…"
+  - All Abyss Artifact Locations
+      mechanic → exploration
+      "All Abyss Artifact Locations  [...] Sealed Abyss Artifact. This place can also be reached by heading…"
+  - Demeniss_Royal_Guard_Shield
+      character → item
+      "Demeniss Royal Guard Shield  [...] Ore x6 Abyss Artifact x1 26,164 +10 Defense 15  Movement Speed Lv…"
+  - Fish_Skewers_(Recipe)
+      item → recipe
+      "Fish Skewers (Recipe)  (Recipe) Braised Ribs (Recipe) Bright Red Dye (Recipe) Bullet (Recipe) Chewy …"
+  - Grasping_Moon
+      character → item
+      "Grasping Moon  [...] Recent changes - Random page - Help about MediaWiki  Home > Equipment > Weapons…"
+  - Eastern_Witch's_Fan
+      character → item
+      "Eastern Witch's Fan  [...] x45 Ivory x36 Flawless Timber x20 Abyss Artifact x1 33,300 +10 Attack: 33…"
+  - Lioncrest Watchtower
+      character → exploration
+      "Lioncrest Watchtower  ### Lioncrest Watchtower           A watchtower once used in the war. It has f…"
+  - Gourmet III
+      mechanic → item
+      "Gourmet III  [...] the benefits gained from meals. Abyss Cores are use to grant additional effects t…"
+  - Renee
+      character → uncertain [reason: nav-only]
+      "Renee  - World- World Information - Locations - Greymane Camp - Abyss Nexus - Interactive Map - Fact…"
+  - Interactive Map
+      mechanic → uncertain [reason: nav-only page with interactive map tool, no specific subject content]
+      "Interactive Map  [...] quests, wares, and more. Check the map to find their exact location and also …"
+  - Interactive Map
+      boss → uncertain [reason: nav-only page with mixed content overview]
+      "Interactive Map  ### Crimson Desert Interactive Map     The Crimson Desert Full Map is an interactiv…"
+
+Tokens:              input=3294008, output=19057
+Estimated cost:      $2.7114
+Total wall time:     4925.6s
+File written:        ./phase1c-corpus-classifications.json
+
+────────────────────────────────────────────────────────────
+Genuinely-uncertain rate: PASS (0.0%)
+Change rate: PASS (39.8%)
+Haiku-wrong rate: review 15 disagreement samples manually

@@ -4,6 +4,90 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: IVFFlat with lists=sqrt(rows) is REQUIRED for stable retrieval (Session 26 — REINDEX round)
+
+- **At lists=100 against 63K rows, probe tuning could not stabilize the eval.** Every probes value tested (10, 20, 30) had pathological behavior: 10 had cluster-shift regressions after content_type churn, 20 had ±6.7pp run-to-run variance from Voyage embedding micro-variation, 30 had statement timeouts. Rebuilding the index with `lists=237` (≈ sqrt(63,552)) eliminated all three problems simultaneously: 0pp variance across 3 consecutive runs, no timeouts, +15.6pp recall on the lower bound.
+- **Saving REINDEX "until end of Phase 1" was a mistake** — should have rebuilt sooner once the corpus shape stabilized after Phase 1c. The 2-3 sessions spent on probes tuning were chasing a problem the actual fix would resolve in 5 minutes of CREATE INDEX.
+- **Lesson: IVFFlat is sized for the data shape, not the final-target shape. Resize whenever you've removed >10% of rows.** Phase 1a removed 19,634 rows (22%), Phase 1b removed 7,209 more (10%), Phase 1c retagged 11,669 chunks (didn't change row count but invalidated cluster centroids). Cumulatively the index was 32% mis-sized before this REINDEX.
+- **Two unexpected eval wins emerged after REINDEX**: Toll of Hernand (0% → 67%) and best body armor (0% → 67%). Both queries had been at the "cluster boundary" — the right chunks existed in the corpus but lived in clusters that probes=10 at lists=100 wasn't reliably scanning. Smaller, tighter clusters at lists=237 surfaced them deterministically. **Translation: a portion of every "still-failing" query in earlier rounds was actually index-sizing failure, not a content/classifier failure.** Always REINDEX before drawing conclusions about what content or classifier changes a corpus needs.
+- **`maintenance_work_mem` matters for IVFFlat builds.** Default Supabase setting (32MB) was insufficient for 63K × 1024-dim — Postgres errored with "memory required is 61 MB". Bumping to 256MB worked. For an HNSW migration this would be even higher.
+- **MCP `apply_migration` wraps DDL in a transaction with a default timeout that's too short for IVFFlat CREATE INDEX.** Workaround: drop via execute_sql (atomic), then issue CREATE via execute_sql with `SET maintenance_work_mem` and `SET statement_timeout='15min'` in the same query. The MCP call itself will time out after ~2 minutes, but the build continues on Postgres independent of the connection. Poll `pg_stat_activity` for completion. Record the operation as an audit-only migration after the fact for changelog hygiene.
+
+---
+
+## RAG: Eval Seed Quality Is Part of the System (Session 26 — eval audit round)
+
+- **A "failing" query with a boilerplate seed measures the seed, not the system.** Phase 1 caught 4 bad seeds across 15 queries (Q1 Saint's Necklace originally, Q4 Toll of Hernand replaced earlier, Q11 best one-handed weapons, Q13 Faded Abyss Artifact). When chasing remaining 0%-recall queries through retrieval/classifier/index changes, every dollar of effort spent before auditing the seeds produces at best a misattributed win (system change "fixes" a query that the seed itself was preventing) and at worst no movement at all (system change does nothing because the seed will never be reachable regardless of retrieval quality).
+- **Routine eval seed audits should happen after every major corpus change.** Phase 1c retagged 11,669 chunks across content_types — many of those chunks were eval seeds whose neighbors in the chunk-content-type pool changed dramatically. Phase 1d will re-embed ~6,000 chunks; an audit pass after that is non-negotiable. **Pattern: corpus mutation → eval seed audit → measurement → next phase.**
+- **The audit's value isn't the recall number bump (+7.7pp this round) — it's that subsequent phases now produce trustworthy attribution.** When Reed Devil stayed at 0% after a 3-seed extension with all-substantive content chunks, that is *information*: it tells us the residual failure is Phase 1d territory (trailing-boilerplate dilution) and not seed-quality. Without the audit, that diagnosis would have been muddied by the lingering question "is the seed even right?".
+- **Audit pattern that works**: pull every chunk on the seed's source_url ordered by content length, visually compare each first-200 chars to the query, identify the actual best-answer chunk(s). Most pages have 5–15 chunks ranging from substantive content (~600+ chars) to pure nav/footer (~250–300 chars). The right seed is almost never the single longest chunk (often that's a real-content + trailing-boilerplate concatenation) — it's the chunk whose first 200 chars contain a direct answer to the query.
+- **Multi-seed arrays are more robust than single-seed.** Where the source page has 2-3 substantive content chunks (description + walkthrough + drops), seed all of them. Multi-seed gives the eval a "any of these found = success" semantic, which matches what users actually want from retrieval. Single-seed forces a specific chunk to rank, which is fragile to corpus shifts.
+- **Sometimes the right move is to SHRINK the seed array.** Sanctum of Temperance had 3 seeds where one was pure boilerplate; replacing it with another boilerplate chunk would have been worse than dropping the boilerplate entirely and letting the eval measure honesty (1/2 = 50% is a real signal; 1/3 = 33% with one impossible-to-rank chunk in the denominator is noise).
+- **Cross-subdomain canonicalization matters more than expected.** Faded Abyss Artifact's best functional-description chunk (`6db9fcd5`) lives at the `/Faded_Abyss_Artifact` URL but is `mechanic`-tagged, while `a1cf377e` and `58537084` at the *same URL* are `item`-tagged. Phase 1c canonicalized URLs to one content_type but missed the dual-subdomain pattern (`crimsondesert.wiki.fextralife.com` vs `crimsondesertgame.wiki.fextralife.com`). This is a Phase 2+ ingest concern — when re-crawling, dedupe across subdomains before chunking.
+
+---
+
+## REINDEX rollback artifact (session 26)
+
+If the lists=237 REINDEX needs to be reverted, recreate with the previous lists=100 definition:
+
+```sql
+DROP INDEX IF EXISTS idx_chunks_embedding;
+CREATE INDEX idx_chunks_embedding
+  ON public.knowledge_chunks
+  USING ivfflat (embedding vector_cosine_ops)
+  WITH (lists = 100);
+-- Then re-set probes inside match_knowledge_chunks() to 20:
+-- PERFORM set_config('ivfflat.probes', '20', true);
+```
+
+The probes=20 vs probes=10 setting is independent of the index lists — both can be tuned separately.
+
+---
+
+## RAG: IVFFlat Probe Tuning Cannot Compensate for Bad `lists` Sizing (Session 26 — probes round)
+
+- **Mass content_type changes (>~10% of a pool) trigger IVFFlat cluster instability that requires probe tuning. The pattern recurs at higher density thresholds** — probes=10 was sufficient post-Phase-1a (removed 19,634 chunks across all types) but insufficient post-Phase-1c (removed ~5,000 chunks from character alone). Future bulk reclassification or deletion should anticipate a probes adjustment as part of the round.
+- **Probes-bumping past a point introduces statement timeouts.** probes=30 at threshold=0.25 made the IVFFlat scan slow enough that the first warm-up RPC after a `CREATE OR REPLACE FUNCTION` triggered a 30s statement timeout. probes=20 didn't have this issue. The right-of-way isn't more probes — it's smaller `lists` so each cluster is closer to query centroids on average.
+- **Triple-run stability check is the right diagnostic for IVFFlat queries.** Single-run results lie when probe coverage is borderline. At probes=20, the same Oongka query produced pool=28 success in 1/3 runs and pool=8 fallback in 2/3 runs across consecutive eval invocations. Voyage embedding micro-variation (<0.001 between calls) is enough to shift IVFFlat's cluster ordering when the relevant cluster centroid is near the boundary of the top-N probed clusters. Always run an eval ≥3 times when comparing probes settings; report the distribution, not the point.
+- **The actual fix is REINDEX with `lists=237` (≈ rows/1000 for 63K rows).** Current `lists=100` was set when the DB had ~17K rows and is undersized for 63K. With `lists=100` each cluster averages 635 vectors — too many for the centroid to be representative; some clusters become "topic mixtures" that match no query well. Smaller buckets (≈265 vectors per cluster at lists=237) tighten cluster cohesion. Deferred to end of Phase 1.
+- **Probes setting interacts with `match_threshold`.** At threshold=0.25, the SQL has to filter many candidates per cluster — slow. At threshold=0.5 (the function default), much fewer candidates pass — fast even with high probes. The eval intentionally uses 0.25 to surface marginal candidates for analysis; production may want 0.5 for stability.
+- **Net result**: Settled on probes=20 because probes=30 has timeouts, probes=10 has the Oongka regression. probes=20 has variance — recall ranges 31.1%–37.8% across runs depending on whether Oongka's cluster gets scanned. **Lower bound (31.1%) is unchanged from probes=10 era; upper bound (37.8%) is new.** Real fix is REINDEX, not probe tuning.
+
+---
+
+## RAG: Eval Seed Quality Is Independent of Classifier And Retrieval (Session 26 — Faded Abyss Artifact diagnosis)
+
+- **A seed that points at a real chunk is not the same as a seed that points at the *right* chunk for the query.** Faded Abyss Artifact's seed `a417c884` was the longest chunk on the Faded_Abyss_Artifact URL (942 chars) but contained zero functional description of what the artifact does — it's a trailing list of related items + a "notes/tips/trivia goes here" placeholder + a navigation list of all gatherables. Even at perfect retrieval the eval would correctly NOT rank this chunk for "how does the Faded Abyss Artifact work?", because the chunk doesn't answer the query.
+- **Eval seed audit pattern that works**: pull top-10 chunks at the same source_url ordered by content length, visually compare each to the query, identify the actual best-answer chunk(s). The right seed for "how does X work?" is the chunk whose first 200 chars contain a functional description of X.
+- **Re-seeding after Phase 1c is a pattern to expect**, because URL retags can shift which chunks live in the right content_type pool. The original seed for Faded Abyss Artifact may have been chosen when the chunk was mechanic-typed pre-1c; after the retag to item, better-content chunks at the same URL are now also item-typed and should be the new seed.
+- **Two of Faded Abyss Artifact's substantive chunks are still mechanic-typed** post-1c — likely because they came from the `crimsondesertgame.wiki.fextralife.com` subdomain (different from the canonical `crimsondesert.wiki.fextralife.com`) and weren't enumerated in Phase 1c's distinct-URL fetch. **Cross-subdomain URL canonicalization is a Phase 2+ ingest concern** that this round surfaces but doesn't address.
+
+---
+
+## RAG: Classifier Waterfalls Have Ordering Dependencies (Session 26 — classifier alignment round)
+
+- **Corpus alignment and classifier alignment are TWO halves of the same fix; doing only one delivers a fraction of the gain.** Faded Abyss Artifact was the textbook case: corpus right (`item` after Phase 1c retag), classifier wrong (`mechanic` regex caught `abyss artifact` keyword + `how does .+ work`), query still failed. Saint's Necklace was the inverse — classifier had been routing it to item but `getItemPhrases`' `where (is|are) the` was too greedy, scoping a too-narrow item subpool that excluded the canonical chunks. Removing that one phrase pattern + reordering exploration above item lifted it from 0% → 100% recall.
+- **Moving EXPLORATION before ITEM was required for Sanctum-style location queries.** "Where is the Sanctum of Temperance?" matches both `where (is|are) the` (item) AND `sanctum` (exploration). With item first, every Sanctum query was scoping to a subpool that didn't contain location chunks. The reorder is the entire fix; no keyword change required for that query specifically.
+- **Adding new keywords (`artifact`) at the right layer of the waterfall is more reliable than broadening earlier layers.** The original instinct was to narrow the mechanic regex (remove `how does .+ work`) — but that breaks legitimate "how does the parry system work" queries. Better fix: add `artifact` to itemKeywords AND reorder so item fires before mechanic. Each layer keeps its broad rule; the order resolves the ambiguity.
+- **When you reorder a waterfall, audit for downstream interactions.** Moving ITEM above MECHANIC for the artifact fix accidentally meant RECOMMENDATION fired AFTER ITEM, so "best one-handed weapons" matched `weapon` in itemKeywords and routed to item before recommendation could null-out. Caught the bug before measuring; required also lifting RECOMMENDATION + BEST [modifier] above ITEM. Lesson: the safe order is null-returning patterns first, then specific-type patterns last; never let a `return "type"` block precede a `return null` block that depends on the same keywords.
+- **Eval has its own copy of `classifyContentType()` in `scripts/run-eval.ts`** — it is NOT imported from `route.ts`. Any classifier change must be mirrored in both files or the eval will measure the OLD classifier against the new corpus, producing meaningless numbers. Add a comment marker to remind future-you, or refactor to a shared module (deferred — not blocking).
+- **Cluster instability after large content_type churn**: post-Phase-1c, the `character` content_type lost ~5,000 chunks (mostly retagged to item/exploration/quest). The remaining 33 Oongka chunks are still character-typed but the IVFFlat cluster centroid for the `character` filter shifted enough that the filtered RPC at probes=10 returned 0 results for "who is Oongka?", forcing fallback. Pre-1c: pool=28, top-sim 0.775. Post-classifier-alignment: pool=8 (fallback), top-sim 0.540. Same pattern as the Phase 1a NG+ regression (cluster shift after mass change). **Bumping probes 10→20 is the likely fix; deferred to a separate measured round so the impact is attributable.**
+- **Net classifier-alignment delta**: +2.2pp recall (28.9% → 31.1%), +0.066 MRR (0.171 → 0.237). MRR jump is bigger than recall jump because Saint's Necklace went 0% → 100% with all 3 expected chunks in top-4 (RR=1.000), so the round produced one big rank-1 win. Two clean wins (Saint's Necklace, Sanctum), one regression (Oongka), zero changes elsewhere.
+
+---
+
+## RAG: Phase 1a Byte-Identical Dedup Is Necessary But Insufficient (Session 26)
+
+- **Multi-category crawl pollution survives byte-identical dedup**: when a single Fextralife page is enumerated under N category indexes (e.g. `/Bosses`, `/Quests`, `/Characters`), the crawler produces N cached JSON files. The chunker may produce *near-identical-but-not-byte-identical* text from each, so Phase 1a's `(content, source_url)` byte-identical group-by leaves them in place, each tagged with a different `content_type`. Phase 1c's audit caught this in **69 URLs / 1,230 chunks** out of the 1,007 reclassified URLs. The page would partially-update under Phase 1c's matched-old-type safety check, leaving residual chunks at non-target types.
+- **Symptom to look for**: after a content_type UPDATE that uses a matched-old-type safety clause, a non-trivial slice of URLs end up in a "mixed_partial" state — they have the new type AND other types simultaneously. Audit query: `GROUP BY source_url HAVING COUNT(DISTINCT content_type) > 1 AND BOOL_OR(content_type = new_type)`.
+- **Spot-check before re-running UPDATE without the safety clause**: 15-chunk visual inspection across (largest residual URL, semantic-far residuals, random) showed ~80% real content / 7% boilerplate / 13% mixed. Real-content dominance justified relabeling; boilerplate/mixed minorities deferred to Phase 1d's trailing-boilerplate stripper. Without the spot-check, blind UPDATE would have been correct anyway here, but the discipline prevents over-confidence — same discipline that saved 1,300 chunks in Phase 1b's `p3∧p5` cutoff.
+- **Phase 2+ ingest must canonicalize at URL level, not chunk level**: the right long-term fix is enforcing one URL = one canonical content_type at ingest, before chunking. Chunk-level canonicalization is doomed because near-identical chunks from different category crawls embed slightly differently.
+- **Page-level vs chunk-level content_type is a forced choice with trade-offs**: Phase 1c assumes one URL = one canonical type. For pages whose content actually spans types (e.g. `/Mystical_Key` documented as both a key item AND a quest objective; `/Greymane_Camp` as both a location AND home to characters), chunk-level tagging would be more accurate. **This is a Phase 2+ refinement, not a Phase 1c blocker** — page-level canonicalization gets you most of the win at a fraction of the engineering cost. Revisit when we have a corpus where chunk-level disambiguation is the dominant remaining error mode.
+- **Bucket A apply on 1,007 URLs / 11,669 chunks delivered +2.2pp recall** (26.7% → 28.9%). Modest delta; most of the projected lift is pending classifier alignment. Did-NOT-move analysis on the 9 previously-failing queries showed 4 of 6 still-failing are direct classifier-alignment targets (Sanctum of Temperance, Faded Abyss Artifact, best-X tier-list queries), 2 are eval-seed/Phase-1d targets (Kailok, Reed Devil). This split confirms the "measure corpus update in isolation, then classifier alignment in isolation" methodology — without the split we'd attribute everything to "Phase 1c" and miss that the classifier knobs are the bigger remaining lever.
+
+---
+
 ## Meta: Measure in Isolation Before Optimizing
 
 Hypotheses are cheap, measurements are truth. Every round in this project that produced a measurable win came from (1) forming a specific hypothesis, (2) making one change, (3) measuring against a stable eval set, (4) investigating regressions before proceeding. Every round that produced noise came from stacking fixes without measurement between them.

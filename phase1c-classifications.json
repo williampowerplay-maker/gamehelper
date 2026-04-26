@@ -1,0 +1,902 @@
+[
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Golden-Knotted_Ancestral_Bow",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Golden-Knotted_Ancestral_Bow",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 576
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Large_Farming_Rake_Scythe",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Large_Farming_Rake_Scythe",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 614
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Rising_Torrent",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Rising_Torrent",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 566
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Subcontent:Accessories_2_Accessories_Table",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Subcontent:Accessories_2_Accessories_Table",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with minimal substantive content about accessories",
+    "latency_ms": 821
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Agstree_Leather_Boots",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Agstree_Leather_Boots",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 545
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Frostward+I",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Frostward I",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 1564
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Spear_of_the_Fleeting",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Spear_of_the_Fleeting",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 827
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Vendors",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Vendors",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 603
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Disarm+I",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Disarm I",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 597
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Notepad",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Notepad",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page listing tools without substantive content",
+    "latency_ms": 895
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Solas+Plate+Armor",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Solas Plate Armor",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 418
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Medium+Varnian+Banner+Pike",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Medium Varnian Banner Pike",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 616
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Composure+II",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Composure II",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 466
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Unyielding+Warrior's+Plate+Boots",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Unyielding Warrior's Plate Boots",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 432
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Bethel_Leather_Boots",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Bethel_Leather_Boots",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 1064
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Spear_of_Righteousness",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Spear_of_Righteousness",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 548
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Subcontent:Abyss_Core_1_Abyss_Core_Gallery",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Subcontent:Abyss_Core_1_Abyss_Core_Gallery",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 481
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Grilled_Fruit_(Recipe)",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Grilled_Fruit_(Recipe)",
+    "new_content_type": "uncertain",
+    "haiku_reason": "excerpt is nav-only list without recipe details",
+    "latency_ms": 634
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Rhinoceros_Beetle",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Rhinoceros_Beetle",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 489
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Nagmore_Leather_Boots",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Nagmore_Leather_Boots",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 551
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Hernandian+Guard+Captain's+Cloth+Cloak",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Hernandian Guard Captain's Cloth Cloak",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 750
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Shadowleaf+Bow",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Shadowleaf Bow",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 413
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Sanguine+Knell",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Sanguine Knell",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 592
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Leather_Helm_of_the_Fallen_Kingdom",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Leather_Helm_of_the_Fallen_Kingdom",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 588
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Metal+Ware",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Metal Ware",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 500
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Fine+Stone",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Fine Stone",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 545
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Golden_Green_Plate_Cloak",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Golden_Green_Plate_Cloak",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 447
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Plate_Boots_of_the_Fallen_Kingdom",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Plate_Boots_of_the_Fallen_Kingdom",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 539
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Weapons",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Weapons",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 424
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/St+Halsius's+Priest's+Hat",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "St Halsius's Priest's Hat",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 457
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Jester_Leather_Cloak",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Jester_Leather_Cloak",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 454
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Leather_Armor_of_the_Fallen_Kingdom",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Leather_Armor_of_the_Fallen_Kingdom",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 496
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Goyen%27s_Plate_Boots",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Goyen's_Plate_Boots",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 520
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Shrubby+Sophora",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Shrubby Sophora",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 458
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Steelbane_I",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Steelbane_I",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 590
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Propeller_Spear",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Propeller_Spear",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 835
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Blackwing_Mask",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Blackwing_Mask",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 465
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Vow_of_the_Dead_King",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Vow_of_the_Dead_King",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 771
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Memories+of+Abundance",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Memories of Abundance",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 425
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Category:Footwear",
+    "old_content_type": "item",
+    "is_tier_list_candidate": false,
+    "page_name": "Category:Footwear",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 621
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Hernandian_Signet",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Hernandian_Signet",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 421
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Grasping_Moon",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Grasping_Moon",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 429
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Bounty+Notice:+Bianca",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Bounty Notice: Bianca",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 598
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Drake_Shield",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Drake_Shield",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 820
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/A+Fresh+Start",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "A Fresh Start",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 458
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Interactive+Map?id=208&amp;code=mapA",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Interactive Map",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with map interface, no specific subject content",
+    "latency_ms": 747
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Pororin+Forest",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Pororin Forest",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 538
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Spencer+Pistol",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Spencer Pistol",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 435
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Charles_Celeste",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Charles_Celeste",
+    "new_content_type": "character",
+    "haiku_reason": null,
+    "latency_ms": 687
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Brightening_the_Spirits",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Brightening_the_Spirits",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 447
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Arboria+Castle",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Arboria Castle",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 434
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Interactive+Map?id=531&amp;code=mapA",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Interactive Map",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with map interface, no specific subject content",
+    "latency_ms": 680
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Balton_Large_Shield",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Balton_Large_Shield",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 471
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Serge's+Request",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Serge's Request",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 448
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Staglord%27s_Shield",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Staglord's_Shield",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 647
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Artisan%27s_Ornamented_Shield",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Artisan's_Ornamented_Shield",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 576
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Trial+After+Trial",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Trial After Trial",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 566
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Hernandian_Parish_of_Solumen",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Hernandian_Parish_of_Solumen",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 462
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Pollengarth+Apiary",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Pollengarth Apiary",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 630
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Dragon's+Fang",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Dragon's Fang",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 409
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Diverging_Moon",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Diverging_Moon",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 411
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Hornsplitter's+Guards",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Hornsplitter's Guards",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 459
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Canta_Plate_Helm",
+    "old_content_type": "character",
+    "is_tier_list_candidate": false,
+    "page_name": "Canta_Plate_Helm",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 561
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Faded+Abyss+Artifact",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Faded Abyss Artifact",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 439
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Turning+Slash",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Turning Slash",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 754
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Subcontent:Faction_Quests_5_Delesyia",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Subcontent:Faction_Quests_5_Delesyia",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 782
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Lightning+Pulse",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Lightning Pulse",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 695
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Dancing+Blade+Shining+Shield+I",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Dancing Blade Shining Shield I",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with link list, no substantive content about the item itself",
+    "latency_ms": 692
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Silver+Trigger",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Silver Trigger",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 648
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Sealed+Abyss+Artifacts",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Sealed Abyss Artifacts",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 521
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Scissor_Takedown",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Scissor_Takedown",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 562
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Turning_Slash",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Turning_Slash",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 535
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Mystical+Storage",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Mystical Storage",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 679
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Turning+Slash+Expertise",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Turning Slash Expertise",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 656
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/New_Player_Help",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "New_Player_Help",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only guide page with mixed topics",
+    "latency_ms": 582
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Return+of+the+Greymane",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Return of the Greymane",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 575
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Interactive+Map?id=935&amp;code=mapA",
+    "old_content_type": "mechanic",
+    "is_tier_list_candidate": false,
+    "page_name": "Interactive Map",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with map tool, lacks substantive content",
+    "latency_ms": 1033
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Crow's+Nest+(Challenge)",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Crow's Nest (Challenge)",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 581
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Crafting_Guide",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Crafting_Guide",
+    "new_content_type": "mechanic",
+    "haiku_reason": null,
+    "latency_ms": 662
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Silver+Trigger",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Silver Trigger",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 648
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Raspberry",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Raspberry",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 561
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Interactive+Map?id=543&amp;code=mapA",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Interactive Map",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with mixed content overview",
+    "latency_ms": 640
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Where_the_Light_Leads",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Where_the_Light_Leads",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only",
+    "latency_ms": 628
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Factions",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Factions",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page listing factions without substantive details",
+    "latency_ms": 851
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Bounty+Notice:+Alessio",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Bounty Notice: Alessio",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 728
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Interactive+Map?id=350&amp;code=mapA",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Interactive Map",
+    "new_content_type": "uncertain",
+    "haiku_reason": "nav-only page with interactive map tool, no specific subject content",
+    "latency_ms": 643
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Spire+of+Clockwork+(Challenge)",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Spire of Clockwork (Challenge)",
+    "new_content_type": "puzzle",
+    "haiku_reason": null,
+    "latency_ms": 603
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/The+Crow's+Warning",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "The Crow's Warning",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 614
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Night+of+the+Silent+Banner+Pike",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Night of the Silent Banner Pike",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 548
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Sanctum+of+Penitence+(Quest)",
+    "old_content_type": "quest",
+    "is_tier_list_candidate": false,
+    "page_name": "Sanctum of Penitence (Quest)",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 514
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Spider_Web",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Spider_Web",
+    "new_content_type": "item",
+    "haiku_reason": null,
+    "latency_ms": 450
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Grilled_Meat",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Grilled_Meat",
+    "new_content_type": "recipe",
+    "haiku_reason": null,
+    "latency_ms": 493
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Tranan%27s_Request",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Tranan's_Request",
+    "new_content_type": "quest",
+    "haiku_reason": null,
+    "latency_ms": 457
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Filling_Grilled_Fruit",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Filling_Grilled_Fruit",
+    "new_content_type": "recipe",
+    "haiku_reason": null,
+    "latency_ms": 408
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Chewy+Rice+Cakes",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Chewy Rice Cakes",
+    "new_content_type": "recipe",
+    "haiku_reason": null,
+    "latency_ms": 514
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Milford",
+    "old_content_type": "recipe",
+    "is_tier_list_candidate": false,
+    "page_name": "Milford",
+    "new_content_type": "character",
+    "haiku_reason": null,
+    "latency_ms": 468
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Gabriel+Caliburn",
+    "old_content_type": "boss",
+    "is_tier_list_candidate": false,
+    "page_name": "Gabriel Caliburn",
+    "new_content_type": "boss",
+    "haiku_reason": null,
+    "latency_ms": 448
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Trukan+the+Ascended",
+    "old_content_type": "boss",
+    "is_tier_list_candidate": false,
+    "page_name": "Trukan the Ascended",
+    "new_content_type": "boss",
+    "haiku_reason": null,
+    "latency_ms": 475
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Church_of_Calphade",
+    "old_content_type": "exploration",
+    "is_tier_list_candidate": false,
+    "page_name": "Church_of_Calphade",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 429
+  },
+  {
+    "source_url": "https://crimsondesert.wiki.fextralife.com/Vilkom+Outpost",
+    "old_content_type": "exploration",
+    "is_tier_list_candidate": false,
+    "page_name": "Vilkom Outpost",
+    "new_content_type": "exploration",
+    "haiku_reason": null,
+    "latency_ms": 639
+  }
+]

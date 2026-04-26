@@ -91,8 +91,8 @@ function classifyContentType(question: string): string | null {
   if (/\b(vs\.?|versus)\b|better than\b|compare.{0,30}(weapon|armor|skill|class)|(sword|spear|bow|axe|staff|dagger|ring|necklace|earring|armor|armour)\s+(or|vs)\s+\w|\bor\b.{0,30}\b(which (is |one )?(better|stronger|best|worse|worse))|which (is|one) (better|stronger|best)/.test(q)) return null;
   if (/\b(food (buff|bonus|effect|for|before|during|guide)|best food (for|to eat|before)|what (food|meal) (should|to|is good)|elixir (effect|buff|guide)|buff food|combat food|healing food|consumable (guide|tips?|buff|strategy)|what (to eat|should i eat|food (to use|gives))|food (that (gives|boosts?|increases?)|for (combat|fighting|bosses?|dungeons?)))\b/.test(q)) return null;
 
-  const bossNames = ["kailok","hornsplitter","ludvig","gregor","fortain","gabriel","lucian","bastier","walter","lanford","master du","antumbra","crimson warden","crimson nightmare","hexe marie","trukan","saigord","staglord","reed devil","blinding flash","grave walker","icewalker","white horn","stoneback crab","taming dragon","tenebrum","crowcaller","draven","cassius","kearush","myurdin","excavatron","priscus","muskan","cubewalker","lithus","black fang","hemon","beindel","gwen kraber","white bearclaw","queen spider","crookrock","desert marauder","rusten","abyss kutum","kutum","goyen","matthias","white bear","t'rukan"];
-  // Removed region names: hernand, demeniss, delesyia, pailune (0 boss-type chunks each)
+  // Session 26: bossNames extended with Phase 1c retags (corpus content_type='boss').
+  const bossNames = ["kailok","hornsplitter","ludvig","gregor","fortain","gabriel","lucian","bastier","walter","lanford","master du","antumbra","crimson warden","crimson nightmare","hexe marie","trukan","saigord","staglord","saigord the staglord","reed devil","blinding flash","grave walker","icewalker","white horn","stoneback crab","queen stoneback crab","taming dragon","tenebrum","crowcaller","draven","cassius","kearush","myurdin","excavatron","priscus","muskan","cubewalker","lithus","black fang","hemon","beindel","gwen kraber","white bearclaw","queen spider","crookrock","desert marauder","rusten","abyss kutum","kutum","goyen","matthias","white bear","t'rukan","lava myurdin","ator","ator archon","marni's clockwork mantis","marni's excavatron","awakened lucian bastier","awakened ludvig","one armed ludvig","new moon reaper","full moon reaper","half moon reaper","beloth the darksworn","dreadnought","thunder tank","turbine","pororin forest guardians","fundamentalist goblins","golden star"];
   const bossVerbs = /\b(beat|defeat|kill|fight|fighting|phase|weak ?point|cheese|stagger|parry|dodge)\b/;
   if (bossVerbs.test(q) || bossNames.some((n) => q.includes(n))) return "boss";
 
@@ -101,17 +101,26 @@ function classifyContentType(question: string): string | null {
   if (/\b(new game\+?|ng\+|post.?game|after (beating|finishing|completing) the (game|story|main quest)|endgame (content|guide|tips?|activities?)|what (to do|is there) after (the )?(game|story|ending)|end game content|postgame|game\+)\b/.test(q)) return "mechanic";
   if (/\b(camp (management|system|upgrade|level|buildings?|feature|guide|expand|expansion)|greymane camp (guide|upgrade|system|how|expand)|faction (system|reputation|rank|guide|how)|how (do i|to) (upgrade|level up|build up|improve|expand|grow|develop) (my |the )?camp|base (building|management|upgrade|system)|camp (resources?|workers?|npc|unlock)|expand(ing)? (the |my |greymane )?camp|how (big|large) (can|does) (the |my )?camp (get|become|grow))\b/.test(q)) return "mechanic";
   if (/\b(mount(s)? (system|guide|tips?|unlock|how|work)|how (do i|to|do) (get|obtain|unlock|tame|ride|use) (a |the )?(mount|horse|pet|steed)|how do(es)? (mounts?|horses?|pets?) work|pet (system|guide|combat|unlock|how)|horse (guide|system|tips?|riding|unlock|taming)|riding (system|guide|tips?)|best (mount|horse|pet)\b)\b/.test(q)) return "mechanic";
-  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
+
+  // Session 26 reorder: EXPLORATION → RECOMMENDATION → ITEM → SKILL/MECHANIC.
+  // EXPLORATION moved up so "where is the Sanctum of Temperance?" routes to exploration,
+  // not item via getItemPhrases' (now-removed) `where (is|are) the` pattern.
+  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|sanctum|sanctorum|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
+
   if (/\b(what (are|is) (some |the |any )?(good|great|best|op|strong|powerful|recommended)\b|best (sword|weapon|bow|spear|axe|dagger|staff|armor|armour|helmet|boots|gloves|ring|necklace|earring|accessory|gear|loadout|skill)s?\b|recommend(ed)? (weapon|armor|armour|gear|build|loadout|skill)|what should i (use|equip|get|pick|choose)|worth (getting|using|buying|farming)\b|tier list|what.{0,20}(good for|best for|work(s)? (well|good))|is .{3,30} (any )?good\b|which (weapon|sword|armor|gear|skill|accessory|build) (is|should|would|to))\b/.test(q)) return null;
   if (/\bbest\b.{1,25}\b(weapon|sword|bow|spear|axe|dagger|staff|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories)\b/.test(q)) return null;
 
-  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|drop|loot|reward|obtain|enhance)\b/;
-  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm|obtain)|how (do i|to) (acquire|obtain|get|find)|where to (find|get|buy|obtain)|where (is|are) the|how to get)\b/;
+  // ITEM moved ABOVE mechanic (session 26): "artifact" added to itemKeywords so Faded Abyss Artifact
+  // routes to item (post-1c content_type) before mechanic's `abyss artifact`+`how does .+ work` patterns fire.
+  // `where (is|are) the` removed from getItemPhrases (now in EXPLORATION above).
+  const itemKeywords = /\b(weapon|sword|bow|staff|spear|axe|dagger|gun|shield|armor|armour|helmet|boots|gloves|cloak|ring|earring|necklace|abyss gear|abyss-gear|accessory|accessories|equipment|item|artifact|drop|loot|reward|obtain|enhance)\b/;
+  const getItemPhrases = /\b(where (do i|can i) (find|get|buy|farm|obtain)|how (do i|to) (acquire|obtain|get|find)|where to (find|get|buy|obtain)|how to get)\b/;
   if (itemKeywords.test(q) || getItemPhrases.test(q)) return "item";
 
-  if (/\b(where is|how do i get to|how to reach|location of|find the area|map|region|dungeon|cave|castle|mine|fort|outpost|landmark|portal|entrance|how to enter|labyrinth|tower|temple|crypt|catacomb|ranch|gate|basin|falls|grotto|ridge|beacon|ancient ruins$|ancient ruin$)\b/.test(q)) return "exploration";
+  if (/\b(skill|ability|talent|passive|active|skill tree|mechanic|system|stamina|stat|attribute|combo|aerial|grapple|grappling|observation|abyss artifact|challenge|challenges|mastery|minigame|mini-game|fast travel|fast-travel|travel point|abyss nexus|traces of the abyss|how does the .+ work|how does .+ work|what does .+ do|refinement|refine|upgrade equipment|how to upgrade|how to heal|healing|potion|consumable|critical rate|critical chance)\b/.test(q)) return "mechanic";
+
   if (/\b(quest|mission|objective|side quest|main quest|storyline|story|chapter|talk to|deliver|collect for|bring to)\b/.test(q)) return "quest";
-  if (/\b(who is|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
+  if (/\b(who is|who are|character|npc|lore|backstory|relationship|faction|kliff|damiane|oongka|greymane|matthias|shakatu|myurdin|naira|yann|grundir)\b/.test(q)) return "character";
 
   return null;
 }

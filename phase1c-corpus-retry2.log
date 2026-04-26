@@ -1,0 +1,98 @@
+[phase1c] Anthropic key resolved (length=108).
+[phase1c] Re-classifying 57 failed records
+[phase1c] Concurrency=2…
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] WARN slow 2413ms: Interactive Map
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Rate-limited; pausing pool for 1s
+[phase1c] Progress: 57/57
+
+[phase1c] Recovered 57 of 57
+[phase1c] Wall time: 47.6s
+[phase1c] File written: ./phase1c-corpus-classifications.json
+
+[phase1c] Per-record retry outcomes:
+  ✓ Precipice of Echoes Ruins       mechanic → uncertain [reason: nav-only page listing challenges/locations without substantive content about the specific location itself.]
+  ✓ Garred                          recipe → character
+  ✓ Interactive Map                 character → uncertain [reason: nav-only page with map tool, lacks substantive content]
+  ✓ Aerial Stab                     mechanic → mechanic
+  ✓ Nature's Veil                   mechanic → mechanic
+  ✓ Shield Toss Proficiency         mechanic → mechanic
+  ✓ Hearty Small Grilled Fish       item → item
+  ✓ Mining_Knuckledrill             item → item
+  ✓ Flash                           quest → uncertain [reason: nav-only; mostly challenge list without substantive Flash content]
+  ✓ Scorchflame_Plate_Gloves        item → item
+  ✓ Serge's Request                 quest → quest
+  ✓ Rock Paper Scissors             quest → mechanic
+  ✓ Dewhaven_Shotgun                character → item
+  ✓ Turbine                         character → boss
+  ✓ Frozen Heart Plate Cloak        item → item
+  ✓ Spire_of_the_Stars              quest → exploration
+  ✓ Small Banner Pike               item → item
+  ✓ Tiny Greymane Banner Pike       item → item
+  ✓ Interactive Map                 quest → uncertain [reason: nav-only page with mixed content overview]
+  ✓ Interactive Map                 quest → uncertain [reason: nav-only page with map interface, no specific subject content]
+  ✓ Black_Forest                    exploration → exploration
+  ✓ Bluemont_Cask_House             exploration → exploration
+  ✓ Sandpeak_Gold_Mine              character → exploration
+  ✓ Subcontent:All_Abyss_Artifact_Locations_2_Demeniss  mechanic → exploration
+  ✓ Sealed_Abyss_Artifact_(Trespassing)  recipe → puzzle
+  ✓ Hernandian_Parish_of_Solumen    character → exploration
+  ✓ Kiln Repair at the Kilnden Workshop  character → quest
+  ✓ Wyvern Blaster                  item → item
+  ✓ Key Items                       item → uncertain [reason: nav-only page listing key items category without substantive content about specific items]
+  ✓ Bounty_Notice:_Billy            quest → uncertain [reason: nav-only page listing quests without substantive content about Billy bounty]
+  ✓ Bolton Plate Armor              item → item
+  ✓ Beastbane I                     item → item
+  ✓ Bright_Red_Dye_(Recipe)         item → uncertain [reason: nav-only]
+  ✓ Between Herbs and Poisons       mechanic → quest
+  ✓ Cliffside Gold Mine             character → exploration
+  ✓ Unfamiliar Lands                character → quest
+  ✓ Bounty Notice: Billy            character → quest
+  ✓ Halssius Trading Post           character → exploration
+  ✓ Unarmed Duel: Boxing            character → mechanic
+  ✓ Embernest Beacon                character → exploration
+  ✓ Wycliffe Mappery                character → exploration
+  ✓ Interactive Map                 character → uncertain [reason: nav-only page with map interface, no specific subject content]
+  ✓ Interactive Map                 character → uncertain [reason: nav-only page with map tool, lacks substantive content about specific subject]
+  ✓ Interactive Map                 character → uncertain [reason: nav-only page with map tool, lacks substantive content]
+  ✓ The Crimson Nightmare (Quest)   character → quest
+  ✓ Ancient Rift                    character → exploration
+  ✓ Guides_and_Walkthrough          recipe → uncertain [reason: nav-only]
+  ✓ Subcontent:Walkthrough_2_Chapter_1:_The_First_Encounter  recipe → quest
+  ✓ Metal_Bowl                      item → item
+  ✓ Bolton_Plate_Armor              character → item
+  ✓ Gorthak_Greataxe                character → item
+  ✓ Interactive Map                 boss → uncertain [reason: nav-only page with mixed content overview]
+  ✓ Elowen                          character → character
+  ✓ Fortification_II                item → item
+  ✓ Greater_Abyssbane               item → item
+  ✓ Goldleaves'_Short_Leather_Boots  item → item
+  ✓ Matia_Leather_Boots             item → item
