@@ -4,6 +4,15 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: URL-Level Bulk Classifiers Are Too Coarse for Mixed Pages (Session 27 — Phase 1e close)
+
+- **Phase 1e revealed the limits of URL-level classification for bulk deletion.** The Phase 1c Haiku classifier had a 35% false-positive rate on "nav-only" page labels. Pages where MediaWiki nav cruft sits alongside substantive content (quest pages, lore indexes, faction subcontent) got tagged as nav-only because the visible boilerplate dominated the classifier's judgment of the URL. Bulk URL DELETE was the wrong granularity for this pollution pattern. **Per-chunk classification (Phase 1d-style) is the correct approach for mixed pages.**
+- **Externally verifiable URL patterns are the only safe input for URL-level bulk DELETE.** The 298 `Interactive+Map?id=NNN&code=mapA` URL-variants were confirmable as nav-only by URL pattern alone — independent of any classifier's judgment, every chunk at those URLs is identical generic map UI text. That subset deleted cleanly. The other 289 URLs needed per-chunk verification that was never done.
+- **IVFFlat without REINDEX has a deletion-rate threshold past which run-to-run variance reappears.** Phase 1d (748 deletions, ~1% of index) had zero variance across triple-run. Phase 1e (3,096 deletions, ~5% of index) reintroduced 1-in-13 run variance. Hypothesis: cluster centroids don't recompute on delete, so probe selection at probes=10 occasionally picks a slightly different cluster set than the no-deletion case, and Voyage embedding micro-variation now changes the answer for borderline rank-9/rank-10 retrievals. REINDEX would restore determinism. Pattern: deletions over ~3-5% of index size warrant a follow-up REINDEX to restore eval stability.
+- **Predicted recall lift can be a useful sanity check on whether a phase is load-bearing.** Phase 1e was predicted at "+1-3pp at most" based on the hypothesis that nav chunks weren't ranking for any eval query anyway. The post-1e measurement (80.0% mode, same as pre-1e) confirmed this — the value of 1e was corpus shrinkage and reduced fallback-pool noise, not direct eval lift. If a low-predicted-lift phase had unexpectedly delivered +5-10pp, that would have been a flag to audit eval seeds (something else changed).
+
+---
+
 ## RAG: Phase 1c URL-Variant content_type Orphans Hid in Eval Seeds (Session 27 — comprehensive audit pass)
 
 - **Phase 1c content_type updates targeted canonical URLs but didn't catch URL-variant duplicates** (e.g., `/Foo+Bar` vs `/Foo_Bar`). When the canonical URL was retagged, the variant URL kept its pre-1c content_type, and chunks at the variant URL stayed in the eval seed arrays as orphans — filtered out by the post-1c classifier. Phase 1d's comprehensive audit caught 3 of these in a single pass: New Game Plus (`09c7c77e` quest-tagged at `/New_Game_Plus`), Faded Abyss Artifact (`6db9fcd5` mechanic-tagged at `/Faded_Abyss_Artifact`), Hearty Grilled Seafood (`6147dcf9` item-tagged at `/Hearty+Grilled+Seafood`). Each query jumped 67%→100% or 33%→100% just by dropping the orphan.

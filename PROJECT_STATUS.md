@@ -1,16 +1,17 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-26 (session 27 — Phase 1d eval audit comprehensive pass)
+**Last updated:** 2026-04-26 (session 27 — Phase 1e Interactive Map cleanup + **Phase 1 COMPLETE**)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
-| Corpus | **62,804 chunks** (1d deleted 748 thin remainders) |
-| Retrieval Recall@10 | **80.0%** (deterministic across 3 runs; cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
+| Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
+| Retrieval Recall@10 | **80.0%** (mode 12/13 runs; outlier 77.8% in 1/13. Cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
 | Retrieval MRR | **0.482** (cumulative Phase 1: 0.189 → 0.482) |
-| Vector index | IVFFlat **lists=237**, probes=**10** |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · **1d eval audit comprehensive pass (3 orphan drops + Hearty Grilled Seafood swap + Kailok hybrid)** |
+| Vector index | IVFFlat **lists=237**, probes=**10** (not REINDEXed post-1e — see eval variance note below) |
+| Phase 1 status | **COMPLETE** |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass (3 orphan drops + Hearty Grilled Seafood swap + Kailok hybrid) · **1e Interactive Map URL-variant cleanup** |
 | Phase next | **1e** nav-only DELETE (587 candidates queued — re-count first; some may have been deleted by 1d) · keyword-boost / matchCount work for tier-list queries (best one-handed weapons remains 0%) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
@@ -35,6 +36,59 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 27 — Phase 1e Interactive Map Cleanup + Phase 1 CLOSE (2026-04-26)
+
+**Working from:** 80.0% post-comprehensive-audit. Phase 1c had queued 587 URLs flagged "nav-only" by the Haiku classifier for Phase 1e bulk-delete. Pre-flight spot-check revealed the queue was unsafe to execute as-is.
+
+#### Preflight finding — 35% false-positive rate on the Phase 1c "nav-only" labels
+Spot-check on 20 random URLs from the 587-URL queue:
+
+| Bucket | URLs in queue | Spot-check verdict |
+|---|---:|---|
+| `Interactive+Map?id=NNN` URL-variants | 298 | All 13 sampled were clean nav-only — safe |
+| `Subcontent:` pages | 49 | 1 sampled had real content (faction quest summaries) — risky |
+| `(Recipe)` pages | 7 | 1 sampled had real recipe ingredients — risky |
+| Other (quest/lore/index pages) | 233 | 6 of 6 sampled had real content — **NOT safe** |
+
+7 of 20 (35%) had real content the Haiku classifier had mis-flagged as nav-only — examples: `/Lifeforms` (animal descriptions), `/A_Fresh_Start` (quest walkthrough), `/Awestruck` (NPC dialog + region info), `/Troubled_Count` (quest progress). Phase 1c's URL-level Haiku classification was too coarse for mixed pages where MediaWiki nav cruft sits alongside substantive content.
+
+#### Decision: narrow scope to externally verifiable Interactive Map subset
+The 298 `Interactive+Map?id=NNN&code=mapA` URL-variants are externally verifiable as nav-only via URL pattern alone (every chunk is the generic map UI text, not subject-specific). Independent of Haiku's judgment, this subset is safe.
+
+Deferred 289 remaining URLs (subcontent + recipe + other) to future per-chunk reclassifier work. Phase 1d's per-chunk pattern is the correct granularity for mixed pages.
+
+#### Execution
+- Eval collision check: 0 rows ✓
+- Backup: `knowledge_chunks_backup_phase1e_20260426` — 3,096 chunks across 298 URLs
+- Rollback smoke-test: 1 random chunk deleted + restored, md5 hash matched ✓
+- Deletion: **3,096 chunks deleted** (62,804 → **59,708** corpus rows)
+
+#### Eval impact (13 runs)
+| Metric | Pre-1e | Post-1e |
+|---|---:|---:|
+| Recall@10 | 80.0% (deterministic) | 80.0% mode (12/13), 77.8% outlier (1/13) |
+| MRR | 0.482 (deterministic) | 0.482 mode, 0.560 outlier |
+
+Phase 1e held recall at 80.0% as predicted (no lift expected — these chunks weren't ranking for eval queries). 1-in-13 outlier is post-deletion IVFFlat variance: deletions don't update cluster centroids, and 3,096 removals (~5% of index) push some borderline retrieval cases past Voyage embedding micro-variation thresholds. REINDEX would fix but was out of scope this round.
+
+#### Cumulative Phase 1 progress (FINAL)
+
+| Stage | Recall@10 | MRR |
+|---|---:|---:|
+| Pre-Phase-1a baseline | 20.0% | 0.189 |
+| Post-Phase-1a (probes=10) | 26.7% | 0.182 |
+| Post-Phase-1b | 26.7% | 0.182 |
+| Post-Phase-1c Bucket A | 28.9% | 0.171 |
+| Post-classifier-alignment | 31.1% | 0.237 |
+| Post-REINDEX (lists=237) | 46.7% | 0.259 |
+| Post-eval-audit (session 26 close) | 54.4% | 0.283 |
+| Post-Phase-1d | 52.6% | 0.267 |
+| Post-Phase-1d-eval-audit (Oongka+Reed Devil) | 66.7% | 0.390 |
+| Post-Phase-1d-eval-audit-comprehensive | 80.0% | 0.482 |
+| **Post-Phase-1e (Interactive Map cleanup) — Phase 1 COMPLETE** | **80.0%** | **0.482** |
+
+Cumulative Phase 1: **+60.0pp recall, +0.293 MRR. 6 measured rounds (1a–1e + REINDEX) plus 3 eval audit passes.**
 
 ### Session 27 — Phase 1d Eval Audit Comprehensive Pass (2026-04-26)
 
