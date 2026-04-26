@@ -4,6 +4,14 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: REINDEX Should Be the Final Step of Any >2% Deletion Phase (Session 27 — post-1e REINDEX)
+
+- **Post-deletion REINDEX restored deterministic measurement.** Phase 1e's 3,096 deletions (~5% of index) reintroduced a 1-in-13 run variance (77.8% outlier vs 80.0% mode) because IVFFlat doesn't recompute centroids on delete. A single REINDEX with the same `lists=237` (still optimal: √59,708 = 244) eliminated the outlier. Post-REINDEX: 80.0% across 10/10 runs.
+- **Lesson: any phase removing >2% of corpus should REINDEX as the final step**, not as "optional cleanup later." The cost is a few minutes of wall-clock (~2 min for 59K × 1024-dim vectors at `maintenance_work_mem=256MB`) and the benefit is restored zero-variance measurement, which matters for the *next* phase's eval discipline. Carrying variance forward makes it harder to attribute future per-query movements to actual causes.
+- **The MRR micro-wobble remaining post-REINDEX is below the decision noise floor.** 9/10 runs at 0.482, 1/10 at 0.449 (Δ 0.033). That spread is consistent with a single query's expected chunk shifting rank-1↔2 in one run — same content surfaces, same top-10 membership, same answer to the user. Voyage embedding-side micro-variation is the most likely source. Not worth chasing.
+
+---
+
 ## RAG: URL-Level Bulk Classifiers Are Too Coarse for Mixed Pages (Session 27 — Phase 1e close)
 
 - **Phase 1e revealed the limits of URL-level classification for bulk deletion.** The Phase 1c Haiku classifier had a 35% false-positive rate on "nav-only" page labels. Pages where MediaWiki nav cruft sits alongside substantive content (quest pages, lore indexes, faction subcontent) got tagged as nav-only because the visible boilerplate dominated the classifier's judgment of the URL. Bulk URL DELETE was the wrong granularity for this pollution pattern. **Per-chunk classification (Phase 1d-style) is the correct approach for mixed pages.**

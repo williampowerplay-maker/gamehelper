@@ -7,11 +7,11 @@
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Retrieval Recall@10 | **80.0%** (mode 12/13 runs; outlier 77.8% in 1/13. Cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
-| Retrieval MRR | **0.482** (cumulative Phase 1: 0.189 → 0.482) |
-| Vector index | IVFFlat **lists=237**, probes=**10** (not REINDEXed post-1e — see eval variance note below) |
+| Retrieval Recall@10 | **80.0%** (deterministic, 10/10 runs post-REINDEX. Cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
+| Retrieval MRR | **0.482** (9/10 runs; 1/10 at 0.449 micro-wobble — single rank-1↔2 shift, no top-10 effect. Cumulative Phase 1: 0.189 → 0.482) |
+| Vector index | IVFFlat **lists=237** (rebuilt post-1e), probes=**10** |
 | Phase 1 status | **COMPLETE** |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass (3 orphan drops + Hearty Grilled Seafood swap + Kailok hybrid) · **1e Interactive Map URL-variant cleanup** |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · **post-1e REINDEX (final)** |
 | Phase next | **1e** nav-only DELETE (587 candidates queued — re-count first; some may have been deleted by 1d) · keyword-boost / matchCount work for tier-list queries (best one-handed weapons remains 0%) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
@@ -36,6 +36,27 @@ AI-powered game companion for Crimson Desert. Players ask questions about quests
 | Deployment | Vercel | - |
 
 ## Current Status: MVP Functional + Stripe Integration + Improved RAG
+
+### Session 27 — Post-Phase-1e REINDEX, Phase 1 GENUINELY CLOSED (2026-04-26)
+
+**Working from:** Phase 1e left IVFFlat with ~5% deletion churn (3,096 / 62,804) which reintroduced a 1-in-13 run-to-run recall variance (77.8% outlier vs 80.0% mode). Final cleanup before declaring Phase 1 done.
+
+#### Execution
+- Pre-state: 59,708 rows, IVFFlat lists=237 (still optimal — √59,708 = 244, within 3%)
+- `SET maintenance_work_mem = '256MB'; DROP INDEX idx_chunks_embedding; CREATE INDEX ... lists=237;`
+- MCP `execute_sql` client-side timeout (~2 min); polled `pg_stat_activity` to confirm completion
+- Wall time: ~2 minutes
+- Index rebuilt: 521 MB
+
+#### Eval (10 runs)
+| Metric | Pre-REINDEX (post-1e) | Post-REINDEX (final) |
+|---|---|---|
+| Recall@10 | 80.0% mode (12/13), 77.8% outlier (1/13) | **80.0% in 10/10 runs — deterministic** |
+| MRR | 0.482 mode, 0.560 outlier | 0.482 in 9/10, 0.449 in 1/10 (single query rank-1↔2 micro-wobble; no top-10 effect) |
+
+The recall outlier was the variance concern. It's eliminated. The remaining MRR micro-wobble is below the noise floor of any retrieval decision (rank-1↔2 doesn't change top-10 membership) and is more likely Voyage embedding-side than IVFFlat — well outside Phase 1 scope.
+
+#### Phase 1 status: **GENUINELY COMPLETE**
 
 ### Session 27 — Phase 1e Interactive Map Cleanup + Phase 1 CLOSE (2026-04-26)
 

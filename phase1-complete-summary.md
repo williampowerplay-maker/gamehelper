@@ -1,10 +1,11 @@
 # Phase 1 Complete — Crimson Desert AI Guide
 
-**Closed:** 2026-04-26 (session 27)
-**Final Recall@10:** 80.0% (mode, 12/13 runs) | 77.8% (1/13 outlier)
-**Final MRR:** 0.482 (mode)
+**Closed:** 2026-04-26 (session 27, post-REINDEX)
+**Final Recall@10:** 80.0% (deterministic, 10/10 runs)
+**Final MRR:** 0.482 (9/10 runs; 1/10 at 0.449 micro-wobble — single rank-1↔2 shift, no top-10 effect)
 **Cumulative lift from baseline:** +60.0pp recall, +0.293 MRR
 **Final corpus size:** 59,708 chunks (started at ~90,395; net −34% pollution)
+**Final index:** IVFFlat lists=237 (rebuilt post-1e), probes=10
 
 ---
 
@@ -22,7 +23,8 @@
 | 7 | Post-Phase-1d (trailing-boilerplate stripper) | 52.6% | 0.267 | −1.8pp | Truncated 2,914 chunks at 4 sentinel boundaries, deleted 748 thin remainders. Apparent regression was Oongka eval-seed artifact |
 | 8 | Post-Phase-1d-eval-audit (Oongka + Reed Devil) | 66.7% | 0.390 | +14.1pp | Re-seeded both queries with chunks from new top-10 |
 | 9 | Post-Phase-1d-eval-audit-comprehensive | 80.0% | 0.482 | +13.3pp | 4 row updates: 3 Phase 1c URL-variant orphan drops + Kailok hybrid 4-seed array |
-| 10 | **Post-Phase-1e (Interactive Map cleanup) — Phase 1 COMPLETE** | **80.0%** | **0.482** | +0.0pp | 3,096 IM URL-variant chunks deleted. 289 other queue URLs deferred (35% false-positive rate from URL-level Haiku classifier) |
+| 10 | Post-Phase-1e (Interactive Map cleanup) | 80.0% (mode 12/13) | 0.482 | +0.0pp | 3,096 IM URL-variant chunks deleted. 289 other queue URLs deferred. 1-in-13 outlier at 77.8% from IVFFlat post-deletion churn |
+| 11 | **Post-REINDEX (final) — Phase 1 COMPLETE** | **80.0%** (10/10) | **0.482** (9/10) | +0.0pp | IVFFlat rebuilt with same lists=237 (still optimal for 59,708 rows). Recall outlier eliminated. MRR has 1/10 micro-wobble (0.449) from a single query rank-1↔2 shift, no top-10 effect |
 
 ---
 
@@ -78,12 +80,7 @@ All 15 eval queries, baseline → final. **Bold** = perfect recall at end.
    - Costs ~$0.10 in Haiku/Voyage budget.
    - Real-world impact: small (these chunks aren't ranking for eval queries) but reduces fallback-pool noise.
 
-3. **REINDEX after Phase 1e.**
-   - Post-1e introduced 1-in-13 run variance (3,096 deletions = ~5% of index, centroids didn't recompute).
-   - Single REINDEX with `lists=237` and `maintenance_work_mem='256MB'` would restore zero-variance determinism.
-   - Out of scope this session; cheap to do later.
-
-4. **Phase 2 ingest rewrite.**
+3. **Phase 2 ingest rewrite.**
    - URL canonicalization at ingest time (eliminate `/Foo+Bar` vs `/Foo_Bar` duplicate-content problem at the source).
    - Per-chunk content_type classification at ingest (not after).
    - Detect MediaWiki nav cruft + footer boilerplate at chunk creation time, strip before embedding.
