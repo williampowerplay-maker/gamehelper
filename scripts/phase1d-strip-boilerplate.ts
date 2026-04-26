@@ -157,7 +157,7 @@ async function identifyCandidates(supabase: SupabaseClient, args: CliArgs): Prom
         .range(offset, offset + 999);
       if (error) throw new Error(`Supabase error: ${error.message}`);
       if (!data || data.length === 0) break;
-      for (const row of data as Array<{ id: string; source_url: string; content: string; re_embedded_at?: string | null }>) {
+      for (const row of data as unknown as Array<{ id: string; source_url: string; content: string; re_embedded_at?: string | null }>) {
         if (seen.has(row.id)) continue;
         seen.add(row.id);
         if (args.resume && row.re_embedded_at) continue;
