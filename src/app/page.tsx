@@ -8,6 +8,7 @@ import SpoilerTierSelector from "@/components/SpoilerTierSelector";
 import AuthButton from "@/components/AuthButton";
 import AdBanner from "@/components/AdBanner";
 import UpgradeCTA from "@/components/UpgradeCTA";
+import CoverageStats from "@/components/CoverageStats";
 import { useAuth } from "@/lib/auth-context";
 import { type SpoilerTier } from "@/lib/supabase";
 
@@ -137,6 +138,7 @@ export default function Home() {
               Puzzles, boss fights, item locations, builds, mechanics — get
               instant answers with the spoiler level you choose.
             </p>
+            <CoverageStats />
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 w-full max-w-md">
               {[
                 "How do I solve the Azure Moon Labyrinth?",

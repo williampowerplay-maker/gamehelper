@@ -4,6 +4,12 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## UX: Coverage Transparency Without Source Exposure (Session 28)
+
+Users want to know what the system knows about; they don't need to know where the system got its data. Showing "Bosses (129)" is empowering — it sets honest expectations before the first question and prevents frustration when the system says "I don't have that." Showing "Sourced from Fextralife.com" is unnecessary and dilutes the product's identity as a game companion (not a wiki aggregator). The display uses internal `content_type` counts transformed to user-facing labels (e.g., `item` → "Items & Equipment"). Source URLs and corpus origins are never exposed in the UI. If the system doesn't know something, it says so directly — the coverage display sets that expectation up front.
+
+---
+
 ## RAG: REINDEX Should Be the Final Step of Any >2% Deletion Phase (Session 27 — post-1e REINDEX)
 
 - **Post-deletion REINDEX restored deterministic measurement.** Phase 1e's 3,096 deletions (~5% of index) reintroduced a 1-in-13 run variance (77.8% outlier vs 80.0% mode) because IVFFlat doesn't recompute centroids on delete. A single REINDEX with the same `lists=237` (still optimal: √59,708 = 244) eliminated the outlier. Post-REINDEX: 80.0% across 10/10 runs.

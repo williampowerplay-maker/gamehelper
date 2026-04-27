@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-26 (session 27 — Phase 1e Interactive Map cleanup + **Phase 1 COMPLETE**)
+**Last updated:** 2026-04-27 (session 28 — coverage-stats display on landing page)
 
 ## Current State Snapshot
 
@@ -16,6 +16,12 @@
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
+
+## Recent Changes (Session 28)
+
+- **Added coverage-stats display** on landing page (empty state only). Backend: `src/app/api/coverage-stats/route.ts` (GET, public, 24h module-level cache). Frontend: `src/components/CoverageStats.tsx` (client component, skeleton loading, error→hide).
+- User-facing label mapping: item→"Items & Equipment", mechanic→"Game Mechanics", quest→"Quests", character→"Characters & NPCs", exploration→"Locations", recipe→"Recipes", boss→"Bosses", puzzle→"Puzzles". All 8 categories qualify (≥50 pages). Counts show distinct page (URL) counts, not chunk counts.
+- Stats disappear once user sends first message (already conditional on `messages.length === 0`). Sources/URLs not exposed anywhere in the UI.
 
 ## Overview
 
