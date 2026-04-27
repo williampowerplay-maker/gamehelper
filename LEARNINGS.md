@@ -4,6 +4,44 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## Infra: PostgREST 1000-Row Default Limit Silently Truncates Aggregate Queries (Session 28)
+
+PostgREST's default row limit (1000) applies to all direct table SELECT queries — including analytics/aggregate fetches that expect full-table scans. The truncation is **silent**: no error, no warning, no indication that results are incomplete. In practice this means `SELECT content_type, COUNT(DISTINCT source_url) FROM knowledge_chunks GROUP BY content_type` routed through PostgREST returns counts based on the first 1000 rows scanned, not the full 59K. The result was `totalSources=195` instead of the correct `5,481`.
+
+**Fix: use `SECURITY DEFINER` SQL functions for any server-side aggregation.** These execute with the creator's permissions, run entirely inside Postgres (no PostgREST row limit, no RLS filtering), and return a single aggregate row to the client. Pattern:
+
+```sql
+CREATE OR REPLACE FUNCTION coverage_stats_by_type()
+RETURNS TABLE(content_type text, page_count bigint)
+LANGUAGE sql SECURITY DEFINER AS $$
+  SELECT content_type, COUNT(DISTINCT source_url)::bigint
+  FROM knowledge_chunks GROUP BY content_type ORDER BY page_count DESC;
+$$;
+```
+
+Called via `supabase.rpc("coverage_stats_by_type")` — bypasses PostgREST entirely.
+
+**Rule**: any analytics-style read from a large table (>1000 rows) must use an RPC function, not a direct `.from("table").select()` chain. Direct selects are fine for small lookup tables; dangerous for corpus-level aggregation.
+
+---
+
+## Qualitative: Ad-Hoc Testing With Real Player Questions (Session 28)
+
+Running 20 real player questions through the full pipeline (retrieval + Claude) before launch surfaced signal that synthetic eval sets don't: content gaps, retrieval near-misses, and answer quality patterns.
+
+**Findings from 20 questions (bosses, puzzles, locations, mechanics, crafting, economy):**
+- ~14/20 solid (direct, accurate, actionable answers with sources)
+- ~4/20 partial (correct direction but vague or incomplete — typically "best X" tier-list queries where retrieval finds meta-discussion instead of specific recommendations)
+- ~2/20 genuine content gaps (too game-specific to have wiki coverage yet)
+
+**The 4/20 partial pattern maps exactly to the known tier-list retrieval gap** (best one-handed weapons, best body armor queries at 0% in eval). Confirms these are the highest-impact remaining retrieval problems.
+
+**Practical methodology:** `scripts/ad-hoc-test.ts` runs without a dev server — connects directly to Supabase + Voyage + Anthropic via the same pipeline as run-eval.ts. Takes ~3 min for 20 questions. Useful for qualitative pre-launch sanity checks without needing a deployed environment.
+
+**Lesson: synthetic eval seeds measure recall; real questions measure usefulness.** An 80% eval score tells you 4/5 retrieval targets surface correctly; 20 real questions tell you which *types* of answers Claude handles well vs. where it hedges. Both are necessary; neither replaces the other.
+
+---
+
 ## UX: Coverage Transparency Without Source Exposure (Session 28)
 
 Users want to know what the system knows about; they don't need to know where the system got its data. Showing "Bosses (129)" is empowering — it sets honest expectations before the first question and prevents frustration when the system says "I don't have that." Showing "Sourced from Fextralife.com" is unnecessary and dilutes the product's identity as a game companion (not a wiki aggregator). The display uses internal `content_type` counts transformed to user-facing labels (e.g., `item` → "Items & Equipment"). Source URLs and corpus origins are never exposed in the UI. If the system doesn't know something, it says so directly — the coverage display sets that expectation up front.

@@ -1,13 +1,14 @@
-# Resume: Phase 1 closed at 80% deterministic recall
+# Resume: Phase 1 closed + coverage-stats display shipped
 
 ## Current state
-- Last commit: d546264 (post-Phase-1e REINDEX)
+- Last commit: 84de51c (session 28 — coverage-stats display + ad-hoc test script)
 - Branch: main, working tree clean
 - Recall@10: 80.0% deterministic across 10 consecutive runs
 - MRR: 0.482 (1-of-10 runs at 0.449 — sub-decision-floor wobble)
 - Phase 1: COMPLETE
 - Corpus: 59,708 chunks (down from 90,395 baseline)
 - IVFFlat index: idx_chunks_embedding, lists=237, rebuilt post-1e
+- Coverage-stats display: LIVE (landing page empty state, disappears after first message)
 
 ## Database-only state (not in git)
 - knowledge_chunks_backup_20260422 (pre-Phase-1a)
@@ -33,13 +34,15 @@
 5. Expect: 80.0% / 0.482 (or 0.449 on the 1-in-10 wobble)
 6. If lower or unstable: investigate before any new work
 
-## Next session — three options to choose from
+## Next session — options
 1. SHIP: Vercel deploy + telemetry + production hygiene
-   (eval at 80% is production-viable; real users surface real problems faster than eval optimization)
+   (eval at 80%, coverage-stats display live, landing page polished — system is production-viable now)
 2. POLISH: Tier-list retrieval (Phase 1f)
    (best-X queries at 0% — URL-pattern boost or matchCount tuning, 1-2 sessions, could reach ~87%)
 3. INGEST: Phase 2 ingest rewrite
    (URL canonicalization, cheerio-based parsing, content-based content_type — biggest scope, sets up clean re-crawls)
+4. UX: Additional landing page / onboarding improvements
+   (example questions tuning based on ad-hoc test findings, mobile layout, etc.)
 
 ## Open work items (deferred, documented)
 - Phase 1e residual queue: 289 URLs deferred pending per-chunk reclassifier
@@ -49,7 +52,9 @@
 - Production deployment / monitoring
 
 ## API key on this machine
-ANTHROPIC_API_KEY at %USERPROFILE%\.anthropic_key
+ANTHROPIC_API_KEY: stored in Windows Credential Manager (Target: "ANTHROPIC_API_KEY")
+  Retrieve via: $env:ANTHROPIC_API_KEY = (Get-StoredCredential -Target 'ANTHROPIC_API_KEY').GetNetworkCredential().Password
+  Or in bash: ANTHROPIC_API_KEY=$(powershell -Command "(Get-StoredCredential -Target 'ANTHROPIC_API_KEY').GetNetworkCredential().Password")
 VOYAGE_API_KEY in .env.local
 SUPABASE_SERVICE_ROLE_KEY in .env.local
 (.env.local is gitignored — verified via git check-ignore)
