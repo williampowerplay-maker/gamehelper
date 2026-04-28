@@ -28,7 +28,7 @@ export default function Home() {
   };
 
   useEffect(() => {
-    scrollToBottom();
+    if (messages.length > 0) scrollToBottom();
   }, [messages]);
 
   // TEMPORARY DEBUG: track header visibility / layout state on mobile.
