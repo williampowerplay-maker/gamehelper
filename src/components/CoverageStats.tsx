@@ -105,14 +105,14 @@ export default function CoverageStats() {
       <p className="text-xs text-gray-500 mb-3 text-center">I can help you with:</p>
 
       {!stats ? (
-        // Skeleton — 8 placeholder rows in a 2-col grid
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
+        // Skeleton — 8 placeholder rows; 1 col on mobile, 2 cols on sm+
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
           {Array.from({ length: 8 }).map((_, i) => (
             <SkeletonRow key={i} />
           ))}
         </div>
       ) : (
-        <div className="grid grid-cols-2 gap-x-6 gap-y-2.5">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-2.5">
           {stats.categories.map(({ label, count }) => (
             <div key={label} className="flex items-center gap-2 min-w-0">
               <span className="text-red-500/80 flex-shrink-0">

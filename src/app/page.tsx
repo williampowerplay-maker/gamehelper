@@ -89,19 +89,19 @@ export default function Home() {
     {/* Main chat column */}
     <div className="flex flex-col flex-1 min-w-0 max-w-3xl mx-auto">
       {/* Header */}
-      <header className="flex-shrink-0 border-b border-[#2a2a3a] px-4 py-2 sm:py-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
+      <header className="flex-shrink-0 border-b border-[#2a2a3a] px-3 sm:px-4 py-2 sm:py-4">
+        <div className="flex items-center justify-between gap-2">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
             <Image
               src="/logo.webp"
               alt="Crimson Desert Guide"
               width={44}
               height={44}
-              className="flex-shrink-0"
+              className="flex-shrink-0 w-9 h-9 sm:w-11 sm:h-11"
               priority
             />
-            <div>
-              <h1 className="text-xl font-bold">
+            <div className="min-w-0">
+              <h1 className="text-base sm:text-xl font-bold truncate">
                 <span className="text-red-500">Crimson</span>{" "}
                 <span className="text-gray-100">Desert Guide</span>
               </h1>
