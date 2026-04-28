@@ -27,15 +27,18 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen">
-        {/* TEMPORARY DEBUG: AdSense disabled to test if it's causing mobile header clipping */}
-        {/* {adsenseId && (
+        {/* TEMPORARY DEBUG: eruda mobile DevTools (Console/Elements/Network) */}
+        <Script id="eruda-load" strategy="afterInteractive">
+          {`var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/eruda';s.onload=function(){eruda.init();};document.head.appendChild(s);`}
+        </Script>
+        {adsenseId && (
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
             crossOrigin="anonymous"
             strategy="lazyOnload"
           />
-        )} */}
+        )}
         <AuthProvider>
           <ErrorBoundary componentName="RootLayout">
             {children}

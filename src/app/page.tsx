@@ -31,6 +31,42 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
+  // TEMPORARY DEBUG: track header visibility / layout state on mobile
+  useEffect(() => {
+    const log = (label: string) => {
+      const h = document.querySelector("header");
+      const marker = document.querySelector("[data-debug-marker]");
+      const body = document.body;
+      const html = document.documentElement;
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG-HEADER]", label, {
+        time: Date.now(),
+        headerExists: !!h,
+        headerRect: h?.getBoundingClientRect(),
+        headerComputedDisplay: h ? getComputedStyle(h).display : null,
+        headerComputedVisibility: h ? getComputedStyle(h).visibility : null,
+        headerComputedHeight: h ? getComputedStyle(h).height : null,
+        headerComputedTransform: h ? getComputedStyle(h).transform : null,
+        markerExists: !!marker,
+        markerRect: marker?.getBoundingClientRect(),
+        bodyScrollTop: body.scrollTop,
+        htmlScrollTop: html.scrollTop,
+        bodyHeight: body.getBoundingClientRect().height,
+        bodyComputedOverflow: getComputedStyle(body).overflow,
+        windowInnerHeight: window.innerHeight,
+        documentScrollHeight: html.scrollHeight,
+        visualViewport: window.visualViewport
+          ? { height: window.visualViewport.height, offsetTop: window.visualViewport.offsetTop, scale: window.visualViewport.scale }
+          : null,
+      });
+    };
+    log("mount");
+    const t1 = setTimeout(() => log("500ms"), 500);
+    const t2 = setTimeout(() => log("1500ms"), 1500);
+    const t3 = setTimeout(() => log("3000ms"), 3000);
+    return () => { clearTimeout(t1); clearTimeout(t2); clearTimeout(t3); };
+  }, []);
+
   const handleSend = async (question: string) => {
     const userMessage: Message = {
       id: Date.now().toString(),
@@ -88,6 +124,21 @@ export default function Home() {
     <div className="flex h-[100dvh] max-w-5xl mx-auto">
     {/* Main chat column */}
     <div className="flex flex-col flex-1 min-w-0 max-w-3xl mx-auto">
+      {/* TEMPORARY DEBUG: visible marker above header */}
+      <div
+        data-debug-marker
+        style={{
+          background: "red",
+          color: "white",
+          padding: "8px 16px",
+          fontSize: "14px",
+          fontWeight: "bold",
+          textAlign: "center",
+          flexShrink: 0,
+        }}
+      >
+        DEBUG MARKER — HEADER BELOW
+      </div>
       {/* Header */}
       <header className="flex-shrink-0 border-b border-[#2a2a3a] px-3 sm:px-4 py-2 sm:py-4">
         <div className="flex items-center justify-between gap-2">
