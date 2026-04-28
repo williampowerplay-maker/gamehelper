@@ -143,8 +143,6 @@ export default function Home() {
               {[
                 "How do I solve the Azure Moon Labyrinth?",
                 "Best strategy for Kailok the Hornsplitter?",
-                "Where is the Saint's Necklace?",
-                "How does the Abyss Artifact system work?",
               ].map((q) => (
                 <button
                   key={q}
