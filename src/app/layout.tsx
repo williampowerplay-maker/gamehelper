@@ -27,10 +27,6 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {/* TEMPORARY DEBUG: eruda mobile DevTools (Console/Elements/Network) */}
-        <Script id="eruda-load" strategy="afterInteractive">
-          {`var s=document.createElement('script');s.src='https://cdn.jsdelivr.net/npm/eruda';s.onload=function(){eruda.init();};document.head.appendChild(s);`}
-        </Script>
         {adsenseId && (
           <Script
             async
