@@ -27,14 +27,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-screen">
-        {adsenseId && (
+        {/* TEMPORARY DEBUG: AdSense disabled to test if it's causing mobile header clipping */}
+        {/* {adsenseId && (
           <Script
             async
             src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
             crossOrigin="anonymous"
             strategy="lazyOnload"
           />
-        )}
+        )} */}
         <AuthProvider>
           <ErrorBoundary componentName="RootLayout">
             {children}
