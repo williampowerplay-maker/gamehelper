@@ -31,35 +31,77 @@ export default function Home() {
     scrollToBottom();
   }, [messages]);
 
-  // TEMPORARY DEBUG: track header visibility / layout state on mobile
+  // TEMPORARY DEBUG: track header visibility / layout state on mobile.
+  // Writes to an on-page overlay at bottom of viewport so it's screenshot-friendly.
   useEffect(() => {
+    // Build the on-page overlay
+    let overlay = document.getElementById("debug-overlay") as HTMLPreElement | null;
+    if (!overlay) {
+      overlay = document.createElement("pre");
+      overlay.id = "debug-overlay";
+      overlay.style.cssText = [
+        "position:fixed",
+        "left:0",
+        "right:0",
+        "bottom:0",
+        "max-height:50vh",
+        "overflow:auto",
+        "margin:0",
+        "padding:6px 8px",
+        "background:rgba(0,0,0,0.92)",
+        "color:#0f0",
+        "font:10px/1.3 ui-monospace,Menlo,Consolas,monospace",
+        "white-space:pre-wrap",
+        "word-break:break-all",
+        "z-index:2147483647",
+        "border-top:2px solid #0f0",
+      ].join(";");
+      document.body.appendChild(overlay);
+    }
+    const append = (s: string) => {
+      if (overlay) overlay.textContent = (overlay.textContent || "") + s + "\n";
+    };
+
+    const fmtRect = (r: DOMRect | undefined) =>
+      r ? `top=${r.top.toFixed(0)} left=${r.left.toFixed(0)} w=${r.width.toFixed(0)} h=${r.height.toFixed(0)}` : "null";
+
     const log = (label: string) => {
-      const h = document.querySelector("header");
-      const marker = document.querySelector("[data-debug-marker]");
+      const h = document.querySelector("header") as HTMLElement | null;
+      const marker = document.querySelector("[data-debug-marker]") as HTMLElement | null;
       const body = document.body;
       const html = document.documentElement;
-      // eslint-disable-next-line no-console
-      console.log("[DEBUG-HEADER]", label, {
-        time: Date.now(),
-        headerExists: !!h,
-        headerRect: h?.getBoundingClientRect(),
-        headerComputedDisplay: h ? getComputedStyle(h).display : null,
-        headerComputedVisibility: h ? getComputedStyle(h).visibility : null,
-        headerComputedHeight: h ? getComputedStyle(h).height : null,
-        headerComputedTransform: h ? getComputedStyle(h).transform : null,
-        markerExists: !!marker,
-        markerRect: marker?.getBoundingClientRect(),
-        bodyScrollTop: body.scrollTop,
-        htmlScrollTop: html.scrollTop,
-        bodyHeight: body.getBoundingClientRect().height,
-        bodyComputedOverflow: getComputedStyle(body).overflow,
-        windowInnerHeight: window.innerHeight,
-        documentScrollHeight: html.scrollHeight,
-        visualViewport: window.visualViewport
-          ? { height: window.visualViewport.height, offsetTop: window.visualViewport.offsetTop, scale: window.visualViewport.scale }
-          : null,
+      const headerParent = h?.parentElement;
+      const hRect = h?.getBoundingClientRect();
+      const mRect = marker?.getBoundingClientRect();
+      const pRect = headerParent?.getBoundingClientRect();
+      const hCs = h ? getComputedStyle(h) : null;
+      const pCs = headerParent ? getComputedStyle(headerParent) : null;
+      const vv = window.visualViewport;
+
+      append(`── ${label} @ ${new Date().toLocaleTimeString()} ──`);
+      append(`hdr exists=${!!h} rect=${fmtRect(hRect)}`);
+      append(`hdr disp=${hCs?.display} vis=${hCs?.visibility} h=${hCs?.height} tr=${hCs?.transform}`);
+      append(`mrk exists=${!!marker} rect=${fmtRect(mRect)}`);
+      append(`parent tag=${headerParent?.tagName} rect=${fmtRect(pRect)}`);
+      append(`parent disp=${pCs?.display} h=${pCs?.height} ovf=${pCs?.overflow} tr=${pCs?.transform}`);
+      append(`body scrollTop=${body.scrollTop} htmlScrollTop=${html.scrollTop}`);
+      append(`body rect.h=${body.getBoundingClientRect().height.toFixed(0)} ovf=${getComputedStyle(body).overflow}`);
+      append(`win.innerHeight=${window.innerHeight} doc.scrollHeight=${html.scrollHeight}`);
+      append(`vv h=${vv?.height.toFixed(0)} offTop=${vv?.offsetTop.toFixed(0)} scale=${vv?.scale.toFixed(2)}`);
+      const bodyKids = Array.from(document.body.children).map((el) => {
+        const r = (el as HTMLElement).getBoundingClientRect();
+        const idAttr = el.id ? `#${el.id}` : "";
+        const cls = (el as HTMLElement).className?.toString().slice(0, 30) || "";
+        return `${el.tagName}${idAttr} top=${r.top.toFixed(0)} h=${r.height.toFixed(0)} "${cls}"`;
       });
+      append(`body.children:`);
+      bodyKids.forEach((k) => append(`  ${k}`));
+      append("");
+      // Also fire to console
+      // eslint-disable-next-line no-console
+      console.log("[DEBUG-HEADER]", label, { hRect, mRect, pRect, hDisp: hCs?.display, hH: hCs?.height, bodyKids });
     };
+
     log("mount");
     const t1 = setTimeout(() => log("500ms"), 500);
     const t2 = setTimeout(() => log("1500ms"), 1500);
