@@ -4,6 +4,43 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.19.0] - 2026-04-27 (Session 29 — Mobile UX Fixes + Landing Trim)
+
+### UX-only session. No retrieval, corpus, or backend changes.
+
+### Mobile header-disappearing bug fixed
+On Android Chrome the header (logo + title + Sign in) was visible for ~1 second after page load, then scrolled above the visible viewport and was unreachable.
+
+**Root cause: two interacting bugs.**
+1. `<body className="antialiased min-h-screen">` set `min-height: 100vh`. On Android Chrome, `100vh` = `lvh` (largest viewport, URL bar collapsed). With URL bar visible: `lvh = 747`, `win.innerHeight = 690`. Body was 57px taller than the visible viewport. `globals.css` already had `body { height: 100%; overflow: hidden }` which locks body's own scroll — but **html became the document scroller** for the 57px gap.
+2. `useEffect(() => { scrollToBottom() }, [messages])` in `page.tsx` fired on initial mount with `messages = []`, calling `messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })`. `scrollIntoView` scrolls every scrollable ancestor including html. The smooth animation ran ~500ms and ended with `html.scrollTop = 56`, hiding the top of the page.
+
+**Fix:** removed `min-h-screen` from `<body>`; guarded `scrollToBottom` with `messages.length > 0`. Either alone would have stopped the symptom; together they make the layout robust against future changes to body sizing or scroll logic.
+
+### Mobile UX cleanup (separate from header fix)
+- **CoverageStats:** changed grid to `grid-cols-1 sm:grid-cols-2` so labels like "Items & Equipment (1,234)" don't truncate on phones.
+- **Header:** smaller logo/title on mobile (`w-9 h-9 sm:w-11 sm:h-11`, `text-base sm:text-xl`), tighter gap, `min-w-0` + `truncate` on the title so it can't push AuthButton off-screen.
+- **Landing example questions:** trimmed 4 → 2. Kept "How do I solve the Azure Moon Labyrinth?" and "Best strategy for Kailok the Hornsplitter?" Removed Saint's Necklace and Abyss Artifact prompts.
+- **Empty-state logo:** removed the duplicate 96px logo (header logo is sufficient; the duplicate consumed mobile vertical space).
+
+### Diagnosis methodology added to LEARNINGS
+For time-delayed mobile bugs, instrument with an on-page debug overlay (`<pre style="position:fixed; bottom:0; z-index:max">`) before theorizing. See `LEARNINGS.md` "UX: For Time-Delayed Mobile Bugs, Instrument Before Theorizing" for the pattern.
+
+### Files changed
+- `src/app/layout.tsx` — removed `min-h-screen` from `<body>`
+- `src/app/page.tsx` — guarded `scrollToBottom`, header sizing tweaks, trimmed example questions, removed empty-state logo
+- `src/components/CoverageStats.tsx` — responsive grid
+- `PROJECT_STATUS.md`, `LEARNINGS.md`, `CHANGELOG.md`, `RESUME.md` — session 29 entries
+
+### Commits
+- `260ebfb` fix(mobile): coverage-stats truncation and header crowding
+- `081ec32` fix(mobile): header hidden by initial smooth-scroll on Android Chrome
+- `c42fca4` chore: remove mobile header debug instrumentation
+- `127efbc` trim landing page example questions from 4 to 2
+- `776bcfe` remove duplicate 96px logo from empty-state landing
+
+---
+
 ## [0.18.0] - 2026-04-23 (Session 25 — Phase 1b Boilerplate Deletion)
 
 ### Retrieval quality — before/after

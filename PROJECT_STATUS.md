@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-27 (session 28 — coverage-stats display on landing page)
+**Last updated:** 2026-04-27 (session 29 — mobile UX fixes + landing trim)
 
 ## Current State Snapshot
 
@@ -17,7 +17,26 @@
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
 
-## Recent Changes (Session 28)
+## Recent Changes (Session 29 — Mobile UX + Landing Trim, 2026-04-27)
+
+UX-only session. No retrieval, corpus, or backend changes.
+
+**Mobile header-disappearing bug fixed (`081ec32`).** Root cause was two interacting bugs:
+1. `<body className="antialiased min-h-screen">` in `layout.tsx` set `min-height: 100vh`. On Android Chrome, `100vh` resolves to `lvh` (the largest viewport, with URL bar collapsed). With URL bar visible: `lvh = 747`, `win.innerHeight = 690`. Body was 57px taller than the visible viewport. `globals.css` already had `body { height: 100%; overflow: hidden }` which locks body's own scroll, but **html became the document scroller** for the 57px gap.
+2. `useEffect(() => { scrollToBottom() }, [messages])` in `page.tsx` fired on initial mount with `messages = []`, calling `messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })`. `scrollIntoView` scrolls every scrollable ancestor including html. The smooth animation ran ~500ms and ended with `html.scrollTop = 56`, hiding the top of the page. Header was briefly visible at mount, then disappeared as the animation completed — exactly the user-reported symptom.
+
+**Fix:** removed `min-h-screen` from `<body>`; guarded `scrollToBottom` with `messages.length > 0`. Both changes shipped together; either alone would have stopped the symptom but together they make the layout robust.
+
+**Diagnosis methodology that worked.** Two earlier rounds of static-CSS analysis (header crowding, then `100vh` viewport-mismatch theory) produced wrong fixes because the bug was *time-delayed runtime behavior* (smooth-scroll animation), not static layout. The breakthrough came from injecting a fixed-position on-page debug overlay that captured `getBoundingClientRect()`, computed styles, and scroll positions at mount/500ms/1500ms/3000ms. The user screenshotted the overlay — no remote DevTools needed. The data showed `htmlScrollTop` jumping from `0 → 56` between mount and 500ms, with `headerRect.top` going from `+37 → -19`. Pattern saved as `feedback_mobile_debug.md` in the user's auto-memory.
+
+**Landing UX cleanup.**
+- `260ebfb` — CoverageStats: 1-col on mobile (`grid-cols-1 sm:grid-cols-2`) so labels like "Items & Equipment (1,234)" don't truncate. Header: smaller logo/title on mobile, tighter gap, `min-w-0`+`truncate` so title can't push AuthButton off-screen.
+- `127efbc` — Trimmed landing example questions 4 → 2 (kept Azure Moon Labyrinth + Kailok the Hornsplitter).
+- `776bcfe` — Removed duplicate 96px logo from empty-state landing (header logo is sufficient).
+
+**Files changed (session 29):** `src/app/layout.tsx`, `src/app/page.tsx`, `src/components/CoverageStats.tsx`. All other source files untouched.
+
+## Earlier Changes (Session 28)
 
 - **Added coverage-stats display** on landing page (empty state only). Backend: `src/app/api/coverage-stats/route.ts` (GET, public, 24h module-level cache). Frontend: `src/components/CoverageStats.tsx` (client component, skeleton loading, error→hide).
 - User-facing label mapping: item→"Items & Equipment", mechanic→"Game Mechanics", quest→"Quests", character→"Characters & NPCs", exploration→"Locations", recipe→"Recipes", boss→"Bosses", puzzle→"Puzzles". All 8 categories qualify (≥50 pages). Counts show distinct page (URL) counts, not chunk counts.

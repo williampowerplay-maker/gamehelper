@@ -4,6 +4,33 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## UX: For Time-Delayed Mobile Bugs, Instrument Before Theorizing (Session 29)
+
+A user-reported "header is visible for ~1 second then disappears on mobile" took two wrong-diagnosis rounds (header crowding, then `100vh` viewport-mismatch theory) before the actual cause was found via runtime instrumentation. The root cause was a JS interaction (`scrollIntoView` smooth-scroll firing on initial mount, scrolling html to its max because body was taller than the visible viewport), not a static CSS layout problem.
+
+**Pattern that worked: an on-page debug overlay.** Inject a fixed-position `<pre>` at the bottom of the viewport (`position:fixed; bottom:0; z-index:max`) that captures, at multiple timestamps (mount / 500 / 1500 / 3000 ms):
+
+- `getBoundingClientRect()` for the affected element + its parent
+- Computed styles (`display`, `visibility`, `height`, `transform`)
+- `html.scrollTop`, `body.scrollTop`
+- `window.innerHeight`, `window.visualViewport.{height, offsetTop}`
+- `body.getBoundingClientRect().height` and `getComputedStyle(body).overflow`
+- `Array.from(document.body.children).map(el => ({tag, id, class, rect}))` — catches stealth elements injected at body root (auto-ads, browser injections, Stripe iframes)
+
+The user screenshots the overlay — no remote DevTools setup needed. This worked when eruda alone failed (the offending element happened to cover eruda's launcher button).
+
+**Diagnostic priorities for time-delayed mobile bugs:**
+1. Is the element still in the DOM? (`headerExists=true` rules out conditional rendering / unmount.)
+2. Where is it positioned? Negative `rect.top` with `htmlScrollTop > 0` means document-level scroll is the mechanism.
+3. What changed between t=0 and t=500ms? In this case, `htmlScrollTop` jumping from 0 → 56 between mount and 500ms with positive `headerRect.top` shrinking accordingly was the smoking gun.
+4. What's actually scrollable? `body { overflow: hidden }` only locks body's own scroll. If body is taller than html (or html is the document scroller), html can still scroll regardless of body styles.
+
+**Specific footgun on this codebase:** `globals.css` has `body { height: 100%; overflow: hidden }`. Any `min-h-*` class on `<body>` (especially `min-h-screen` = `100vh` = `lvh` on Android Chrome) creates a body taller than the visible viewport when the URL bar is showing — making `html` (the document scroller) scrollable. Combined with any code path that calls `scrollIntoView` / `scrollTo` / `Element.scrollTop = …`, this causes the page to scroll on its own and hide top content.
+
+**Don't skip diagnosis for impatience.** When the user explicitly asks for "diagnosis only, no edits," produce a thorough report. The previous round's failure came from rushing to a fix without enough data.
+
+---
+
 ## Infra: PostgREST 1000-Row Default Limit Silently Truncates Aggregate Queries (Session 28)
 
 PostgREST's default row limit (1000) applies to all direct table SELECT queries — including analytics/aggregate fetches that expect full-table scans. The truncation is **silent**: no error, no warning, no indication that results are incomplete. In practice this means `SELECT content_type, COUNT(DISTINCT source_url) FROM knowledge_chunks GROUP BY content_type` routed through PostgREST returns counts based on the first 1000 rows scanned, not the full 59K. The result was `totalSources=195` instead of the correct `5,481`.
