@@ -31,6 +31,30 @@ The user screenshots the overlay — no remote DevTools setup needed. This worke
 
 ---
 
+## Product: Separate "Not Signed In" From "Signed In Free" — They Need Different Gates (Session 30)
+
+Anonymous users and signed-in free users look the same from a feature perspective but need completely different enforcement mechanisms and messaging:
+
+- **Anonymous**: IP-based backend count + localStorage client counter. Message is "sign in to continue" (the value exchange is an account, not money). Blocked from Solution tier entirely — Solution mode is the premium-tier differentiator, not a free-tier feature at all.
+- **Signed-in free**: user_id-based backend count. Message is "upgrade to continue" (the value exchange is $4.99/mo). Can use Solution tier only after upgrading.
+
+The client-side enforcement (localStorage for anon, implied query count for free) provides instant UX without an API round-trip. The server-side enforcement is the real backstop — both checks must be present. Never rely on client-only limiting; anyone can POST directly to `/api/chat`.
+
+**Where the tier check lives in the API:** after JWT verification (`supabase.auth.getUser(token)`), fetch the `users.tier` row for the authenticated user. This adds one DB round-trip per request but is the only reliable source of truth. The JWT itself doesn't contain the tier.
+
+---
+
+## Product: Pre-Launch "Coming Soon" Placeholders for Unfinished Monetisation (Session 30)
+
+When a feature is code-complete but not yet configured (Stripe keys not set up, pricing not finalized), disable the button and show "Coming Soon" rather than either hiding it or letting it fail at runtime. Benefits:
+- Users understand the page isn't broken
+- The page still communicates the value proposition and pricing
+- The re-activation diff is tiny (one code block swap) and can't be forgotten because the placeholder is visible
+
+**The activation checklist belongs in RESUME.md and PROJECT_STATUS.md** — not just in a TODO comment in the code. Code comments get buried; doc-level pre-launch checklists get read at the start of every session.
+
+---
+
 ## Infra: PostgREST 1000-Row Default Limit Silently Truncates Aggregate Queries (Session 28)
 
 PostgREST's default row limit (1000) applies to all direct table SELECT queries — including analytics/aggregate fetches that expect full-table scans. The truncation is **silent**: no error, no warning, no indication that results are incomplete. In practice this means `SELECT content_type, COUNT(DISTINCT source_url) FROM knowledge_chunks GROUP BY content_type` routed through PostgREST returns counts based on the first 1000 rows scanned, not the full 59K. The result was `totalSources=195` instead of the correct `5,481`.

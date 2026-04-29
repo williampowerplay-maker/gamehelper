@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-27 (session 29 — mobile UX fixes + landing trim)
+**Last updated:** 2026-04-29 (session 30 — user tier enforcement + pre-launch gating)
 
 ## Current State Snapshot
 
@@ -16,6 +16,38 @@
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
+
+## Recent Changes (Session 30 — User Tier Enforcement, 2026-04-29)
+
+All product/auth/monetisation gating. No retrieval or corpus changes.
+
+**User tier matrix (now enforced end-to-end):**
+
+| | Not signed in | Free (signed in) | Premium |
+|---|---|---|---|
+| Daily queries | 2 → sign-in wall | 5 → upgrade CTA | Unlimited |
+| Solution mode | Blocked (client + server) | Blocked (upgrade CTA) | Yes |
+| Ads | Yes | Yes | No |
+
+**Anonymous sign-in wall (`9484edc`).**
+- 2 free Nudge queries, then `SignInWall` component replaces the chat bubble
+- localStorage counter (`anonQueryCount`) for instant wall — no wasted API call on the 3rd attempt; cleared on sign-in
+- Backend enforces independently: IP + `cache_hit=false` + 24h window in `queries` table
+- Solution tier (`spoilerTier=full`) blocked server-side for unauthenticated requests — direct API calls also rejected
+- `SpoilerTierSelector`: signed-out users clicking Solution opens sign-in modal (not /upgrade)
+- `AuthButton` accepts `externalOpen`/`onExternalClose` so modal can be triggered from anywhere in `page.tsx`
+
+**Free tier daily cap (`cd5d3f6`).**
+- 5 non-cached queries/24h for signed-in free users; premium bypasses entirely
+- Auth token read from `Authorization: Bearer` header; user tier fetched from `users` table after JWT verification
+- `user_id` now written to all `queries` inserts for authenticated requests (enables per-user counting, not just per-IP)
+
+**Upgrade page + Stripe gating (`d431f93`).**
+- Subscribe button replaced with disabled "Coming Soon" — Stripe not yet configured
+- Free tier feature copy corrected (was "30 questions/day", now "5 questions/day")
+- **Pre-launch TODO:** when Stripe is configured, swap the Coming Soon button back to the `handleSubscribe` flow in `src/app/upgrade/page.tsx` (one code block, clearly marked)
+
+**Signup cap reminder:** `MAX_USERS = NEXT_PUBLIC_MAX_USERS || 100`. New signups are waitlisted once the `users` table hits this count. Existing users can always sign in. Adjust via Vercel env var — no code change needed.
 
 ## Recent Changes (Session 29 — Mobile UX + Landing Trim, 2026-04-27)
 

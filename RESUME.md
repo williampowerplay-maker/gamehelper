@@ -1,7 +1,7 @@
-# Resume: Phase 1 closed + landing/mobile UX polished
+# Resume: Phase 1 closed + user tier enforcement wired
 
 ## Current state
-- Last commit: 776bcfe (session 29 — landing trim: removed duplicate 96px logo)
+- Last commit: d431f93 (session 30 — coming soon on upgrade page)
 - Branch: main, working tree clean
 - Recall@10: 80.0% deterministic across 10 consecutive runs
 - MRR: 0.482 (1-of-10 runs at 0.449 — sub-decision-floor wobble)
@@ -10,6 +10,21 @@
 - IVFFlat index: idx_chunks_embedding, lists=237, rebuilt post-1e
 - Coverage-stats display: LIVE
 - Mobile: header visibility bug FIXED, landing layout polished
+- User tier enforcement: LIVE (anon 2/day wall, free 5/day cap, Solution requires sign-in)
+
+## Session 30 (2026-04-29) — user tier enforcement
+
+Four commits. No retrieval/corpus changes.
+
+1. `9484edc` — Anonymous sign-in wall: 2 free queries, then `SignInWall` component. localStorage counter + server-side IP enforcement. Solution tier blocked server-side for unauthenticated requests. `AuthButton` controllable via `externalOpen` prop.
+2. `cd5d3f6` — Free tier 5 queries/day cap. Auth token verified per-request; user tier fetched from `users` table. `user_id` written to all `queries` inserts for authenticated users.
+3. `d431f93` — Subscribe button → "Coming Soon". Free tier feature copy corrected to 5/day.
+
+**Pre-launch Stripe checklist** (see PROJECT_STATUS for full steps):
+- Add `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET` to Vercel env vars
+- Re-enable subscribe button in `src/app/upgrade/page.tsx` (swap Coming Soon block back to `handleSubscribe`)
+- Register webhook endpoint in Stripe dashboard pointing to `/api/stripe/webhook`
+- Verify `users` table has `stripe_customer_id`, `stripe_subscription_id`, `tier` columns
 
 ## Session 29 (2026-04-27) — mobile UX
 
