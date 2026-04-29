@@ -270,6 +270,27 @@ export async function POST(req: NextRequest) {
     const clientIp = getClientIp(req);
     const supabase = createClient(supabaseUrl, supabaseKey);
 
+    // ===== AUTH CHECK =====
+    // Read the Supabase JWT passed by the client (if any).
+    // isAuthenticated = false means the user is browsing without an account.
+    const authHeader = req.headers.get("Authorization");
+    const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
+    let isAuthenticated = false;
+    if (token) {
+      const { data: { user: authUser } } = await supabase.auth.getUser(token);
+      if (authUser) isAuthenticated = true;
+    }
+
+    // Solution tier requires sign-in — enforce server-side (client already locks the button,
+    // but a direct API call with spoilerTier=full must also be rejected for unauthenticated users)
+    if (!isAuthenticated && spoilerTier === "full") {
+      return NextResponse.json({
+        requiresAuth: true,
+        requiresAuthReason: "solution_tier",
+        error: "Sign in to use Solution mode. It's free to create an account.",
+      }, { status: 401 });
+    }
+
     // Normalize question for cache lookup — treats "How do I beat Kearush?",
     // "how do i beat kearush" and "how do I beat Kearush!" as the same cache key.
     // Original question is passed to Claude for best response quality.
@@ -345,6 +366,28 @@ export async function POST(req: NextRequest) {
         cache_hit: true,
       }).then(() => {});
       return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true });
+    }
+
+    // ===== ANONYMOUS QUERY LIMIT =====
+    // Unauthenticated users get 2 non-cached queries per 24 hours.
+    // Cache hits don't count — they're free to serve and shouldn't penalise re-asks.
+    // The client enforces this via localStorage too; this is the server-side backstop.
+    if (!isAuthenticated) {
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: anonCount } = await supabase
+        .from("queries")
+        .select("id", { count: "exact", head: true })
+        .eq("client_ip", clientIp)
+        .eq("cache_hit", false)
+        .gte("created_at", oneDayAgo);
+
+      if ((anonCount ?? 0) >= 2) {
+        return NextResponse.json({
+          requiresAuth: true,
+          requiresAuthReason: "query_limit",
+          error: "You've used your 2 free questions. Sign in to keep going — it's free.",
+        }, { status: 401 });
+      }
     }
 
     // ===== FREE TIER: SOLUTION DAILY CAP =====

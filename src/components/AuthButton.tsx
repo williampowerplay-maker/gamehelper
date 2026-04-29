@@ -6,11 +6,23 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/auth-context";
 import { supabase } from "@/lib/supabase";
 
-export default function AuthButton() {
+export default function AuthButton({
+  externalOpen,
+  onExternalClose,
+}: {
+  externalOpen?: boolean;
+  onExternalClose?: () => void;
+} = {}) {
   const { user, tier, signIn, signUp, signInWithGoogle, signOut, loading, signupsClosed } =
     useAuth();
   const router = useRouter();
   const [showModal, setShowModal] = useState(false);
+
+  const isModalOpen = showModal || !!externalOpen;
+  const closeModal = () => {
+    setShowModal(false);
+    onExternalClose?.();
+  };
   const [portalLoading, setPortalLoading] = useState(false);
   const [isSignUp, setIsSignUp] = useState(false);
   const [email, setEmail] = useState("");
@@ -93,7 +105,7 @@ export default function AuthButton() {
     if (result.error) {
       setError(result.error);
     } else {
-      setShowModal(false);
+      closeModal();
       setEmail("");
       setPassword("");
     }
@@ -126,7 +138,7 @@ export default function AuthButton() {
         Sign in
       </button>
 
-      {showModal && (
+      {isModalOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
           <div className="bg-[#1a1a24] border border-[#2a2a3a] rounded-2xl p-6 w-full max-w-sm mx-4">
             <div className="flex justify-between items-center mb-4">
@@ -134,7 +146,7 @@ export default function AuthButton() {
                 {isSignUp ? "Create account" : "Sign in"}
               </h2>
               <button
-                onClick={() => setShowModal(false)}
+                onClick={closeModal}
                 className="text-gray-500 hover:text-gray-300"
               >
                 <svg

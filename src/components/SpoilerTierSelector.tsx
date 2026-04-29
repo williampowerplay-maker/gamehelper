@@ -14,7 +14,7 @@ const tiers: { id: SpoilerTier; label: string; desc: string; icon: string; premi
   {
     id: "full",
     label: "Solution",
-    desc: "Complete answer — Premium only",
+    desc: "Complete answer — requires sign-in",
     icon: "\u{1F4A1}",
     premiumOnly: true,
   },
@@ -24,10 +24,14 @@ export default function SpoilerTierSelector({
   selected,
   onChange,
   isPremium = false,
+  isSignedIn = false,
+  onSignInRequest,
 }: {
   selected: SpoilerTier;
   onChange: (tier: SpoilerTier) => void;
   isPremium?: boolean;
+  isSignedIn?: boolean;
+  onSignInRequest?: () => void;
 }) {
   const router = useRouter();
 
@@ -42,12 +46,20 @@ export default function SpoilerTierSelector({
             key={tier.id}
             onClick={() => {
               if (locked) {
-                router.push("/upgrade");
+                if (!isSignedIn && onSignInRequest) {
+                  onSignInRequest();
+                } else {
+                  router.push("/upgrade");
+                }
               } else {
                 onChange(tier.id);
               }
             }}
-            title={locked ? "Premium only — click to upgrade" : tier.desc}
+            title={locked
+              ? isSignedIn
+                ? "Premium only — click to upgrade"
+                : "Sign in to access Solution mode"
+              : tier.desc}
             className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium transition-all
               ${locked
                 ? "bg-[#1a1a24] text-gray-600 border border-[#2a2a3a] hover:border-amber-500/40 hover:text-amber-500/70 cursor-pointer"

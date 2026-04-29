@@ -9,6 +9,8 @@ interface Message {
   spoilerTier?: SpoilerTier;
   sources?: { title: string; url: string }[];
   showUpgradeCTA?: boolean;
+  requiresAuth?: boolean;
+  requiresAuthReason?: "query_limit" | "solution_tier";
 }
 
 const tierBadge: Record<SpoilerTier, { label: string; color: string }> = {

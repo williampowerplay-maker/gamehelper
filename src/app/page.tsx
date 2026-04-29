@@ -8,20 +8,31 @@ import SpoilerTierSelector from "@/components/SpoilerTierSelector";
 import AuthButton from "@/components/AuthButton";
 import AdBanner from "@/components/AdBanner";
 import UpgradeCTA from "@/components/UpgradeCTA";
+import SignInWall from "@/components/SignInWall";
 import CoverageStats from "@/components/CoverageStats";
 import { useAuth } from "@/lib/auth-context";
 import { type SpoilerTier } from "@/lib/supabase";
 
 const AD_SLOT_BANNER = process.env.NEXT_PUBLIC_AD_SLOT_BANNER || "";
 const AD_SLOT_SIDEBAR = process.env.NEXT_PUBLIC_AD_SLOT_SIDEBAR || "";
+const ANON_QUERY_LIMIT = 2;
+const ANON_COUNT_KEY = "anonQueryCount";
 
 export default function Home() {
-  const { tier } = useAuth();
+  const { user, session, tier } = useAuth();
   const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
   const [messages, setMessages] = useState<Message[]>([]);
   const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("nudge");
   const [isLoading, setIsLoading] = useState(false);
+  const [showAuthModal, setShowAuthModal] = useState(false);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+
+  // Clear anon counter once user signs in
+  useEffect(() => {
+    if (user) {
+      localStorage.removeItem(ANON_COUNT_KEY);
+    }
+  }, [user]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -32,6 +43,26 @@ export default function Home() {
   }, [messages]);
 
   const handleSend = async (question: string) => {
+    // Anonymous query limit — check locally first to avoid a wasted API call
+    if (!user) {
+      const anonCount = parseInt(localStorage.getItem(ANON_COUNT_KEY) || "0", 10);
+      if (anonCount >= ANON_QUERY_LIMIT) {
+        const wallMessage: Message = {
+          id: Date.now().toString(),
+          role: "assistant",
+          content: "",
+          requiresAuth: true,
+          requiresAuthReason: "query_limit",
+        };
+        setMessages((prev) => [
+          ...prev,
+          { id: (Date.now() - 1).toString(), role: "user", content: question },
+          wallMessage,
+        ]);
+        return;
+      }
+    }
+
     const userMessage: Message = {
       id: Date.now().toString(),
       role: "user",
@@ -42,15 +73,33 @@ export default function Home() {
     setIsLoading(true);
 
     try {
+      const headers: Record<string, string> = { "Content-Type": "application/json" };
+      if (session?.access_token) {
+        headers["Authorization"] = `Bearer ${session.access_token}`;
+      }
+
       const res = await fetch("/api/chat", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({ question, spoilerTier }),
       });
 
       const data = await res.json();
 
-      // Handle rate limiting
+      // Requires sign-in (anon query limit or solution tier block)
+      if (data.requiresAuth) {
+        const wallMessage: Message = {
+          id: (Date.now() + 1).toString(),
+          role: "assistant",
+          content: "",
+          requiresAuth: true,
+          requiresAuthReason: data.requiresAuthReason ?? "query_limit",
+        };
+        setMessages((prev) => [...prev, wallMessage]);
+        return;
+      }
+
+      // Handle rate limiting (existing signed-in rate limits, still commented out but kept for future)
       if (data.rateLimited) {
         const rateLimitMessage: Message = {
           id: (Date.now() + 1).toString(),
@@ -71,12 +120,17 @@ export default function Home() {
       };
 
       setMessages((prev) => [...prev, aiMessage]);
+
+      // Increment anon counter for non-cached responses (cache hits don't count)
+      if (!user && !data.cached) {
+        const anonCount = parseInt(localStorage.getItem(ANON_COUNT_KEY) || "0", 10);
+        localStorage.setItem(ANON_COUNT_KEY, String(anonCount + 1));
+      }
     } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: "assistant",
-        content:
-          "Something went wrong. Please try again.",
+        content: "Something went wrong. Please try again.",
       };
       setMessages((prev) => [...prev, errorMessage]);
     } finally {
@@ -110,7 +164,10 @@ export default function Home() {
               </p>
             </div>
           </div>
-          <AuthButton />
+          <AuthButton
+            externalOpen={showAuthModal}
+            onExternalClose={() => setShowAuthModal(false)}
+          />
         </div>
       </header>
 
@@ -122,6 +179,8 @@ export default function Home() {
             selected={spoilerTier}
             onChange={setSpoilerTier}
             isPremium={tier === "premium"}
+            isSignedIn={!!user}
+            onSignInRequest={() => setShowAuthModal(true)}
           />
         </div>
       </div>
@@ -162,18 +221,27 @@ export default function Home() {
 
           return (
             <div key={msg.id}>
-              <ChatMessage message={msg} />
-              {/* Show upgrade CTA when free user hits rate limit */}
-              {isAssistant && msg.showUpgradeCTA && (
-                <UpgradeCTA rateLimitHit />
-              )}
-              {/* Show upgrade CTA after every 5th assistant response */}
-              {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
-                <UpgradeCTA />
-              )}
-              {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}
-              {showAds && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
-                <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
+              {msg.requiresAuth ? (
+                <SignInWall
+                  reason={msg.requiresAuthReason}
+                  onSignInClick={() => setShowAuthModal(true)}
+                />
+              ) : (
+                <>
+                  <ChatMessage message={msg} />
+                  {/* Show upgrade CTA when signed-in free user hits rate limit */}
+                  {isAssistant && msg.showUpgradeCTA && (
+                    <UpgradeCTA rateLimitHit />
+                  )}
+                  {/* Show upgrade CTA after every 5th assistant response */}
+                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
+                    <UpgradeCTA />
+                  )}
+                  {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}
+                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
+                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
+                  )}
+                </>
               )}
             </div>
           );
