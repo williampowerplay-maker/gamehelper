@@ -276,9 +276,21 @@ export async function POST(req: NextRequest) {
     const authHeader = req.headers.get("Authorization");
     const token = authHeader?.startsWith("Bearer ") ? authHeader.slice(7) : null;
     let isAuthenticated = false;
+    let authenticatedUserId: string | null = null;
+    let authenticatedUserTier: "free" | "premium" = "free";
     if (token) {
       const { data: { user: authUser } } = await supabase.auth.getUser(token);
-      if (authUser) isAuthenticated = true;
+      if (authUser) {
+        isAuthenticated = true;
+        authenticatedUserId = authUser.id;
+        // Fetch tier from users table
+        const { data: userRow } = await supabase
+          .from("users")
+          .select("tier")
+          .eq("id", authUser.id)
+          .single();
+        if (userRow?.tier === "premium") authenticatedUserTier = "premium";
+      }
     }
 
     // Solution tier requires sign-in — enforce server-side (client already locks the button,
@@ -363,6 +375,7 @@ export async function POST(req: NextRequest) {
         tokens_used: 0,
         input_tokens: 0,
         client_ip: clientIp,
+        user_id: authenticatedUserId,
         cache_hit: true,
       }).then(() => {});
       return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true });
@@ -387,6 +400,27 @@ export async function POST(req: NextRequest) {
           requiresAuthReason: "query_limit",
           error: "You've used your 2 free questions. Sign in to keep going — it's free.",
         }, { status: 401 });
+      }
+    }
+
+    // ===== FREE TIER: DAILY QUERY CAP =====
+    // Signed-in free users: 5 non-cached queries per 24 hours.
+    // Premium users bypass this entirely.
+    if (isAuthenticated && authenticatedUserTier === "free" && authenticatedUserId) {
+      const oneDayAgo = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
+      const { count: freeCount } = await supabase
+        .from("queries")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", authenticatedUserId)
+        .eq("cache_hit", false)
+        .gte("created_at", oneDayAgo);
+
+      if ((freeCount ?? 0) >= 5) {
+        return NextResponse.json({
+          error: "You've reached your 5 free questions for today. Upgrade to Premium for unlimited access.",
+          rateLimited: true,
+          showUpgradeCTA: true,
+        }, { status: 429 });
       }
     }
 
@@ -857,6 +891,7 @@ export async function POST(req: NextRequest) {
           tokens_used: claudeData.usage?.output_tokens || 0,
           input_tokens: claudeData.usage?.input_tokens || 0,
           client_ip: clientIp,
+          user_id: authenticatedUserId,
           cache_hit: false,
           // ── retrieval instrumentation ──────────────────────────────────
           classified_content_type:   contentTypeFilter ?? null,
@@ -879,6 +914,7 @@ export async function POST(req: NextRequest) {
           tokens_used: claudeData.usage?.output_tokens || 0,
           input_tokens: claudeData.usage?.input_tokens || 0,
           client_ip: clientIp,
+          user_id: authenticatedUserId,
           cache_hit: false,
           content_gap: true,
           // ── retrieval instrumentation ──────────────────────────────────
