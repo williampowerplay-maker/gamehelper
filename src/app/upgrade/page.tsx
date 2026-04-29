@@ -8,8 +8,8 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 
 const FREE_FEATURES = [
-  "30 questions per day",
-  "Nudge spoiler tier",
+  "5 questions per day",
+  "Nudge spoiler tier only",
   "Boss strategies, item locations, puzzles",
   "Ads between responses",
 ];
@@ -157,29 +157,15 @@ export default function UpgradePage() {
               >
                 {portalLoading ? "Loading..." : "Manage billing"}
               </button>
-            ) : user ? (
+            ) : (
               <div>
                 <button
-                  onClick={handleSubscribe}
-                  disabled={checkoutLoading}
-                  className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white text-sm font-semibold rounded-xl py-3 transition-colors"
+                  disabled
+                  className="w-full bg-[#2a2a3a] text-gray-500 text-sm font-semibold rounded-xl py-3 cursor-not-allowed"
                 >
-                  {checkoutLoading ? "Redirecting to checkout..." : "Subscribe — $4.99/mo"}
+                  Coming Soon
                 </button>
-                {checkoutError && (
-                  <p className="text-xs text-red-400 mt-2 text-center">{checkoutError}</p>
-                )}
-                <p className="text-xs text-gray-600 text-center mt-2">Secure checkout via Stripe · Cancel anytime</p>
-              </div>
-            ) : (
-              <div className="text-center">
-                <p className="text-xs text-gray-500 mb-3">Sign in to subscribe</p>
-                <Link
-                  href="/"
-                  className="inline-block bg-red-600 hover:bg-red-700 text-white text-sm font-semibold rounded-xl px-6 py-2.5 transition-colors"
-                >
-                  Sign in →
-                </Link>
+                <p className="text-xs text-gray-600 text-center mt-2">Premium subscriptions launching soon</p>
               </div>
             )}
           </div>
