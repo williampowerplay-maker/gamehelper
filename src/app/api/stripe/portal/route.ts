@@ -48,7 +48,7 @@ export async function POST(req: NextRequest) {
   }
 
   const stripe = new Stripe(STRIPE_SECRET_KEY);
-  const origin = req.headers.get("origin") || "https://crimson-guide.vercel.app";
+  const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "https://crimson-guide.vercel.app";
 
   const portalSession = await stripe.billingPortal.sessions.create({
     customer: userData.stripe_customer_id,

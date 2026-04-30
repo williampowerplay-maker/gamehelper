@@ -45,8 +45,7 @@ export default function PrivacyPolicy() {
 
         <Section title="1. Overview">
           <p>
-            Crimson Desert Guide ("we", "us", or "our") operates{" "}
-            <strong>crimson-guide.vercel.app</strong> (the "Service"). This Privacy Policy explains
+            Crimson Desert Guide ("we", "us", or "our") operates this Service. This Privacy Policy explains
             what information we collect, how we use it, and your rights regarding that information.
           </p>
           <p>

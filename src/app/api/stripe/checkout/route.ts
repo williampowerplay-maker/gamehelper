@@ -39,7 +39,7 @@ export async function POST(req: NextRequest) {
 
   const stripe = new Stripe(STRIPE_SECRET_KEY);
   const supabase = createClient(supabaseUrl, supabaseServiceKey);
-  const origin = req.headers.get("origin") || "https://crimson-guide.vercel.app";
+  const origin = req.headers.get("origin") || process.env.NEXT_PUBLIC_APP_URL || "https://crimson-guide.vercel.app";
 
   // Look up existing Stripe customer ID for this user
   const { data: userData } = await supabase

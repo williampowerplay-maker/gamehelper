@@ -45,8 +45,7 @@ export default function TermsOfService() {
 
         <Section title="1. Acceptance of Terms">
           <p>
-            By accessing or using Crimson Desert Guide at <strong>crimson-guide.vercel.app</strong>{" "}
-            (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do
+            By accessing or using Crimson Desert Guide (the "Service"), you agree to be bound by these Terms of Service ("Terms"). If you do
             not agree, do not use the Service.
           </p>
           <p>
