@@ -99,6 +99,35 @@ Users want to know what the system knows about; they don't need to know where th
 
 ---
 
+## RAG: Game8 Markdown Ingestion Eats Hyphenated Title Continuations After Newlines (Session 32)
+
+Game8 page titles with hyphenated continuations get truncated during ingestion: "Best One-Handed Weapons" became "Best One" in chunk content because the parser interpreted `-Handed Weapons` (on a new line after the first half of the title) as a markdown list-item bullet `- Handed Weapons`. Voyage embedded the corrupted text, so vector similarity to tier-list queries lost its semantic anchor. 4 URLs / 172 chunks affected — verified comprehensive via SQL scan for any other game8 first-line ending in single-word fragments (`One$`, `Two$`, `Self$`, `Anti$`, etc.); zero additional matches.
+
+The bug appears in **TWO slots per chunk**: (1) the prepended page-title prefix, and (2) the page's own scraped H1 header inside the chunk content. The slot-1 fix (`scripts/fix-game8-titles.ts`) is a clean prefix-replacement and re-embed; raw vector similarity on the corrected chunks measurably improved (expected chunks moved from below top-100 to top-25 in raw vector search). But the slot-2 H1 header is still inside the chunk content and still truncated, so Voyage still sees "Best One" prominently. **Slot-1 fix alone did not move the post-rerank eval** — the reranker's URL-match and content-start boosts favor fextralife pages whose URLs literally contain "armor"/"weapons", and the ~0.005 raw-sim gain from the title fix isn't enough to overcome the reranker boost gap.
+
+**Two-slot fixes need both slots.** When a parser bug corrupts content that gets stored in multiple positions within a chunk, fixing only one position lifts vector similarity but may not lift post-rerank ranking. The reranker amplifies whatever surface signal it can find (URL terms, content-start matches), so any persistent corruption that's still visible to the embedding model is competing against those amplified signals.
+
+**Data fix at `scripts/fix-game8-titles.ts` is a one-time correction. PARSER FIX QUEUED** — re-ingesting these URLs would re-introduce the bug until `scripts/ingest-*.ts` is updated to escape or pre-process hyphenated continuations before passing to the markdown parser. See `known_issues/game8_markdown_parser_bug.md`.
+
+---
+
+## Ops: Periodically Audit JWT Roles in .env.local (Session 32)
+
+`SUPABASE_SERVICE_ROLE_KEY` in `.env.local` was silently the anon key — both keys decoded to identical JWT bodies with `role: anon`. Phase1d had landed 2,693 re-embeds on 2026-04-26 16:15Z (visible via `re_embedded_at` column), so the key WAS correct at that time and got replaced/swapped sometime between then and 2026-04-30 session 32. Likely cause: copy-paste from the Supabase dashboard during an env-var update — both keys are JWTs that start `eyJhbGci...` and look identical at a glance.
+
+**Diagnostic that nailed it:**
+```js
+const parts = jwt.split('.');
+const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+console.log('role:', payload.role);
+```
+
+**Why:** Supabase's RLS-on-UPDATE returns HTTP 204 with the anon key (PostgREST treats "0 rows updated due to RLS filter" as success), so the script appears to work but no rows actually change. **upsert** is the canary — it uses INSERT...ON CONFLICT, and the INSERT WITH CHECK clause raises an explicit RLS error that surfaces the bug. Pure UPDATE silently no-ops.
+
+**How to apply:** Before any `--execute` script that writes to RLS-protected tables, run a one-line JWT decode to confirm `role: service_role`. Add this as a pre-flight check in any future write-script. Don't trust filename labels in env files alone.
+
+---
+
 ## Infra: AdSense Script Must Be in `<head>` as Plain `<script>`, Not `next/script` with `lazyOnload` (Session 31)
 
 Google's site verification crawler and ad-serving infrastructure both look for the AdSense publisher script in the initial HTML of the page. `<Script strategy="lazyOnload">` (Next.js) defers execution until after browser idle — the crawler doesn't wait for it, and the script may not appear in the parsed HTML at all during the crawl.

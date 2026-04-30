@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-30 (session 31 — AdSense integration + ad cadence + domain prep)
+**Last updated:** 2026-04-30 (session 32 — Phase 1f game8 title-truncation data fix)
 
 ## Current State Snapshot
 
@@ -11,11 +11,42 @@
 | Retrieval MRR | **0.482** (9/10 runs; 1/10 at 0.449 micro-wobble — single rank-1↔2 shift, no top-10 effect. Cumulative Phase 1: 0.189 → 0.482) |
 | Vector index | IVFFlat **lists=237** (rebuilt post-1e), probes=**10** |
 | Phase 1 status | **COMPLETE** |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · **post-1e REINDEX (final)** |
-| Phase next | **1e** nav-only DELETE (587 candidates queued — re-count first; some may have been deleted by 1d) · keyword-boost / matchCount work for tier-list queries (best one-handed weapons remains 0%) |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · post-1e REINDEX · **1f game8 title-fix slot 1 (172 chunks re-embedded)** |
+| Phase next | **1f slot-2** (page-H1 truncation in same 172 chunks — slot-1 fix moved raw vector sim but reranker still favors fextralife pages, eval unchanged) · **1e** nav-only DELETE (289 URLs / 5,127 chunks pending — re-count first; some may have been deleted by 1d) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
-| Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
+| Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs) · `knowledge_chunks_backup_titlefix_20260430` (172 rows, pre-Phase-1f). All droppable pre-launch once cleanup is locked in. |
+
+## Recent Changes (Session 32 — Phase 1f Game8 Title-Truncation Data Fix, 2026-04-30)
+
+**Bug discovered.** Game8 ingestion's markdown parser ate hyphenated title continuations after newlines: page titles like "Best One-Handed Weapons" became "Best One" in chunk content because `-Handed Weapons` on a new line was parsed as a markdown list-item bullet. Voyage embedded the corrupted text, so vector similarity to tier-list queries was poor.
+
+**Scope.** 4 game8 URLs / 172 chunks total (verified via SQL: each URL has exactly 1 distinct first-line, no other game8 hyphen-truncation patterns found):
+
+| URL | Truncated → Correct | Chunks |
+|-----|---------------------|--------|
+| `archives/595314` | `Best One` → `Best One-Handed Weapons` | 34 |
+| `archives/595374` | `Best Two` → `Best Two-Handed Weapons` | 33 |
+| `archives/586776` | `List of All One` → `List of All One-Handed Weapons` | 39 |
+| `archives/586777` | `List of All Two` → `List of All Two-Handed Weapons` | 66 |
+
+**Fix.** `scripts/fix-game8-titles.ts` — fixes the prepended title prefix (slot-1 of two slots), re-embeds via Voyage `voyage-3.5-lite` (input_type=document, matches corpus), UPDATEs content + embedding + re_embedded_at. Cost ~$0.0003 / 16,511 tokens / 1.6s wall time. Idempotency verified: second --execute reports 0 planned, 172 skipped ("already fixed"). Backup: `knowledge_chunks_backup_titlefix_20260430` (172 rows, full schema).
+
+**Eval result: NO CHANGE.** Triple-run eval post-fix: 80.0% / 76.7% / 80.0% (Run 2 outlier on `Sanctum of Temperance` — known IVFFlat micro-variance, unrelated to fix). Both tier-list queries unchanged: best-one-handed-weapons 0%, best-body-armor 67%. Top similarity (post-rerank) **identical** to pre-fix: 1.081 / 1.038.
+
+**Why no eval movement.** Probe (`scripts/probe-tier-list-retrieval.ts`) shows raw vector sim DID improve — for "best body armor" all 3 expected chunks now rank 2/3/4 in raw top-10 (sim 0.663–0.669). For "best one-handed weapons" expected chunks moved from below top-100 to rank 19/21 raw (sim 0.668), and one corrected TOC chunk made raw rank 8. But the eval pipeline reranks vector hits with URL-match + content-start boosts that favor fextralife pages whose URLs literally contain "armor"/"weapons". The slot-1 fix's ~0.005 sim gain isn't enough to overcome the reranker boost gap.
+
+**Slot-2 still polluting embedding.** Each chunk now reads `"Best One-Handed Weapons\n\n"` (slot 1, fixed) followed by `"Best One\n\n"` (slot 2 = the page's own H1 header, still truncated). Voyage still sees the truncated H1 prominently in the chunk content. **Slot-2 fix is the next data-correction candidate** — see `known_issues/game8_markdown_parser_bug.md`.
+
+**Other findings during this session:**
+- `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` was the anon key (both keys decoded to `role: anon`). Fixed manually before --execute could run. Phase1d had landed 2,693 re-embeds on 2026-04-26 16:15Z, so the key was correct then — must have been replaced/swapped after. Worth a periodic JWT-role audit on env files.
+- Supabase silent-RLS-filter behavior: PostgREST returns HTTP 204 on UPDATE with anon JWT (RLS filters all rows), looking like success. `upsert` (INSERT path) returns the explicit RLS error, which is what surfaced the bug.
+
+**Files changed:**
+- `scripts/fix-game8-titles.ts` — new
+- `scripts/probe-tier-list-retrieval.ts` — new (diagnostic tool)
+- `known_issues/game8_markdown_parser_bug.md` — new
+- `LEARNINGS.md` — added title-truncation entry
 
 ## Recent Changes (Session 31 — AdSense + Domain + Ad Cadence, 2026-04-30)
 
