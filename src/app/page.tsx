@@ -233,12 +233,16 @@ export default function Home() {
                   {isAssistant && msg.showUpgradeCTA && (
                     <UpgradeCTA rateLimitHit />
                   )}
-                  {/* Show upgrade CTA after every 5th assistant response */}
-                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
+                  {/* Show upgrade CTA after every 5th assistant response (signed-in users only) */}
+                  {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
                     <UpgradeCTA />
                   )}
-                  {/* Show ad banner after every 3rd assistant response (skip if CTA just shown) */}
-                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
+                  {/* Anonymous: show ad after 2nd response, then every 2nd after that */}
+                  {showAds && !user && isAssistant && assistantCount > 0 && assistantCount % 2 === 0 && (
+                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
+                  )}
+                  {/* Signed-in free: show ad banner every 6th response */}
+                  {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
                     <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
                   )}
                 </>
