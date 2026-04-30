@@ -1,99 +1,56 @@
-# Resume: Phase 1 closed + AdSense live + user tier enforcement wired
+# Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: 171b758 (session 31 — anonymous ad cadence + sign-in wall copy)
+- Last commit: `c78980d` (fix: coverage-breadth-eval canonical-name pass check)
 - Branch: main, working tree clean
-- Recall@10: 80.0% deterministic across 10 consecutive runs
-- MRR: 0.482 (1-of-10 runs at 0.449 — sub-decision-floor wobble)
-- Phase 1: COMPLETE
-- Corpus: 59,708 chunks (down from 90,395 baseline)
-- IVFFlat index: idx_chunks_embedding, lists=237, rebuilt post-1e
-- Coverage-stats display: LIVE
-- Mobile: header visibility bug FIXED, landing layout polished
-- User tier enforcement: LIVE (anon 2/day wall, free 5/day cap, Solution requires sign-in)
-- AdSense: script in `<head>`, env vars set in Vercel, submitted for approval
-- Custom domain: code is domain-agnostic; set NEXT_PUBLIC_APP_URL + Supabase redirects when ready
+- Production: live at gitgudai.com + crimson-guide.vercel.app
+- Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
+- Coverage (breadth eval, 276 entities seed=42): **96.7% ± 2.1%**
+- Phase 1 + Phase 2 complete
+- Mobile header bug: fixed
+- Coverage stats display: live
+- AdSense: enabled in production
 
-## Session 30 (2026-04-29) — user tier enforcement
-
-Four commits. No retrieval/corpus changes.
-
-1. `9484edc` — Anonymous sign-in wall: 2 free queries, then `SignInWall` component. localStorage counter + server-side IP enforcement. Solution tier blocked server-side for unauthenticated requests. `AuthButton` controllable via `externalOpen` prop.
-2. `cd5d3f6` — Free tier 5 queries/day cap. Auth token verified per-request; user tier fetched from `users` table. `user_id` written to all `queries` inserts for authenticated users.
-3. `d431f93` — Subscribe button → "Coming Soon". Free tier feature copy corrected to 5/day.
-
-**Pre-launch Stripe checklist** (see PROJECT_STATUS for full steps):
-- Add `STRIPE_SECRET_KEY`, `STRIPE_PRICE_ID`, `STRIPE_WEBHOOK_SECRET` to Vercel env vars
-- Re-enable subscribe button in `src/app/upgrade/page.tsx` (swap Coming Soon block back to `handleSubscribe`)
-- Register webhook endpoint in Stripe dashboard pointing to `/api/stripe/webhook`
-- Verify `users` table has `stripe_customer_id`, `stripe_subscription_id`, `tier` columns
-
-## Session 29 (2026-04-27) — mobile UX
-
-Five commits, all UX. No retrieval / corpus changes.
-
-1. `260ebfb` — CoverageStats: `grid-cols-1 sm:grid-cols-2` so labels fit on mobile. Header: smaller logo/title on mobile, tighter gap, `min-w-0`+`truncate` so title can't push AuthButton off-screen.
-2. `081ec32` — **Mobile header-disappearing bug fixed.** Two interacting causes:
-   - `body { min-h-screen }` (= `100vh` = `lvh` on Android Chrome) made body 57px taller than the visible viewport (`win.innerHeight = 690`, `body rect.h = 747`). `globals.css` had `body { height: 100%; overflow: hidden }` which locks body's own scroll, but **html became the document scroller** for the 57px gap.
-   - `useEffect(() => { scrollToBottom() }, [messages])` fired on initial mount with `messages = []`, calling `messagesEndRef.scrollIntoView({ behavior: "smooth" })`. This scrolled html to its max (56px) over a ~500ms animation, hiding the top of the page (which was visible briefly, then disappeared — exactly the symptom).
-   - Fix: removed `min-h-screen` from `<body>` in `layout.tsx`; guarded `scrollToBottom` with `messages.length > 0`.
-3. `c42fca4` — Cleanup: removed debug instrumentation (eruda script, on-page overlay logger, red marker div).
-4. `127efbc` — Trimmed landing example questions 4 → 2 (kept Azure Moon Labyrinth + Kailok the Hornsplitter).
-5. `776bcfe` — Removed duplicate 96px logo from empty-state landing (header logo is sufficient).
-
-## Diagnostic methodology that worked (session 29)
-- For time-delayed mobile bugs, **instrument first, theorize second**. Two earlier rounds of static-CSS analysis (header crowding, then 100vh viewport-mismatch theory) produced wrong fixes.
-- Inject a fixed-position on-page debug overlay (`<pre style="position:fixed;bottom:0;z-index:max">`) that captures `getBoundingClientRect()` for the affected element + parent, computed styles, `html.scrollTop`, `body.scrollTop`, `window.innerHeight`, `visualViewport.{height,offsetTop}`, and `Array.from(document.body.children)` at multiple timestamps (mount / 500 / 1500 / 3000 ms). User screenshots the overlay — no remote DevTools needed.
-- Eruda alone wasn't sufficient because the offending element covered eruda's launcher. The on-page overlay pattern is the more reliable fallback.
-
-## Database-only state (not in git)
-- knowledge_chunks_backup_20260422 (pre-Phase-1a)
-- knowledge_chunks_backup_phase1b_20260423
-- knowledge_chunks_backup_phase1c_20260425
-- knowledge_chunks_backup_phase1d_20260426
-- knowledge_chunks_backup_phase1e_20260426
-- retrieval_eval_backup_20260422
-- retrieval_eval_backup_phase1c_audit_20260424
-- retrieval_eval_backup_phase1d_20260426
-- retrieval_eval_backup_phase1d_audit_20260426
-- phase1c_classifications_20260425 (Bucket A applied)
-- phase1c_manual_review_20260425 (2 rows, deferred)
-- phase1d_candidates_20260426
-- phase1d_failed_20260426 (0 rows, clean run)
-- phase1e_nav_only_candidates_20260425 (587 rows; 298 deleted, 289 deferred — invalidated by spot-check)
+## Database-only state
+- All prior backup tables (pre-1a through 1e)
+- `knowledge_chunks_backup_titlefix_20260430` (172 rows from Phase 1f)
+- `retrieval_eval_backup_phase1d_audit_20260426`
+- IVFFlat: `idx_chunks_embedding`, `lists=237`, `probes=10`
+- corpus: 59,708 chunks (post-1e, post-1f)
 
 ## Smoke test on resume
-1. cd to repo
-2. git pull
-3. (clean any .git/refs/desktop.ini that Windows recreated)
-4. npx tsx scripts/run-eval.ts
-5. Expect: 80.0% / 0.482 (or 0.449 on the 1-in-10 wobble)
-6. If lower or unstable: investigate before any new work
-7. Open production URL on a phone — verify header stays visible (the session-29 fix). If not, check `body` has no `min-h-*` class and that `scrollToBottom` is guarded.
+1. `cd` to repo
+2. `git pull` (clean any `.git/refs/desktop.ini` that Windows recreated)
+3. `npx tsx scripts/run-eval.ts` — expect **86.7% / 0.536** deterministic
+4. `npx tsx scripts/coverage-breadth-eval.ts --seed=42` — expect **~96.7%** (within margin of error; per-entity ~1.8% wobble is normal IVFFlat noise)
+5. Open `gitgudai.com` on a phone — verify header stays visible (the session-29 fix)
 
-## Next session — options
-1. **SHIP**: Vercel deploy is live; add telemetry + production hygiene
-2. **POLISH**: Tier-list retrieval (Phase 1f) — best-X queries at 0%, URL-pattern boost or matchCount tuning, 1-2 sessions, could reach ~87%
-3. **INGEST**: Phase 2 ingest rewrite (URL canonicalization, cheerio-based parsing, content-based content_type — biggest scope)
-4. **UX**: Continued landing/onboarding tuning (mobile layout currently good after session 29)
+## Next session — three real options
 
-## Open work items (deferred, documented)
-- Phase 1e residual queue: 289 URLs deferred pending per-chunk reclassifier
-- Tier-list retrieval (best-one-handed-weapons, best-body-armor at 0%)
-- Phase 2 ingest rewrite
-- Optional reranker (Cohere or Haiku-relevance pass)
-- Production deployment / monitoring
+**A. Production telemetry round.** Instrument live app to log: queries received, retrieval pool size, top similarity, which content_type fired, whether fallback ran, thumbs-up/down feedback if added. Build basic dashboard. Cost: 1–2 sessions. Value: every future decision benefits from real-user signal.
 
-## API key on this machine
-ANTHROPIC_API_KEY: stored in Windows Credential Manager (Target: "ANTHROPIC_API_KEY")
-  Retrieve via: $env:ANTHROPIC_API_KEY = (Get-StoredCredential -Target 'ANTHROPIC_API_KEY').GetNetworkCredential().Password
-  Or in bash: ANTHROPIC_API_KEY=$(powershell -Command "(Get-StoredCredential -Target 'ANTHROPIC_API_KEY').GetNetworkCredential().Password")
-VOYAGE_API_KEY in .env.local
-SUPABASE_SERVICE_ROLE_KEY in .env.local
-(.env.local is gitignored — verified via git check-ignore)
+**B. "I don't know" UX round.** Confidence detection, low-confidence response styling, honest failure copy, query-rephrase suggestions. The user-facing quality work for the 3.3% failure cases. Cost: 1–2 sessions. Value: graceful failures preserve trust.
+
+**C. Continued retrieval optimization.** Cross-domain bias on bosses (5 entities), Bounty Notice cluster collisions (3–4 entities), parser-fix for game8 markdown bug (queued in `known_issues/game8_markdown_parser_bug.md`), slot-2 H1 fix for tier-list pages (would lift the one missing chunk for `best-one-handed-weapons`). Cost: variable. Value: marginal eval gains, may not affect real-user perceived quality.
+
+**Recommended order: A then B.** Telemetry first because you can't tune UX for "I don't know" cases without knowing what those cases look like in the wild. Real production data after 1–2 weeks tells you whether the 3.3% failure rate correlates with real user queries or not.
+
+## API key state
+- `ANTHROPIC_API_KEY` at `%USERPROFILE%\.anthropic_key` (also Windows Credential Manager target `ANTHROPIC_API_KEY`)
+- `VOYAGE_API_KEY` in `.env.local`
+- `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` (verified `role=service_role` after a swap incident this cycle — see LEARNINGS for JWT-decode startup-assertion pattern)
+- `.env.local` is gitignored (verified via `git check-ignore`)
 
 ## Final reference docs
-- phase1-complete-summary.md (milestone artifact, full scoreboard, per-query deltas, top 7 lessons)
-- PROJECT_STATUS.md (working state)
-- LEARNINGS.md (operational lessons)
-- CHANGELOG.md (commit history reference)
+- `phase1-complete-summary.md` (Phase 1 milestone, scoreboard, lessons)
+- `PROJECT_STATUS.md` (working state)
+- `LEARNINGS.md` (operational lessons)
+- `known_issues/game8_markdown_parser_bug.md` (queued root-cause fix for hyphenated title truncation in ingestion)
+- `CHANGELOG.md` (commit history reference — may be stale)
+- `coverage-breadth-42.csv` (latest seed=42 baseline; currently untracked — see Task 6 in last session for CSV decision)
+- `coverage-breadth-99.csv` (independent seed=99 sample for generalization confirmation; currently untracked)
+
+## Key open questions
+- **Has any real user traffic happened yet at gitgudai.com?** If yes, pull telemetry/logs and analyze before any tuning work.
+- **Is AdSense actually generating revenue or just adding latency?** Look at the AdSense dashboard before committing to keep it.
+- **Does the production deployment have any error monitoring** (Sentry, LogRocket, console.errors going anywhere)? If not, this is the highest priority for next session.

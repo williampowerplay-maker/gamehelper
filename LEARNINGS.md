@@ -4,6 +4,66 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## RAG: Per-Term URL-Match Boosts Bleed Across Query Types (Session 34, supersedes Session 33 entry)
+
+The retrieval reranker had a `+0.08` URL-match boost: if any term in `urlTermsForRerank` (a flat list including single words like `"one-handed"` and `"weapons"`) was a substring of `source_url`, add 0.08 to chunk similarity. This was tuned for entity-specific queries (`how do I beat Kailok` → `/Kailok+the+Hornsplitter` URL match). It bled badly for tier-list queries: `"best one-handed weapons"` extracted `["best", "one-handed", "weapons"]`, and Fextralife's `/One-Handed_Weapons` URL (a category landing page, NOT a tier list) got the URL-match boost via the substring `"one-handed"`. Game8's actual tier-list page (`archives/595314`) got no URL-match boost — game8 archive URLs are numeric.
+
+**Solution:** detect tier-list intent (`isTierListQuery()`), skip the URL-match boost when triggered, AND bump `match_count` to 20 (matching `isListQuery`). The match-count bump was necessary because expected game8 chunks sat at vector ranks 19–21, just below the default cutoff. Wider pool + neutralized URL boost → game8 tier-list chunks win on contentStart + proper-noun boosts. Eval moved 78.3% → 86.7% deterministically.
+
+**Lesson:** rerank logic that helps one query class can hurt another. **Audit reranker boosts per query class, not in aggregate.** When two URL families compete for the same query intent, any boost keyed on URL structure systematically favors one family — the fix is to gate the boost by query intent, not to add counter-bias for the other side.
+
+---
+
+## RAG: Silent Bugs vs Loud Bugs — Watch Eval Variance As a Signal (Session 34)
+
+`cleanedForPhrase` (the topic-name extracted from a question for URL-ILIKE search) wasn't stripping punctuation. URL-ILIKE searches included literal `?` from question-mark-terminated queries and returned zero rows — a silent failure mode where the boost path "worked" (no errors) but contributed nothing useful. Fixing it as a side-effect of Phase 2 (`replace(/[?!.,;:'"()[\]{}]/g, "")`) **also stabilized the Sanctum of Temperance variance** (was wobbling 50%–100% across runs in pre-fix evals; now deterministic 100%).
+
+**Lesson:** silent bugs that "almost work" cause more measurement noise than loud bugs that fail clearly. Loud bugs surface as 0% recall on a single query and are fixed quickly. Silent bugs surface as eval variance and ambiguous test runs that get attributed to "approximate-NN noise" or "embedding micro-variation." **Watch for variance in the eval as a signal of silent bugs**, not just frank failures. If a query's pass rate wobbles between consecutive runs of identical code and identical retrieval, suspect a non-deterministic boost path before blaming IVFFlat.
+
+---
+
+## RAG: Two Evals Are Better Than One — Depth + Breadth Catch Different Failure Modes (Session 34)
+
+The 15-query depth eval (`retrieval_eval` table + `scripts/run-eval.ts`) measures: do specific expected chunk UUIDs rank in top-10? The 276-entity breadth eval (`scripts/coverage-breadth-eval.ts`) measures: does any chunk from the right entity page rank in top-10, across a stratified sample? Different questions, both useful.
+
+- **Depth catches ranking-quality issues.** Tier-list queries returning 0% in depth eval flagged the per-term URL-match boost problem.
+- **Breadth catches coverage gaps.** The 96.7% breadth result (vs 86.7% depth) showed retrieval is much better at "find the right page somewhere in top-10" than at "rank the specific expected chunk first." That's a useful signal: ranking quality is the lower bound, page-level coverage is the upper bound, and the gap (~10pp here) is the head-room available to a smarter reranker.
+- **Breadth also caught a harness-bug:** the canonical-name vs variant-URL pass-check that artificially understated the baseline by 3.2pp (93.5% → 96.7% after fix). Different metric ≠ different system; was the *measurement* that was off.
+
+**Lesson:** when you only have one eval, ambiguous results are forced into a single explanation. With both depth and breadth, you can distinguish "right page wrong rank" (depth fails, breadth passes) from "right entity entirely missing" (both fail). Phase 2 + breadth eval together gave: tier-list queries fail depth but pass breadth → ranking issue, not coverage issue → reranker fix. That diagnosis would've been muddier with depth-only data.
+
+---
+
+## Ops: Audit Service-Role Key Periodically — Silent RLS-Filter Means PATCH Returns 204 (Session 34, supersedes Session 33 entry)
+
+`SUPABASE_SERVICE_ROLE_KEY` in `.env.local` had been silently overwritten with the **anon key** value at some point between sessions (both decoded to `role: anon` in the JWT body). Phase1d had landed 2,693 re-embeds successfully on `2026-04-26`, so the key was correct then; it got swapped after.
+
+**The failure mode that masked this:** Supabase's RLS-on-UPDATE returns HTTP 204 with the anon key — PostgREST treats "0 rows updated due to RLS filter" as a successful no-op. The script appears to work but no rows actually change. `upsert` (INSERT path) is the canary — its WITH CHECK clause raises an explicit RLS error, which is what surfaced the bug for me. Pure UPDATE silently no-ops.
+
+**Recommended startup assertion** for any script requiring service-role access:
+
+```js
+const parts = SUPABASE_SERVICE_ROLE_KEY.split('.');
+const payload = JSON.parse(Buffer.from(parts[1], 'base64').toString());
+if (payload.role !== 'service_role') {
+  throw new Error(`SUPABASE_SERVICE_ROLE_KEY has role=${payload.role}, expected service_role`);
+}
+```
+
+**Lesson:** don't trust filename labels in env files alone. JWTs are self-describing — the role field is right there in the payload, decode-and-check at startup. The cost is one line; the alternative is "mysterious script failure" debugging that ate ~1 hour of a session.
+
+---
+
+## RAG: Cross-Domain Retrieval Bias Is the Inverse of the Tier-List Problem (Session 34)
+
+Breadth eval revealed that for some boss queries, **game8's focused "How to Beat X" walkthrough pages outrank Fextralife wiki pages for entity-specific queries**. Affects 5 of 47 sampled bosses (Cassius Morten, Myurdin, Staglord, Goyen, Matthias) — all return correct content from game8 archives instead of the expected fextralife page. This is the **inverse** of the tier-list problem we fixed: for tier-list queries (`best one-handed weapons`), Fextralife's `/One-Handed_Weapons` category page was outranking game8's tier-list page; for boss queries (`how do I beat Cassius Morten`), game8's walkthrough is now outranking the fextralife boss page.
+
+**Why defer the fix:** the user gets correct content in both cases — just from a different source. The harness flag is a URL-canonical mismatch, not a content-quality failure. Real-user perceived quality is fine. A fix would require domain-aware rerank logic (e.g., prefer fextralife for entity-specific queries when both have content), which is more invasive and worth real-traffic data before tuning.
+
+**Lesson:** **distinguish "wrong content" from "right content from a different source" in failure analysis.** A retrieval miss isn't always a real user problem — sometimes it's the harness expecting the wrong artifact. Production telemetry (which path users follow up on, which answers get thumbs-down) will tell us whether the cross-domain bias matters in practice.
+
+---
+
 ## UX: For Time-Delayed Mobile Bugs, Instrument Before Theorizing (Session 29)
 
 A user-reported "header is visible for ~1 second then disappears on mobile" took two wrong-diagnosis rounds (header crowding, then `100vh` viewport-mismatch theory) before the actual cause was found via runtime instrumentation. The root cause was a JS interaction (`scrollIntoView` smooth-scroll firing on initial mount, scrolling html to its max because body was taller than the visible viewport), not a static CSS layout problem.

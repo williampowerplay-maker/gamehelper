@@ -1,14 +1,16 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-30 (session 33 — reranker tuning for tier-list queries)
+**Last updated:** 2026-04-30 (session 34 — checkpoint after Phase 2 + breadth eval, production live)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Retrieval Recall@10 | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
+| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `c78980d`). AdSense enabled. Mobile header bug fixed. Coverage stats display live. |
+| Retrieval Recall@10 (depth eval, 15 queries) | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
 | Retrieval MRR | **0.536** (deterministic, 3/3 runs. Cumulative Phase 1+2: 0.189 → 0.536) |
+| Coverage breadth (276 entities, seed=42) | **96.7% ± 2.1%** — boss 89.4%, quest 94.1%, item 100.0%, puzzle 92.3%. (Different metric than depth: "any chunk from right page in top-10" across stratified entity sample.) |
 | Vector index | IVFFlat **lists=237** (rebuilt post-1e), probes=**10** |
 | Phase 1 status | **COMPLETE** |
 | Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · post-1e REINDEX · 1f game8 title-fix slot 1 (172 chunks re-embedded) · **Phase 2 reranker tuning for tier-list queries** |
@@ -16,6 +18,43 @@
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs) · `knowledge_chunks_backup_titlefix_20260430` (172 rows, pre-Phase-1f). All droppable pre-launch once cleanup is locked in. |
+
+## Cumulative Scoreboard (depth eval — retrieval_eval, 15 queries)
+
+| Stage | Recall@10 | MRR | Notes |
+|---|---|---|---|
+| Pre-Phase-1a baseline | 20.0% | 0.189 | initial state |
+| Post-1a | (intermediate) | (intermediate) | URL dedup |
+| Post-1b | (intermediate) | (intermediate) | boilerplate prune |
+| Post-1c (Bucket A) | (intermediate) | (intermediate) | content_type retag |
+| Post-1c classifier alignment + probes tuning | (intermediate) | (intermediate) | session 26 |
+| Post REINDEX (session 26) | (intermediate) | (intermediate) | first deterministic baseline |
+| Post-1d trailing-boilerplate stripper | (intermediate) | (intermediate) | 2,693 chunks re-embedded |
+| Post-1e Interactive Map URL-variant cleanup | (intermediate) | (intermediate) | 3,096 chunks deleted |
+| Post-1e REINDEX (final) | **80.0%** | **0.482** | deterministic 10/10 runs |
+| Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
+| **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
+| Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 34 — Checkpoint, 2026-04-30)
+
+This session was bookkeeping after a heavy Phase 1f → Phase 2 → breadth-eval cycle. No code changes; updated docs. Production confirmed live at `gitgudai.com` + `crimson-guide.vercel.app` after one Vercel build failure (caught + fixed in the same cycle — type error in a diagnostic probe script that `tsx` ignored at runtime but `next build` blocks on).
+
+**Cycle commits:**
+- `37dc066` — Phase 1f: game8 title truncation, 172 chunks corrected
+- `78ee214` — Phase 2: tier-list query handling (isTierListQuery, match_count=20, skip URL-match boost, punctuation fix)
+- `497b56b` — fix: trace-tier-list-pipeline.ts type error blocking Vercel build
+- `c78980d` — fix: coverage-breadth-eval canonical-name pass check
+
+**Coverage breadth eval built** (`scripts/coverage-breadth-eval.ts`) — additive to depth eval. Stratified sampling: bosses + puzzles full enum, quests 20% [50, 100], items 10% [100, 200]. Deterministic SHA-256 stable hash by seed. Per-entity Recall@10 with Wald 95% CI. Wall time ~2 min for 276 queries.
+
+Initial run reported 93.5% but the harness pass-check was filtering URL variants out of the enumeration set, causing false failures (e.g. Reed Devil → top-1 `Reed+Devil` was rejected because only `Reed_Devil` was in the variant set). Canonical-name pass-check fix lifted baseline to **96.7% ± 2.1%**. The system was already this good — harness was misreporting it.
+
+**9 remaining failures** break into two patterns: (1) cross-domain bias on bosses (5 entities — game8 walkthroughs out-rank fextralife boss pages: Cassius, Myurdin, Staglord, Goyen, Matthias), (2) sibling-page collisions (4 entities — Bounty Notice cluster + Sealed Abyss Artifact subspace).
+
+**Side findings:**
+- `SUPABASE_SERVICE_ROLE_KEY` in `.env.local` had been silently overwritten with the anon key value at some point. PATCH operations returned HTTP 204 (RLS silently filtered all rows) instead of 401, masking the bug. Corrected mid-cycle. Worth a startup-time JWT-role assertion in any future write-script.
+- Punctuation in `cleanedForPhrase` (`.replace(/[?!.,;:'"()[\]{}]/g, "")`) was a side bug surfaced during Phase 2; fixing it stabilized Sanctum of Temperance from variable 50%/100% to deterministic 100%.
 
 ## Recent Changes (Session 33 — Phase 2 Reranker Tuning for Tier-List Queries, 2026-04-30)
 
