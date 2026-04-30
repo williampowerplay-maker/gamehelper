@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import Script from "next/script";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID;
+const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-5671407541170136";
 
 export const metadata: Metadata = {
   title: "Crimson Desert Guide | AI Game Companion",
@@ -26,15 +25,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      <head>
+        {/* Google AdSense — must be in <head> for site verification and ad serving */}
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+          crossOrigin="anonymous"
+        />
+      </head>
       <body className="antialiased">
-        {adsenseId && (
-          <Script
-            async
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-            crossOrigin="anonymous"
-            strategy="lazyOnload"
-          />
-        )}
         <AuthProvider>
           <ErrorBoundary componentName="RootLayout">
             {children}
