@@ -99,6 +99,22 @@ Users want to know what the system knows about; they don't need to know where th
 
 ---
 
+## RAG: Per-Term URL-Match Rerank Boost Bleeds Into Category Pages for Tier-List Queries (Session 33)
+
+The retrieval reranker had a `+0.08` URL-match boost: if any term in `urlTermsForRerank` (a flat list including single words like `"one-handed"` and `"weapons"`) was a substring of `source_url`, add 0.08 to the chunk's similarity score. This was originally tuned for entity-specific queries: `how do I beat Kailok` extracts `"Kailok the Hornsplitter"`, which matches `/Kailok+the+Hornsplitter` in fextralife URLs. Works perfectly for one-page-per-entity queries.
+
+It bled badly for tier-list queries. `"what are the best one-handed weapons?"` extracted `["best", "one-handed", "weapons"]`, and Fextralife's `/One-Handed_Weapons` URL (a category landing page, not a tier list) got the URL-match boost via the substring `"one-handed"`. Game8's actual tier-list page (`archives/595314`, "Best One-Handed Weapons") got NO URL-match boost — game8 archive URLs are numeric. Result: every top-10 slot was the Fextralife category page; the game8 tier-list page got displaced.
+
+**Solution: detect tier-list intent via regex (`isTierListQuery`), skip the URL-match boost when triggered, AND bump `match_count` to 20 (matching `isListQuery`).** The match-count bump is necessary because the expected game8 chunks sit at vector ranks 19–21, just below the default `effectiveMatchCount + 10 = 14` cutoff for nudge tier. Wider pool + neutralized URL-match boost = game8 tier-list chunks win on `contentStart` (4 of 4 boost terms in first 200 chars, post-Phase-1f title fix) + `proper-noun` (4 of 4 boost terms in chunk content). Eval moved from 78.3% → 86.7% deterministically.
+
+**Why:** Multiple boost levers all firing together cap at a near-uniform amount for a *type* of page. When two URL families (fextralife page-name URLs vs game8 numeric archive URLs) compete for the same query intent, any boost keyed on URL structure systematically favors one family. The fix isn't to add a counter-bias for game8 — it's to recognize that for tier-list queries, the URL is *uninformative* and let pure content-based boosts (contentStart + proper-noun + termHits) decide the order.
+
+**How to apply:** When tuning rerank weights, ask "would this boost have favored category-listing pages over curated/tier-list pages?" If yes, gate it by query intent. Don't try to compensate by adding more single-domain boosts — that's a treadmill.
+
+**Side bug fix discovered during diagnosis:** `cleanedForPhrase` (the topic-name extracted from the question) was not stripping punctuation, so URL-ILIKE searches included literal `?` from question-mark-terminated queries and returned zero rows. Added `.replace(/[?!.,;:'"()[\]{}]/g, "")` before `.trim()`. Side benefit: `Sanctum of Temperance` query stabilized from variable 50%/100% to deterministic 100% — apparently the URL-ILIKE was previously returning useless candidates that occasionally displaced the right ones in rerank.
+
+---
+
 ## RAG: Game8 Markdown Ingestion Eats Hyphenated Title Continuations After Newlines (Session 32)
 
 Game8 page titles with hyphenated continuations get truncated during ingestion: "Best One-Handed Weapons" became "Best One" in chunk content because the parser interpreted `-Handed Weapons` (on a new line after the first half of the title) as a markdown list-item bullet `- Handed Weapons`. Voyage embedded the corrupted text, so vector similarity to tier-list queries lost its semantic anchor. 4 URLs / 172 chunks affected — verified comprehensive via SQL scan for any other game8 first-line ending in single-word fragments (`One$`, `Two$`, `Self$`, `Anti$`, etc.); zero additional matches.

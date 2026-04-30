@@ -1,21 +1,53 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-30 (session 32 — Phase 1f game8 title-truncation data fix)
+**Last updated:** 2026-04-30 (session 33 — reranker tuning for tier-list queries)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Retrieval Recall@10 | **80.0%** (deterministic, 10/10 runs post-REINDEX. Cumulative Phase 1: 20.0% → 80.0% = **+60.0pp**) |
-| Retrieval MRR | **0.482** (9/10 runs; 1/10 at 0.449 micro-wobble — single rank-1↔2 shift, no top-10 effect. Cumulative Phase 1: 0.189 → 0.482) |
+| Retrieval Recall@10 | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
+| Retrieval MRR | **0.536** (deterministic, 3/3 runs. Cumulative Phase 1+2: 0.189 → 0.536) |
 | Vector index | IVFFlat **lists=237** (rebuilt post-1e), probes=**10** |
 | Phase 1 status | **COMPLETE** |
-| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · post-1e REINDEX · **1f game8 title-fix slot 1 (172 chunks re-embedded)** |
-| Phase next | **1f slot-2** (page-H1 truncation in same 172 chunks — slot-1 fix moved raw vector sim but reranker still favors fextralife pages, eval unchanged) · **1e** nav-only DELETE (289 URLs / 5,127 chunks pending — re-count first; some may have been deleted by 1d) |
+| Phases completed | 1a · 1b · 1c Bucket A · 1c-classifier alignment · probes tuning · REINDEX (session 26) · eval seed audit (session 26) · 1d trailing-boilerplate stripper · 1d eval seed audit (Oongka + Reed Devil) · 1d eval audit comprehensive pass · 1e Interactive Map URL-variant cleanup · post-1e REINDEX · 1f game8 title-fix slot 1 (172 chunks re-embedded) · **Phase 2 reranker tuning for tier-list queries** |
+| Phase next | **1f slot-2** (in-chunk H1 still polluting embedding; data fix would push 4bad19ac into top-30 vector pool — last missing tier-list chunk) · **1e** nav-only DELETE (289 URLs / 5,127 chunks pending — re-count first; some may have been deleted by 1d) · Strongbox puzzle (33% — separate eval seed gap) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs) · `knowledge_chunks_backup_titlefix_20260430` (172 rows, pre-Phase-1f). All droppable pre-launch once cleanup is locked in. |
+
+## Recent Changes (Session 33 — Phase 2 Reranker Tuning for Tier-List Queries, 2026-04-30)
+
+**Eval result: 78.3% → 86.7% (+8.4pp), MRR 0.482 → 0.536, deterministic 3/3 runs.**
+
+**Root cause** (diagnosed via `scripts/trace-tier-list-pipeline.ts`): the per-term URL-match rerank boost (+0.08) was designed for entity-specific queries (`how do I beat Kailok` → matches `/Kailok+the+Hornsplitter` URL) but bled into category-page matches for tier-list queries. For "best one-handed weapons", every Fextralife `/One-Handed_Weapons` chunk got the URL-match boost because the URL literally contains "one-handed" — pushing the Fextralife category landing page above game8's actual tier-list page (`archives/595314`) which has numeric URLs that never match.
+
+**Four changes** (`src/app/api/chat/route.ts` + mirrored in `scripts/run-eval.ts`):
+
+1. **Add `isTierListQuery()` detector.** Two regexes: full pattern (`what (are|is) the (best|top|strongest) [item-type]`) and short pattern (`(best|top|strongest) [item-type]`). Item-type list unioned across this fn and `classifyContentType` line 178: weapon/sword/bow/gun/spear/pike/axe/hammer/dagger/staff/shield/armor/armour/headgear/helmet/gloves/footwear/boots/cloak/ring/necklace/earring/accessory/accessories/item/gear. Verified against 7 cases (2 true, 5 false) including `best build for Kliff` (false — build, not item) and `best food before boss fight` (false — food not in list).
+
+2. **Bump `match_count` to 20 for tier-list queries.** Same as `isListQuery` path. Reason: expected tier-list chunks sit at vector ranks 19–21 (just below the default `effectiveMatchCount + 10 = 14` cutoff for nudge tier).
+
+3. **Skip URL-match rerank boost for tier-list queries.** `if (!isTierList && urlTermsForRerank.some(t => sourceUrl.includes(t))) boost += 0.08`. Other boosts (contentStart, proper-noun, termHits) preserved — those operate on chunk content, not URL structure, and correctly favor game8 chunks whose first 200 chars contain the query terms (post-Phase-1f title fix).
+
+4. **Bug fix: strip punctuation from `cleanedForPhrase`.** Added `.replace(/[?!.,;:'"()[\]{}]/g, "")` before `.trim()`. Was including literal `?` in URL-ILIKE searches, returning zero rows for any question-mark-terminated query. Side benefit: stabilized `Sanctum of Temperance` from variable 50%/100% to deterministic 100%.
+
+**Per-query delta:**
+
+| Query | Pre | Post | Δ |
+|-------|-----|------|---|
+| best one-handed weapons | 0% | **67%** | +67pp ✓ |
+| best body armor | 67% | **100%** | +33pp ✓ |
+| Sanctum of Temperance | 50–100% (variable) | 100% (stable) | stabilized |
+| All other 12 queries | unchanged | unchanged | 0 (no regressions) |
+
+**Trace verification post-fix.** Top-3 for "best one-handed weapons" went from 3-of-3 Fextralife category pages to 3-of-3 game8 595314 (the actual tier-list page): rank 1 is the TOC chunk (1.073), rank 2 is `e5b04a96` (1.068, expected ✓), rank 3 is `fa85ee79` (1.068, expected ✓). 4bad19ac still missing — its raw vector sim is below rank 30 because its content doesn't include the "Best One-Handed Weapons" intro repeating the title; would require Phase 1f slot-2 fix to land in pool.
+
+**Files changed:**
+- `src/app/api/chat/route.ts` — Changes 1-4
+- `scripts/run-eval.ts` — mirrors Changes 1, 3, 4 (effectiveMatchCount, URL-match skip, punctuation strip)
+- `scripts/trace-tier-list-pipeline.ts` — updated probe to mirror new logic for diagnostics
 
 ## Recent Changes (Session 32 — Phase 1f Game8 Title-Truncation Data Fix, 2026-04-30)
 

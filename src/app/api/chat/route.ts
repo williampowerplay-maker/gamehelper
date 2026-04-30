@@ -217,6 +217,19 @@ function isListQuery(question: string): boolean {
   return /\b(list (all|every)|all (the )?(bosses?|weapons?|armou?rs?|skills?|quests?|accessories|items?|locations?|enemies?|recipes?|puzzles?|challenges?)|every (weapon|boss|skill|armou?r|item|accessory|enemy|quest)|complete list|full list of|how many (bosses?|weapons?|skills?|quests?|items?|regions?|dungeons?))\b/.test(q);
 }
 
+// Detects tier-list shaped queries ("best one-handed weapons", "what is the best body armor",
+// "top 5 swords"). These need: (a) wider candidate pool (match_count=20), and (b) suppression
+// of the per-term URL-match rerank boost — the URL-match was designed for entity-specific
+// queries and bleeds into category-page matches for tier-lists.
+//
+// Item-type list is unioned across this fn and the tier-list branch in classifyContentType
+// (route.ts:178). If you add a new item-type word in either place, mirror it here.
+function isTierListQuery(question: string): boolean {
+  const q = question.toLowerCase();
+  return /\b(what (are|is) the (best|top|strongest)|which (is|are) the best|top \d+|tier list of)\b.{1,25}\b(weapon|sword|bow|gun|spear|pike|axe|hammer|dagger|staff|shield|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories|item|gear)s?\b/.test(q)
+      || /\b(best|top|strongest)\b.{1,25}\b(weapon|sword|bow|gun|spear|pike|axe|hammer|dagger|staff|shield|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories|item|gear)s?\b/.test(q);
+}
+
 // Detects clearly off-topic questions that have no Crimson Desert context.
 // Short-circuits the pipeline immediately to save Voyage + Claude API costs.
 function isOffTopic(question: string): boolean {
@@ -456,17 +469,23 @@ export async function POST(req: NextRequest) {
 
     // Classify question to narrow vector search to a specific content type
     const contentTypeFilter = classifyContentType(question);
-    // List queries need a very wide net; recommendation queries need a moderately wider net.
+    // List queries need a very wide net; tier-list queries also need 20 (their expected
+    // chunks tend to sit at vector ranks 19-21, just below the default cutoff). Recommendation
+    // queries need a moderately wider net.
     const isRec = isRecommendationQuery(question);
     const isList = isListQuery(question);
-    const effectiveMatchCount = isList
+    const isTierList = isTierListQuery(question);
+    const effectiveMatchCount = (isList || isTierList)
       ? 20
       : isRec
         ? Math.min(tierConfig.matchCount + 4, 12)
         : tierConfig.matchCount;
     console.log(
       "Content type filter:", contentTypeFilter ?? "none (full search)",
-      isList ? "| list query (matchCount=20)" : isRec ? "| recommendation query (+4 matchCount)" : ""
+      isList ? "| list query (matchCount=20)"
+        : isTierList ? "| tier-list query (matchCount=20, no url-match boost)"
+        : isRec ? "| recommendation query (+4 matchCount)"
+        : ""
     );
 
     // Step 1: Try vector search if Voyage AI key is available
@@ -561,6 +580,10 @@ export async function POST(req: NextRequest) {
             .replace(/^(find|locate|get|buy|farm|obtain|craft|make|use|equip|upgrade|unlock|show|tell|give)\s+/i, "")
             .replace(/^(the|a|an|do|my)\s+/i, "")
             .replace(/\s+(challenge|challenges|quest|mission|boss|fight|item|skill|location|area|region|guide|help|tips?|strategy|strategies|ruins?|dungeon)s?\s*$/i, "")
+            // Strip non-URL-safe punctuation so URL-ILIKE %term% doesn't include literal
+            // '?'/'!'/etc. (which never appear in source_url). Bug fix: previously
+            // "best+one-handed+weapons?" was sent to ILIKE and returned zero rows.
+            .replace(/[?!.,;:'"()[\]{}]/g, "")
             .trim();
           if (
             cleanedForPhrase.split(/\s+/).length >= 2 &&
@@ -678,7 +701,11 @@ export async function POST(req: NextRequest) {
               let boost = Math.min(0.10, termHits * 0.02);
               // URL-match boost: fextralife URLs contain page names, game8 URLs are numeric.
               // Lowered from 0.25 → 0.08 so URL matches help but don't overwhelm semantic sim.
-              if (urlTermsForRerank.some((t: string) => sourceUrl.includes(t))) {
+              // SKIPPED for tier-list queries — the per-term match (e.g. "one-handed" hitting
+              // /One-Handed_Weapons category page) bleeds into category pages instead of the
+              // game8 tier-list pages we actually want. ContentStart + proper-noun boosts
+              // remain so chunks whose first 200 chars contain the query terms still win.
+              if (!isTierList && urlTermsForRerank.some((t: string) => sourceUrl.includes(t))) {
                 boost += 0.08;
               }
               // Content-start boost: if the chunk's title area contains query terms, it's

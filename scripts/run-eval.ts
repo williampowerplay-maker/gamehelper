@@ -155,7 +155,13 @@ async function retrieve(question: string, topK: number): Promise<{
   fallback: boolean;
 }> {
   const contentTypeFilter = classifyContentType(question);
-  const effectiveMatchCount = topK;
+  // Tier-list queries: bump vector pool to 20 (their expected chunks sit at vector
+  // ranks 19-21, just below the default cutoff). topK still 10 for Recall@10.
+  // Mirrors route.ts:isTierListQuery + effectiveMatchCount logic.
+  const isTierList =
+    /\b(what (are|is) the (best|top|strongest)|which (is|are) the best|top \d+|tier list of)\b.{1,25}\b(weapon|sword|bow|gun|spear|pike|axe|hammer|dagger|staff|shield|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories|item|gear)s?\b/i.test(question)
+    || /\b(best|top|strongest)\b.{1,25}\b(weapon|sword|bow|gun|spear|pike|axe|hammer|dagger|staff|shield|armor|armour|headgear|helmet|gloves?|footwear|boots|cloak|ring|necklace|earring|accessory|accessories|item|gear)s?\b/i.test(question);
+  const effectiveMatchCount = isTierList ? 20 : topK;
   let fallback = false;
 
   // ── Voyage embedding ──────────────────────────────────────────────────────
@@ -192,7 +198,9 @@ async function retrieve(question: string, topK: number): Promise<{
     .replace(/^(how (to do|to get|to reach|to complete|to find|to unlock|to|do i|does|can i)|where (is|can i find|do i find)|what (is|are|does)|who is|when is|tell me about|explain)\s+/i, "")
     .replace(/^(find|locate|get|buy|farm|obtain|craft|make|use|equip|upgrade|unlock|show|tell|give)\s+/i, "")
     .replace(/^(the|a|an|do|my)\s+/i, "")
-    .replace(/\s+(challenge|challenges|quest|mission|boss|fight|item|skill|location|area|region|guide|help|tips?|strategy|strategies|ruins?|dungeon)s?\s*$/i, "").trim();
+    .replace(/\s+(challenge|challenges|quest|mission|boss|fight|item|skill|location|area|region|guide|help|tips?|strategy|strategies|ruins?|dungeon)s?\s*$/i, "")
+    .replace(/[?!.,;:'"()[\]{}]/g, "")
+    .trim();
   if (cleanedForPhrase.split(/\s+/).length >= 2 && !quotedNames.some((n) => n.toLowerCase() === cleanedForPhrase.toLowerCase())) {
     quotedNames.push(cleanedForPhrase);
   }
@@ -249,7 +257,10 @@ async function retrieve(question: string, topK: number): Promise<{
       const termHits = questionTerms.filter((t) => content.includes(t)).length;
       const baseSim = Number(c.similarity || 0.3);
       let boost = Math.min(0.10, termHits * 0.02);
-      if (urlTermsForRerank.some((t) => sourceUrl.includes(t))) boost += 0.08;
+      // URL-match boost SKIPPED for tier-list queries — was favoring Fextralife
+      // category pages (URLs contain "one-handed"/"armor") over game8 tier-list pages.
+      // Mirrors route.ts.
+      if (!isTierList && urlTermsForRerank.some((t) => sourceUrl.includes(t))) boost += 0.08;
       const contentStartHits = urlTermsForRerank.filter((t) => contentStart.includes(t.replace(/\+/g, " "))).length;
       if (contentStartHits > 0) boost += Math.min(0.20, contentStartHits * 0.10);
       for (const pn of allBoostTerms) { if (content.includes(pn.toLowerCase())) boost += 0.04; }
