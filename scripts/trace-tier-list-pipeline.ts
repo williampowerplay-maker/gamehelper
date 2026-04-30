@@ -119,7 +119,10 @@ async function main() {
     match_count: effectiveMatchCount + 10,
   });
   if (vecErr) throw new Error("vector rpc: " + vecErr.message);
-  let chunks = (vecData as ChunkRow[]).map(c => ({ ...c, _origin: "vector" as const }));
+  // No `as const` — keeps _origin widened to string so the later [...chunks, ...newKw]
+  // merge accepts "url-match" / "content-match" too. Build typecheck failed on this
+  // when _origin was narrowed to literal "vector" only (Vercel commit 78ee214).
+  let chunks: ChunkRow[] = (vecData as ChunkRow[]).map(c => ({ ...c, _origin: "vector" }));
   console.log(`  returned ${chunks.length} candidates`);
   for (let i = 0; i < chunks.length; i++) {
     const c = chunks[i];
@@ -206,7 +209,7 @@ async function main() {
   const existingIds = new Set(chunks.map(c => c.id));
   const newKw = keywordChunks.filter(c => !existingIds.has(c.id)).map(c => {
     const isUrl = urlTerms.some(t => (c.source_url || "").toLowerCase().includes(t.toLowerCase()));
-    return { ...c, similarity: isUrl ? 0.88 : 0.40, keywordBoost: true, _origin: isUrl ? "url-match" as const : "content-match" as const };
+    return { ...c, similarity: isUrl ? 0.88 : 0.40, keywordBoost: true, _origin: isUrl ? "url-match" : "content-match" };
   });
   console.log(`\n[STEP 6] Merge keyword candidates`);
   console.log(`  keywordChunks total: ${keywordChunks.length}`);
