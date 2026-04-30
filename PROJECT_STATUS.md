@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-29 (session 30 — user tier enforcement + pre-launch gating)
+**Last updated:** 2026-04-30 (session 31 — AdSense integration + ad cadence + domain prep)
 
 ## Current State Snapshot
 
@@ -16,6 +16,33 @@
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
 | Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs). All droppable pre-launch once cleanup is locked in. |
+
+## Recent Changes (Session 31 — AdSense + Domain + Ad Cadence, 2026-04-30)
+
+**Custom domain prep (`d5dbf40`).**
+- Stripe checkout/portal: origin fallback now reads `NEXT_PUBLIC_APP_URL` env var before hardcoded vercel URL — set this when switching domains, no code change needed
+- Privacy + Terms pages: removed hardcoded `crimson-guide.vercel.app`, now says "this Service" — correct on any domain
+- Supabase steps when adding domain: update Site URL + add `https://yourdomain.com/auth/callback` to Redirect URLs allowlist
+
+**AdSense integration (`7f2154f`).**
+- Moved AdSense `<script>` from `<Script strategy="lazyOnload">` (body, fires during browser idle) to a plain `<script>` tag directly in `<head>` — required for Google's site verification crawler to detect it
+- Publisher ID `ca-pub-5671407541170136` hardcoded as default; `NEXT_PUBLIC_ADSENSE_ID` env var takes precedence
+- Ad slot IDs read from `NEXT_PUBLIC_AD_SLOT_BANNER` + `NEXT_PUBLIC_AD_SLOT_SIDEBAR` env vars — both set in Vercel
+- All env vars updated in Vercel and redeployed
+
+**Ad cadence by user type (`171b758`).**
+
+| | Not signed in | Signed-in free | Premium |
+|---|---|---|---|
+| Ad banner | After every 2nd response | After every 6th response | Never |
+| Upgrade CTA | Never (hits sign-in wall at Q2 anyway) | Every 5th response | Never |
+| Query wall | After 2 questions → SignInWall | After 5 questions → UpgradeCTA | Never |
+
+- Anonymous users see 1 ad (after Q2) then hit the sign-in wall — tight funnel
+- SignInWall `query_limit` copy updated: "Sign in for 5 questions a day and fewer ads"
+- Upgrade CTA gated to signed-in users only (was firing for anon but they never reached the 5th response)
+
+**AdSense approval status:** site submitted for review. Approval typically takes 1-3 days. Real ads begin filling after approval; house ads / blanks are normal until then.
 
 ## Recent Changes (Session 30 — User Tier Enforcement, 2026-04-29)
 

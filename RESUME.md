@@ -1,7 +1,7 @@
-# Resume: Phase 1 closed + user tier enforcement wired
+# Resume: Phase 1 closed + AdSense live + user tier enforcement wired
 
 ## Current state
-- Last commit: d431f93 (session 30 — coming soon on upgrade page)
+- Last commit: 171b758 (session 31 — anonymous ad cadence + sign-in wall copy)
 - Branch: main, working tree clean
 - Recall@10: 80.0% deterministic across 10 consecutive runs
 - MRR: 0.482 (1-of-10 runs at 0.449 — sub-decision-floor wobble)
@@ -11,6 +11,8 @@
 - Coverage-stats display: LIVE
 - Mobile: header visibility bug FIXED, landing layout polished
 - User tier enforcement: LIVE (anon 2/day wall, free 5/day cap, Solution requires sign-in)
+- AdSense: script in `<head>`, env vars set in Vercel, submitted for approval
+- Custom domain: code is domain-agnostic; set NEXT_PUBLIC_APP_URL + Supabase redirects when ready
 
 ## Session 30 (2026-04-29) — user tier enforcement
 

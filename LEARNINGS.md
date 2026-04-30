@@ -99,6 +99,37 @@ Users want to know what the system knows about; they don't need to know where th
 
 ---
 
+## Infra: AdSense Script Must Be in `<head>` as Plain `<script>`, Not `next/script` with `lazyOnload` (Session 31)
+
+Google's site verification crawler and ad-serving infrastructure both look for the AdSense publisher script in the initial HTML of the page. `<Script strategy="lazyOnload">` (Next.js) defers execution until after browser idle — the crawler doesn't wait for it, and the script may not appear in the parsed HTML at all during the crawl.
+
+**Fix**: replace `<Script strategy="lazyOnload">` with a plain `<script>` tag inside an explicit `<head>` element in `layout.tsx`. This ensures the script is present in the static HTML on every page, which is required for:
+1. AdSense site ownership verification (crawler finds the script in `<head>`)
+2. Ad serving (ad units need the publisher script bootstrapped before `adsbygoogle.push` runs)
+
+**In Next.js App Router**, if you don't include `<head>` explicitly in `layout.tsx`, Next.js generates its own. Adding `<head>` manually gives you control over what's in it. The AdSense script tag goes inside that `<head>` with `async` and `crossOrigin="anonymous"`.
+
+The publisher ID comes from `NEXT_PUBLIC_ADSENSE_ID` env var with a hardcoded fallback — keeps the value out of git while ensuring the page renders if the env var is missing.
+
+---
+
+## Product: Ad Cadence Should Reflect Auth State as a Funnel Lever (Session 31)
+
+Anonymous and signed-in users have different relationships with ads. Anonymous users haven't made any commitment to the product; signed-in users have already demonstrated engagement. Treating them with the same ad cadence misses a conversion opportunity.
+
+**Design principle: anonymous users see more ads, and ads appear earlier.** This creates a tangible incentive to sign in — signing in is framed explicitly as "fewer ads + more questions." The sign-in wall copy directly says this: "Sign in for 5 questions a day and fewer ads."
+
+**Cadence chosen:**
+- Anonymous: ad after every 2nd response (high frequency — hits before the sign-in wall at question 2)
+- Signed-in free: ad every 6th response + upgrade CTA every 5th (lower frequency — reward for signing in, funnel toward premium)
+- Premium: no ads
+
+**Implementation pattern:** the `showAds` gate (`tier !== "premium" && !!AD_SLOT_BANNER`) handles the premium case globally. Within `showAds`, separate `!user` vs `!!user` branches handle the two cadences. The `assistantCount` is computed inline from the messages slice — no separate counter state needed.
+
+**Why `assistantCount % 5 !== 0` guard on the 6th-response ad:** at `assistantCount=30`, both conditions (30 % 5 === 0 and 30 % 6 === 0) would be true simultaneously, showing both an upgrade CTA and an ad banner. The guard prevents the double-render.
+
+---
+
 ## RAG: REINDEX Should Be the Final Step of Any >2% Deletion Phase (Session 27 — post-1e REINDEX)
 
 - **Post-deletion REINDEX restored deterministic measurement.** Phase 1e's 3,096 deletions (~5% of index) reintroduced a 1-in-13 run variance (77.8% outlier vs 80.0% mode) because IVFFlat doesn't recompute centroids on delete. A single REINDEX with the same `lists=237` (still optimal: √59,708 = 244) eliminated the outlier. Post-REINDEX: 80.0% across 10/10 runs.
