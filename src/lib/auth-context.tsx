@@ -4,7 +4,7 @@ import { createContext, useContext, useEffect, useState } from "react";
 import { supabase } from "./supabase";
 import type { User, Session } from "@supabase/supabase-js";
 
-const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS) || 100;
+const MAX_USERS = Number(process.env.NEXT_PUBLIC_MAX_USERS) || 50;
 
 interface AuthState {
   user: User | null;
