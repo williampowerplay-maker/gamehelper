@@ -20,7 +20,10 @@ const ANON_COUNT_KEY = "anonQueryCount";
 
 export default function Home() {
   const { user, session, tier } = useAuth();
-  const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
+  // AdSense temporarily disabled 2026-05-04 — see src/app/layout.tsx <head> for context.
+  // To re-enable: restore the original line below.
+  // const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
+  const showAds = false;
   const [messages, setMessages] = useState<Message[]>([]);
   const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("nudge");
   const [isLoading, setIsLoading] = useState(false);
