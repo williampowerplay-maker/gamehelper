@@ -11,7 +11,7 @@ export default function UpgradeCTA({ rateLimitHit = false }: { rateLimitHit?: bo
       <p className="text-xs text-gray-400 mb-3">
         {rateLimitHit
           ? "Upgrade to Premium for higher limits, ad-free experience, and full solutions."
-          : "Go premium for ad-free, unlimited full solutions, and premium voice."}
+          : "Go premium for ad-free, unlimited full solutions."}
       </p>
       <Link
         href="/upgrade"

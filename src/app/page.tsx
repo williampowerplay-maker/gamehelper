@@ -141,7 +141,7 @@ export default function Home() {
   return (
     <div className="flex h-[100dvh] max-w-5xl mx-auto">
     {/* Main chat column */}
-    <div className="flex flex-col flex-1 min-w-0 max-w-3xl mx-auto">
+    <div className="flex flex-col flex-1 min-h-0 min-w-0 max-w-3xl mx-auto">
       {/* Header */}
       <header className="flex-shrink-0 border-b border-[#2a2a3a] px-3 sm:px-4 py-2 sm:py-4">
         <div className="flex items-center justify-between gap-2">
@@ -186,7 +186,7 @@ export default function Home() {
       </div>
 
       {/* Messages area */}
-      <div className="flex-1 overflow-y-auto px-4 py-4">
+      <div className="flex-1 overflow-y-auto min-h-0 px-4 py-4">
         {messages.length === 0 && (
           <div className="flex flex-col items-center justify-center h-full text-center px-4">
             <h2 className="text-lg font-semibold text-gray-200 mb-2">
