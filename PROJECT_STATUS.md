@@ -1,13 +1,14 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-04-30 (session 34 — checkpoint after Phase 2 + breadth eval, production live)
+**Last updated:** 2026-05-04 (session 35 — mobile scroll fix + AdSense disabled + signup cap lowered)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `c78980d`). AdSense enabled. Mobile header bug fixed. Coverage stats display live. |
+| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `bddea1b`). **AdSense DISABLED** pending account setup. Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. |
+| Signup cap | **50 users** (default in `src/lib/auth-context.tsx:7`; override via `NEXT_PUBLIC_MAX_USERS` env var). Currently 4 users signed up → **46 spots remaining** before signups close + waitlist UI activates. |
 | Retrieval Recall@10 (depth eval, 15 queries) | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
 | Retrieval MRR | **0.536** (deterministic, 3/3 runs. Cumulative Phase 1+2: 0.189 → 0.536) |
 | Coverage breadth (276 entities, seed=42) | **96.7% ± 2.1%** — boss 89.4%, quest 94.1%, item 100.0%, puzzle 92.3%. (Different metric than depth: "any chunk from right page in top-10" across stratified entity sample.) |
@@ -35,6 +36,42 @@
 | Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
 | **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
 | Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 35 — Mobile Scroll Fix + AdSense Disabled + Signup Cap, 2026-05-04)
+
+Three operational fixes after long-thread mobile testing exposed a layout bug and a suspected AdSense interaction issue.
+
+**Cycle commits:**
+- `57fe343` — fix: messages area scroll — add `min-h-0` to flex children. Also removed "premium voice" from `UpgradeCTA` marketing copy (feature not implemented).
+- `ef3ccdb` — chore: disable AdSense pending account setup.
+- `bddea1b` — chore: lower signup cap default 100 → 50.
+
+**Mobile scroll fix (`57fe343`).** Long chat threads were breaking layout: the messages area's `flex-1 overflow-y-auto` div had implicit `min-height: auto`, preventing it from shrinking below content size. Once content exceeded viewport, the column grew past `100dvh`, pushing the input off-screen. Fix adds `min-h-0` to:
+- `src/app/page.tsx:144` — chat column wrapper (`flex flex-col flex-1 min-h-0 min-w-0 max-w-3xl mx-auto`)
+- `src/app/page.tsx:189` — messages area itself (`flex-1 overflow-y-auto min-h-0 px-4 py-4`)
+
+Both flex children needed `min-h-0` (defensive). Standard flex+overflow gotcha. Build sanity passed (`next build`); behavioral verification deferred to phone testing on production.
+
+**AdSense disabled (`ef3ccdb`).** After deploying the scroll fix, user reported continued mobile freeze on the 6th message. Diagnosis showed that on `assistantCount=6`, three components stack: rate-limit message + `UpgradeCTA rateLimitHit` + `AdBanner` — the AdBanner being a Google AdSense `<ins class="adsbygoogle">` with `data-full-width-responsive="true"`. Suspected source of freeze:
+- AdSense auto-ads (vignette/anchor interstitials) injected by Google's `adsbygoogle.js`, which is loaded site-wide in `<head>`. Auto-ad enablement is configured at the AdSense dashboard level, not in our code.
+- Or the AdSense iframe itself rendering large/unstable on mobile.
+
+Disabled in two places (both clearly commented for revival):
+1. `src/app/layout.tsx`: `<script src=".../adsbygoogle.js">` commented out in `<head>`. The `adsenseId` const above also commented out (was unused after removing the script ref).
+2. `src/app/page.tsx:25`: `const showAds = false;` (original `tier !== "premium" && !!AD_SLOT_BANNER` preserved as comment one line above).
+
+This kills both inline AdBanner mounts and any auto-ad / vignette injection. Inline `UpgradeCTA` banners (every 5th response, rate-limit hit) are unaffected.
+
+**To re-enable AdSense later:**
+- Uncomment the `const adsenseId` line in `src/app/layout.tsx`
+- Uncomment the `<script>` block in `src/app/layout.tsx` `<head>`
+- Restore the `showAds` calculation in `src/app/page.tsx:25` (the original line is preserved as a comment one line above)
+
+**Signup cap lowered (`bddea1b`).** Default cap in `src/lib/auth-context.tsx:7` lowered from 100 to 50. Currently 4 users signed up → 46 spots remaining. Override available via `NEXT_PUBLIC_MAX_USERS` env var in Vercel. Cap enforcement is client-side only (race condition possible at the boundary; not a real concern at current scale).
+
+**Other changes in this session:**
+- Verified UpgradeCTA copy: removed "and premium voice" from non-rate-limit message (the feature was never implemented). Sentence now reads "Go premium for ad-free, unlimited full solutions."
+- One Vercel build failure mid-cycle: type error in `scripts/trace-tier-list-pipeline.ts` (left over from Phase 2 round) blocked the Phase 2 deploy initially. Fixed in `497b56b` before any of session 35's commits. Smoke tests (depth eval 86.7%, breadth eval 96.4% within MoE) passed when this session started.
 
 ## Recent Changes (Session 34 — Checkpoint, 2026-04-30)
 

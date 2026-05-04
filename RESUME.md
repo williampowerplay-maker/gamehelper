@@ -1,15 +1,18 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: `c78980d` (fix: coverage-breadth-eval canonical-name pass check)
-- Branch: main, working tree clean
+- Last commit: `bddea1b` (chore: lower signup cap default 100 → 50)
+- Branch: main, working tree clean (CSVs from breadth eval still untracked)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
 - Coverage (breadth eval, 276 entities seed=42): **96.7% ± 2.1%**
 - Phase 1 + Phase 2 complete
-- Mobile header bug: fixed
+- Mobile header bug: fixed (session 29)
+- Mobile long-thread scroll bug: fixed (session 35 — `min-h-0` on flex children, `src/app/page.tsx:144` and `:189`)
 - Coverage stats display: live
-- AdSense: enabled in production
+- **AdSense: DISABLED** pending account setup. Both the `<script>` loader in `layout.tsx` and `showAds` calc in `page.tsx` are commented out with revival instructions in commit `ef3ccdb`.
+- **Signup cap: 50** users (default in `src/lib/auth-context.tsx:7`). Currently 4 signed up → 46 spots remaining. Override via `NEXT_PUBLIC_MAX_USERS` env var in Vercel.
+- UpgradeCTA copy: removed "premium voice" mention (feature was never implemented).
 
 ## Database-only state
 - All prior backup tables (pre-1a through 1e)
@@ -23,7 +26,7 @@
 2. `git pull` (clean any `.git/refs/desktop.ini` that Windows recreated)
 3. `npx tsx scripts/run-eval.ts` — expect **86.7% / 0.536** deterministic
 4. `npx tsx scripts/coverage-breadth-eval.ts --seed=42` — expect **~96.7%** (within margin of error; per-entity ~1.8% wobble is normal IVFFlat noise)
-5. Open `gitgudai.com` on a phone — verify header stays visible (the session-29 fix)
+5. Open `gitgudai.com` on a phone — verify header stays visible (session-29 fix) AND send 6+ messages to verify long-thread scroll works (session-35 fix). No ads should appear (AdSense disabled).
 
 ## Next session — three real options
 
@@ -52,5 +55,6 @@
 
 ## Key open questions
 - **Has any real user traffic happened yet at gitgudai.com?** If yes, pull telemetry/logs and analyze before any tuning work.
-- **Is AdSense actually generating revenue or just adding latency?** Look at the AdSense dashboard before committing to keep it.
+- **AdSense re-enable timing.** Currently disabled (suspected source of mobile freeze on 6th-message AdBanner). Re-enabling = uncomment two blocks in `layout.tsx` + restore `showAds` calc in `page.tsx`. Before re-enabling: confirm AdSense account is approved, decide on auto-ad enablement (vignette/anchor) — those were the most likely freeze culprit and the AdSense dashboard config controls them, not our code.
 - **Does the production deployment have any error monitoring** (Sentry, LogRocket, console.errors going anywhere)? If not, this is the highest priority for next session.
+- **Phone-test the session-35 fixes.** Confirm the long-thread scroll works on multiple viewport sizes (375x667, 390x844, 412x915) and that the AdSense-disabled state doesn't introduce any other UX regressions.
