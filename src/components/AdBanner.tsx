@@ -34,12 +34,16 @@ export default function AdBanner({ slot, format = "horizontal", className = "" }
     : "min-h-[100px] w-full";
 
   return (
-    <div className={`${className}`} ref={adRef}>
-      <div className="flex items-center justify-between mb-1 px-0.5">
-        <span className="text-[10px] text-gray-600 uppercase tracking-wider">Advertisement</span>
+    // border-top + py-2 gives a clear visual separator between chat content and
+    // ad inventory (AdSense policy: ads must be distinguishable from site content).
+    <div className={`${className} border-t border-[#2a2a3a] pt-3`} ref={adRef}>
+      {/* "Advertisement" label per AdSense policy 2.1 — bumped from 10px gray-600
+          to 12px gray-500 for clearer disclosure on the dark background. */}
+      <div className="flex items-center justify-between mb-2 px-0.5">
+        <span className="text-xs text-gray-500 uppercase tracking-wider font-medium">Advertisement</span>
         <Link
           href="/upgrade"
-          className="text-[10px] text-red-500/70 hover:text-red-400 transition-colors"
+          className="text-xs text-red-500/80 hover:text-red-400 transition-colors"
         >
           Remove ads — Upgrade
         </Link>
