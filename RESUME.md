@@ -1,7 +1,7 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: `55aeb7f` (docs: session 35 — followed by session 36 RLS hardening in-DB only, no new commit yet for that)
+- Last commit: `573e538` (fix: gate inline AdBanner to tablet+desktop only — session 37). Followed up by docs commit (session 37 + session 36 captures).
 - Branch: main, working tree clean (CSVs from breadth eval still untracked)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
@@ -10,7 +10,7 @@
 - Mobile header bug: fixed (session 29)
 - Mobile long-thread scroll bug: fixed (session 35 — `min-h-0` on flex children, `src/app/page.tsx:144` and `:189`)
 - Coverage stats display: live
-- **AdSense: DISABLED** pending account setup. Both the `<script>` loader in `layout.tsx` and `showAds` calc in `page.tsx` are commented out with revival instructions in commit `ef3ccdb`.
+- **AdSense: PARTIALLY LIVE (session 37).** Head-level `<script>` loader ✅, `public/ads.txt` ✅, desktop sidebar ad ✅. Inline AdBanner in chat is gated to **tablet + desktop only** (`hidden md:block`, viewports ≥ 768px). **Mobile inline ads disabled** due to unresolved screen-freeze (iframe touch-capture issue; see LEARNINGS for full story). Three rounds of mitigation didn't fix the mobile freeze — re-enabling mobile ads requires actual instrumentation first (session-29-style on-page debug overlay).
 - **Signup cap: 50** users (default in `src/lib/auth-context.tsx:7`). Currently 4 signed up → 46 spots remaining. Override via `NEXT_PUBLIC_MAX_USERS` env var in Vercel.
 - UpgradeCTA copy: removed "premium voice" mention (feature was never implemented).
 - **Supabase RLS hardening (session 36):** all 18 backup/staging tables in the `public` schema now have RLS enabled (no policies attached). Supabase Security Advisor warnings cleared. **⚠️ Caveat: `scripts/fix-game8-titles.ts` reads `knowledge_chunks_backup_titlefix_20260430` via supabase-js and will now return zero rows silently.** If Phase 1f rollback is ever needed, either add a service-role policy to that table or switch the script to MCP-direct SQL. See LEARNINGS for the full PostgREST/RLS mental model.
@@ -60,3 +60,4 @@
 - **Does the production deployment have any error monitoring** (Sentry, LogRocket, console.errors going anywhere)? If not, this is the highest priority for next session.
 - **Phone-test the session-35 fixes.** Confirm the long-thread scroll works on multiple viewport sizes (375x667, 390x844, 412x915) and that the AdSense-disabled state doesn't introduce any other UX regressions.
 - **Path B backup-table cleanup (deferred from session 36).** 15 obsolete backup/staging tables in `public` schema can be dropped to reclaim ~76 MB. The 3 keepers (`knowledge_chunks_backup_phase1e_20260426`, `knowledge_chunks_backup_titlefix_20260430`, `phase1e_nav_only_candidates_20260425`) are referenced by active rollback paths or queued cleanup work. See PROJECT_STATUS session 36 block for the full drop list. Low priority — RLS already silenced the warnings; this is just storage hygiene.
+- **Mobile-ads diagnostic + re-enable (deferred from session 37).** Inline ads on mobile are currently disabled to escape the iframe-touch-capture freeze. To re-enable them safely, add session-29-style on-page debug overlay that fires when an AdBanner mounts, capturing the iframe's `getBoundingClientRect()`, messages-area `scrollTop` / `scrollHeight` / `clientHeight`, document-level `position: fixed` children, and touch-event targets at mount + 500ms + 1500ms. Send 2 messages on mobile, screenshot the overlay, pinpoint the actual mechanism. Then ship a targeted fix (likely lazy-load via IntersectionObserver, OR move ads outside the scrollable chat area entirely). Estimated cost: 1 session, ~30 min. Value: recover mobile ad revenue (probably majority of traffic).

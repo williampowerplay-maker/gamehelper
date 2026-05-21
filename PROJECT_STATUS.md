@@ -1,13 +1,14 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-05-04 (session 36 — RLS enabled on all backup/staging tables)
+**Last updated:** 2026-05-04 (session 37 — AdSense re-enable + mobile inline-ads disabled due to freeze)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `bddea1b`). **AdSense DISABLED** pending account setup. Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. |
+| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `573e538`). Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. |
+| AdSense status | **PARTIALLY LIVE.** Head-level `<script>` loader: ✅ live. `public/ads.txt` publisher authorization: ✅ live. Desktop sidebar ad (`hidden lg:flex`): ✅ live. Inline AdBanner in chat: **tablet + desktop only (≥768px)** — `hidden md:block`. **No inline ads on mobile** due to unresolved screen-freeze (session 37 investigation; three rounds of mitigation didn't fully solve it). Auto-ads / vignettes / anchor ads: OFF in AdSense dashboard. |
 | Signup cap | **50 users** (default in `src/lib/auth-context.tsx:7`; override via `NEXT_PUBLIC_MAX_USERS` env var). Currently 4 users signed up → **46 spots remaining** before signups close + waitlist UI activates. |
 | Retrieval Recall@10 (depth eval, 15 queries) | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
 | Retrieval MRR | **0.536** (deterministic, 3/3 runs. Cumulative Phase 1+2: 0.189 → 0.536) |
@@ -37,6 +38,43 @@
 | Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
 | **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
 | Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 37 — AdSense Re-Enable + Mobile Freeze Investigation, 2026-05-04)
+
+Re-enabled AdSense after session 35 disabled it. AdSense site verification + ads.txt + desktop ads are all live. **Mobile inline ads remain disabled** because three rounds of mitigation didn't solve a persistent mobile screen freeze. Decisive call: `hidden md:block` gate on the inline AdBanner so it only renders ≥ 768px viewport.
+
+**Cycle commits:**
+- `f297ae1` — feat: re-enable AdSense head-level loader script (`<script async src=".../adsbygoogle.js?client=ca-pub-5671407541170136" crossOrigin="anonymous">` restored in `<head>`)
+- `b0dbaf4` — chore: add `public/ads.txt` for AdSense site authorization (`google.com, pub-5671407541170136, DIRECT, f08c47fec0942fa0`)
+- `1385328` — chore: improve AdBanner policy compliance (label readability + visual separator border-top)
+- `32c8541` — feat: re-enable inline AdSense ad units + unify cadence to every 2nd response (anon + signed-in free)
+- `d913055` — fix(attempt): constrain ad size + `touch-pan-y` (didn't solve mobile freeze)
+- `573e538` — fix: gate inline AdBanner to tablet+desktop only (`hidden md:block`)
+
+**The mobile freeze story.** After re-enabling inline ads, user reported persistent screen freezes on mobile when an ad rendered. Symptom: "partial piece of the answer box visible but cannot scroll down or move screen at all." Auto-ads in AdSense dashboard confirmed OFF, so the cause was the inline `<ins class="adsbygoogle">` iframe itself.
+
+**Three mitigation rounds, none decisive:**
+1. **Round 1:** `data-full-width-responsive="false"` (force standard sizes 320×50/100, no responsive expansion). Didn't fix.
+2. **Round 2:** `max-h-[120px] overflow-hidden` on the inner ad container (hard size cap regardless of what AdSense serves). Didn't fix.
+3. **Round 3:** `touch-pan-y` (touch-action: pan-y) on the AdBanner wrapper, hoping to override iframe touch capture. Didn't fix — confirmed limitation: `touch-action` on the parent does NOT override the iframe's internal touch handling, since cross-origin iframes are separate browsing contexts.
+
+**Root-cause hypothesis (best guess, not yet verified).** Two failure modes stacking: (a) AdSense iframe captures touch events on its visible surface, blocking scroll-through; (b) `scrollToBottom` smooth-scroll races the iframe injection, leaving the visible viewport partway-scrolled with the new content + input below the fold. User can't scroll past the iframe to reach them. Combined effect: "entire screen frozen" from the user's perspective.
+
+**The fix:** disable inline ads on mobile. `hidden md:block` on the inline AdBanner means viewports < 768px never render the `<ins>` element at all. AdSense head script + ads.txt + desktop sidebar ad all unaffected.
+
+**Trade-off accepted:** lose mobile inline-ad revenue (probably the majority of traffic — typical gaming-help audience skews mobile). The alternative was a broken mobile experience that would lose users entirely. Future investigation: session-29-style on-page debug overlay around the AdBanner mount, capturing iframe rect / scroll positions / touch events at multiple timestamps to pinpoint the exact freeze mechanism.
+
+**Cadence (unchanged for tablet+desktop where ads do render):**
+- Every 2nd assistant response (`assistantCount % 2 === 0`)
+- Skip multiples of 5 (`assistantCount % 5 !== 0`) — UpgradeCTA fires there instead
+- Skip rate-limit messages (`!msg.showUpgradeCTA`) — avoids triple-stack with rate-limit UpgradeCTA
+- Anon + signed-in free share the same cadence; premium bypasses entirely
+
+**Files changed (session 37):**
+- `src/app/layout.tsx` — uncommented adsenseId const + restored `<script>` in `<head>`
+- `src/app/page.tsx` — restored `showAds` calc, unified cadence, added `hidden md:block` gate
+- `src/components/AdBanner.tsx` — policy improvements (label, border) + sizing constraints
+- `public/ads.txt` — NEW, AdSense publisher authorization
 
 ## Recent Changes (Session 36 — RLS Enabled on All Backup/Staging Tables, 2026-05-04)
 

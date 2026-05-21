@@ -4,6 +4,36 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## UX/Ads: AdSense iframe Touch-Capture Is Unsolvable on Mobile From Parent CSS (Session 37)
+
+After re-enabling AdSense inline ads, mobile users reported persistent screen freezes when an ad rendered. Three rounds of mitigation didn't fix it; the decisive fix was to gate inline ads behind `hidden md:block` (no inline ads on viewports < 768px).
+
+**What was tried and failed:**
+
+1. **`data-full-width-responsive="false"`** — forces AdSense to serve standard banner sizes (320×50, 320×100) instead of letting ads expand to 600px+ tall responsive units. Didn't help.
+2. **`max-h-[120px] overflow-hidden` on the inner ad container** — hard cap on ad height regardless of what AdSense serves. Didn't help.
+3. **`touch-pan-y` (`touch-action: pan-y`) on the AdBanner wrapper** — supposed to tell the browser "vertical scroll always wins in this region." Didn't help.
+
+**Why none of these worked:** AdSense ads render in cross-origin iframes. Cross-origin iframes are **separate browsing contexts** — they have their own event loop, their own touch handling, their own CSS scope. **`touch-action` on the parent does NOT propagate into the iframe.** When a user touches inside the iframe, the iframe captures the touchstart and the parent never sees it. No CSS on our side can override this. It's not a bug; it's a fundamental browser security boundary.
+
+**Symptom this produces:** user sees the page, sees the ad, sees the answer below the ad partially. Tries to scroll down to see the rest / reach the input. Touch lands on the iframe. Iframe eats the touch. Parent scroll container never gets the gesture. From the user's perspective: "the entire screen is frozen — I can't scroll or move anything." Technically the page is fine; the iframe just won't let you scroll past it.
+
+**Why this affects mobile specifically:** desktop uses mouse scroll wheel or scrollbar — these don't route through iframe touch handling. Mobile is touch-only, and every scroll gesture is at risk of starting on top of the ad iframe.
+
+**Decisive fix:** disable inline ads on mobile viewports entirely. `hidden md:block` Tailwind class on the AdBanner — display:none below 768px, display:block at and above. AdSense head script + ads.txt + desktop sidebar ad all unaffected; mobile gets no inline ads.
+
+**Trade-off:** lose mobile inline-ad revenue. For a gaming-help app with majority-mobile traffic, this is significant. But a broken mobile experience loses users entirely; degraded ad revenue is the smaller cost.
+
+**Future paths to re-enable mobile ads safely:**
+- Lazy-load via IntersectionObserver, only mount AdBanner when user scrolls within ~N px of it (reduces probability of touch-starting on an off-screen-then-on-screen ad)
+- Add session-29-style on-page debug overlay capturing iframe rect / scroll positions / touch events at AdBanner mount + 500ms + 1500ms — pinpoint the exact failure mode before guessing again
+- Switch to a non-iframe ad network (most networks use iframes for security; difficult to find an exception)
+- Render ads in a sticky area that's clearly outside the scrollable chat content (e.g., between header and chat — won't fix touch capture but at least won't block scroll-to-content)
+
+**Generalizable lesson:** when an iframe is involved in a UX bug, exhaust browser-fundamental-boundary explanations FIRST before trying CSS workarounds. Cross-origin iframe properties: separate touch handling, separate CSS, separate scroll, separate event loop. If your fix requires CSS to "reach into" an iframe, it won't work.
+
+---
+
 ## Ops: Supabase RLS-Enabled-With-No-Policies Silently Blocks service_role via PostgREST (Session 36)
 
 Enabling RLS on a Supabase table without attaching any policies makes the table deny-by-default for **every** role accessed via PostgREST — including `service_role`. This is correct security-advisor behavior (closes the anon-read hole), but it silently breaks any client-side script that uses supabase-js (which routes through PostgREST) to read from that table.
