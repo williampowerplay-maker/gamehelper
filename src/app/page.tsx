@@ -237,14 +237,16 @@ export default function Home() {
                   {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
                     <UpgradeCTA />
                   )}
-                  {/* Ad banner after every 2nd assistant response — same cadence for
-                      anon + signed-in free. Skipped on multiples of 5 to avoid stacking
-                      with the UpgradeCTA (line above). Skipped on rate-limit messages
-                      to avoid stacking the AdBanner + rate-limit UpgradeCTA — session 35
-                      identified this stacking as the suspected source of the 6th-message
-                      mobile freeze. */}
+                  {/* Ad banner after every 2nd assistant response — TABLET + DESKTOP ONLY
+                      (`hidden md:block` = no inline ads on mobile <768px). Mobile inline ads
+                      caused a persistent screen-freeze that survived three rounds of
+                      mitigation (full-width-responsive=false, max-h-[120px], touch-pan-y).
+                      Disabling on mobile until we can instrument the root cause properly.
+                      Desktop sidebar ad (line 295) is also desktop-only via `hidden lg:flex`.
+                      Cadence: every 2nd response, skipping multiples of 5 (UpgradeCTA collision)
+                      and rate-limit messages (stacking). */}
                   {showAds && isAssistant && assistantCount > 0 && assistantCount % 2 === 0 && assistantCount % 5 !== 0 && !msg.showUpgradeCTA && (
-                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
+                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4 hidden md:block" />
                   )}
                 </>
               )}
