@@ -3,9 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
 import ErrorBoundary from "@/components/ErrorBoundary";
 
-// AdSense temporarily disabled — see <head> below. To re-enable, uncomment this
-// const and the <script> block in <head>.
-// const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-5671407541170136";
+const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_ID || "ca-pub-5671407541170136";
 
 export const metadata: Metadata = {
   title: "Crimson Desert Guide | AI Game Companion",
@@ -28,16 +26,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <head>
-        {/* Google AdSense — DISABLED 2026-05-04 pending account approval / setup.
-            Suspected source of mobile interaction freeze on the 6th-message AdBanner.
-            To re-enable: uncomment the script tag below AND restore the showAds
-            calculation in src/app/page.tsx (currently forced to false).
+        {/* Google AdSense — head-level loader. Required for AdSense site verification
+            and ad serving. Inline <AdBanner> units in src/app/page.tsx are still
+            gated by `showAds = false` (session 35 freeze investigation deferred them);
+            flip that separately when ready to re-enable inline ads. */}
         <script
           async
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
           crossOrigin="anonymous"
         />
-        */}
       </head>
       <body className="antialiased">
         <AuthProvider>
