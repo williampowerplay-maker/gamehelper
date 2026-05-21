@@ -20,10 +20,7 @@ const ANON_COUNT_KEY = "anonQueryCount";
 
 export default function Home() {
   const { user, session, tier } = useAuth();
-  // AdSense temporarily disabled 2026-05-04 — see src/app/layout.tsx <head> for context.
-  // To re-enable: restore the original line below.
-  // const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
-  const showAds = false;
+  const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
   const [messages, setMessages] = useState<Message[]>([]);
   const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("nudge");
   const [isLoading, setIsLoading] = useState(false);
@@ -240,12 +237,13 @@ export default function Home() {
                   {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
                     <UpgradeCTA />
                   )}
-                  {/* Anonymous: show ad after 2nd response, then every 2nd after that */}
-                  {showAds && !user && isAssistant && assistantCount > 0 && assistantCount % 2 === 0 && (
-                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
-                  )}
-                  {/* Signed-in free: show ad banner every 6th response */}
-                  {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 6 === 0 && assistantCount % 5 !== 0 && (
+                  {/* Ad banner after every 2nd assistant response — same cadence for
+                      anon + signed-in free. Skipped on multiples of 5 to avoid stacking
+                      with the UpgradeCTA (line above). Skipped on rate-limit messages
+                      to avoid stacking the AdBanner + rate-limit UpgradeCTA — session 35
+                      identified this stacking as the suspected source of the 6th-message
+                      mobile freeze. */}
+                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 2 === 0 && assistantCount % 5 !== 0 && !msg.showUpgradeCTA && (
                     <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4" />
                   )}
                 </>
