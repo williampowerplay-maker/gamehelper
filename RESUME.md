@@ -1,7 +1,7 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: `bddea1b` (chore: lower signup cap default 100 → 50)
+- Last commit: `55aeb7f` (docs: session 35 — followed by session 36 RLS hardening in-DB only, no new commit yet for that)
 - Branch: main, working tree clean (CSVs from breadth eval still untracked)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
@@ -13,6 +13,7 @@
 - **AdSense: DISABLED** pending account setup. Both the `<script>` loader in `layout.tsx` and `showAds` calc in `page.tsx` are commented out with revival instructions in commit `ef3ccdb`.
 - **Signup cap: 50** users (default in `src/lib/auth-context.tsx:7`). Currently 4 signed up → 46 spots remaining. Override via `NEXT_PUBLIC_MAX_USERS` env var in Vercel.
 - UpgradeCTA copy: removed "premium voice" mention (feature was never implemented).
+- **Supabase RLS hardening (session 36):** all 18 backup/staging tables in the `public` schema now have RLS enabled (no policies attached). Supabase Security Advisor warnings cleared. **⚠️ Caveat: `scripts/fix-game8-titles.ts` reads `knowledge_chunks_backup_titlefix_20260430` via supabase-js and will now return zero rows silently.** If Phase 1f rollback is ever needed, either add a service-role policy to that table or switch the script to MCP-direct SQL. See LEARNINGS for the full PostgREST/RLS mental model.
 
 ## Database-only state
 - All prior backup tables (pre-1a through 1e)
@@ -58,3 +59,4 @@
 - **AdSense re-enable timing.** Currently disabled (suspected source of mobile freeze on 6th-message AdBanner). Re-enabling = uncomment two blocks in `layout.tsx` + restore `showAds` calc in `page.tsx`. Before re-enabling: confirm AdSense account is approved, decide on auto-ad enablement (vignette/anchor) — those were the most likely freeze culprit and the AdSense dashboard config controls them, not our code.
 - **Does the production deployment have any error monitoring** (Sentry, LogRocket, console.errors going anywhere)? If not, this is the highest priority for next session.
 - **Phone-test the session-35 fixes.** Confirm the long-thread scroll works on multiple viewport sizes (375x667, 390x844, 412x915) and that the AdSense-disabled state doesn't introduce any other UX regressions.
+- **Path B backup-table cleanup (deferred from session 36).** 15 obsolete backup/staging tables in `public` schema can be dropped to reclaim ~76 MB. The 3 keepers (`knowledge_chunks_backup_phase1e_20260426`, `knowledge_chunks_backup_titlefix_20260430`, `phase1e_nav_only_candidates_20260425`) are referenced by active rollback paths or queued cleanup work. See PROJECT_STATUS session 36 block for the full drop list. Low priority — RLS already silenced the warnings; this is just storage hygiene.

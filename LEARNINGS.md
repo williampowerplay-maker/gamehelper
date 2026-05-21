@@ -4,6 +4,32 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## Ops: Supabase RLS-Enabled-With-No-Policies Silently Blocks service_role via PostgREST (Session 36)
+
+Enabling RLS on a Supabase table without attaching any policies makes the table deny-by-default for **every** role accessed via PostgREST — including `service_role`. This is correct security-advisor behavior (closes the anon-read hole), but it silently breaks any client-side script that uses supabase-js (which routes through PostgREST) to read from that table.
+
+**Concrete failure mode.** `scripts/fix-game8-titles.ts:54` reads from `knowledge_chunks_backup_titlefix_20260430` via:
+```ts
+supabase.from(SOURCE_TABLE).select("id, source_url, content").in("source_url", urls);
+```
+With the service-role-keyed supabase-js client AND RLS-enabled-no-policies on the backup table, this returns `data = []` and `error = null`. The script appears to succeed but produces an empty plan and a "0 chunks affected" result. Same silent-fail pattern as Session 32's anon-key-mislabeled-as-service-role bug — PostgREST is fundamentally a "deny-by-default" gate, not a "service-role passthrough."
+
+**Mental model:** PostgREST routes every request through RLS regardless of the JWT role. `service_role` is just a JWT claim; it only matters if a policy explicitly grants access via `auth.role() = 'service_role'`. Active tables in this codebase (`knowledge_chunks`, `users`, `queries`, etc.) all have such policies — that's why they work. Backup tables enabled in session 36 don't, so PostgREST denies all reads.
+
+**Fix when you need scripted access to an RLS-locked table:** add a service-role passthrough policy.
+```sql
+CREATE POLICY "Service role full access" ON public.<table>
+  FOR ALL USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+```
+
+**Alternative:** use direct SQL via the Supabase MCP `execute_sql` tool — that bypasses RLS entirely (admin connection).
+
+**Detection heuristic:** if a script that worked before suddenly returns "0 rows" without errors after an RLS-enable migration, suspect missing service-role policy first. Don't blame the data, don't blame the JWT — read the policies on the table.
+
+**Process improvement:** when enabling RLS on a table that any script reads from, audit `grep -rn "<table_name>" scripts/` first. Either pre-emptively add a service-role policy, or document the script as MCP-only.
+
+---
+
 ## RAG: Per-Term URL-Match Boosts Bleed Across Query Types (Session 34, supersedes Session 33 entry)
 
 The retrieval reranker had a `+0.08` URL-match boost: if any term in `urlTermsForRerank` (a flat list including single words like `"one-handed"` and `"weapons"`) was a substring of `source_url`, add 0.08 to chunk similarity. This was tuned for entity-specific queries (`how do I beat Kailok` → `/Kailok+the+Hornsplitter` URL match). It bled badly for tier-list queries: `"best one-handed weapons"` extracted `["best", "one-handed", "weapons"]`, and Fextralife's `/One-Handed_Weapons` URL (a category landing page, NOT a tier list) got the URL-match boost via the substring `"one-handed"`. Game8's actual tier-list page (`archives/595314`) got no URL-match boost — game8 archive URLs are numeric.

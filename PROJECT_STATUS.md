@@ -1,6 +1,6 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-05-04 (session 35 — mobile scroll fix + AdSense disabled + signup cap lowered)
+**Last updated:** 2026-05-04 (session 36 — RLS enabled on all backup/staging tables)
 
 ## Current State Snapshot
 
@@ -18,7 +18,8 @@
 | Phase next | **1f slot-2** (in-chunk H1 still polluting embedding; data fix would push 4bad19ac into top-30 vector pool — last missing tier-list chunk) · **1e** nav-only DELETE (289 URLs / 5,127 chunks pending — re-count first; some may have been deleted by 1d) · Strongbox puzzle (33% — separate eval seed gap) |
 | Phase deferred | **1d** trailing-boilerplate stripper (UPDATE + re-embed, ~$0.03 Voyage cost) — see `known_issues/phase1d_trailing_boilerplate.md` · **1e** nav-only DELETE (587 candidates queued in `phase1e_nav_only_candidates_20260425`) |
 | Phase final | REINDEX with `lists=237` after 1d + 1e complete |
-| Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs) · `knowledge_chunks_backup_titlefix_20260430` (172 rows, pre-Phase-1f). All droppable pre-launch once cleanup is locked in. |
+| Supabase backup tables | `knowledge_chunks_backup_20260422` (pre-Phase-1a) · `knowledge_chunks_backup_phase1b_20260423` (7,209 rows) · `knowledge_chunks_backup_phase1c_20260425` (11,670 rows) · `retrieval_eval_backup_20260422` · `dedup_to_delete_20260422` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260425` (1,007 URLs staged) · `phase1e_nav_only_candidates_20260425` (587 URLs queued for 1e) · `phase1c_manual_review_20260425` (2 URLs) · `knowledge_chunks_backup_titlefix_20260430` (172 rows, pre-Phase-1f). All droppable pre-launch once cleanup is locked in. **All 18 backup/staging tables now have RLS enabled (session 36) with NO policies attached** → PostgREST returns zero rows to anon AND service_role via the REST API. SQL editor + MCP still work (admin bypass). |
+| ⚠️ RLS caveat for scripts | `scripts/fix-game8-titles.ts:54` reads from `knowledge_chunks_backup_titlefix_20260430` via supabase-js (PostgREST). **That read will now return zero rows.** If Phase 1f rollback or audit is ever re-needed, either (a) add a service-role policy on the backup table, or (b) switch the script to use direct SQL via the MCP. Same applies to any other script accessing the 17 other RLS-locked backup tables. |
 
 ## Cumulative Scoreboard (depth eval — retrieval_eval, 15 queries)
 
@@ -36,6 +37,31 @@
 | Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
 | **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
 | Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 36 — RLS Enabled on All Backup/Staging Tables, 2026-05-04)
+
+Operational hardening after Supabase Security Advisor flagged 18 tables in the `public` schema with RLS disabled. All flagged tables are backup/staging/audit artifacts from past corpus-cleanup phases (1a–1f). Active app tables (`knowledge_chunks`, `users`, `queries`, `waitlist`, `retrieval_eval`, etc.) already had RLS configured correctly.
+
+**Action taken (Path A — minimal, no data loss).** Ran `ALTER TABLE ... ENABLE ROW LEVEL SECURITY` on all 18 tables via Supabase MCP. No policies attached. Result:
+- PostgREST REST API: returns zero rows for both anon and service_role JWTs on these tables (deny-by-default when RLS is on with no matching policy).
+- Supabase SQL Editor: unaffected (admin connection bypasses RLS).
+- MCP `execute_sql`: unaffected (admin connection bypasses RLS).
+- All 18 Supabase advisor warnings cleared.
+
+**The 18 tables now RLS-enabled:**
+`dedup_to_delete_20260422` · `knowledge_chunks_backup_20260422` · `knowledge_chunks_backup_phase1b_20260423` · `knowledge_chunks_backup_phase1c_20260425` · `knowledge_chunks_backup_phase1d_20260426` · `knowledge_chunks_backup_phase1e_20260426` · `knowledge_chunks_backup_titlefix_20260430` · `phase1b_to_delete_20260423` · `phase1c_classifications_20260424` · `phase1c_classifications_20260425` · `phase1c_manual_review_20260425` · `phase1d_candidates_20260426` · `phase1d_failed_20260426` · `phase1e_nav_only_candidates_20260425` · `retrieval_eval_backup_20260422` · `retrieval_eval_backup_phase1c_audit_20260425` · `retrieval_eval_backup_phase1d_20260426` · `retrieval_eval_backup_phase1d_audit_20260426`
+
+**⚠️ Side effect for scripts that read these tables via supabase-js.** `scripts/fix-game8-titles.ts:54` reads from `knowledge_chunks_backup_titlefix_20260430` to plan title fixes. With RLS enabled and no policy granting `service_role` access, the script's `supabase.from(...).select(...)` call will now return zero rows. The script appears to work (no error) but produces an empty plan — same silent-fail pattern as the anon-key-mislabeled-as-service-role bug from Session 32.
+
+**To restore script access without disabling RLS** (only if Phase 1f rollback or backup audit is ever needed):
+```sql
+CREATE POLICY "Service role full access" ON public.knowledge_chunks_backup_titlefix_20260430
+  FOR ALL USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+```
+
+Same pattern applies to the other 17 if any future script needs to read them. Or just use direct SQL via the MCP (which bypasses RLS).
+
+**Path B (drop the 15 obsolete tables, keep + RLS-enable the 3 active ones) was offered but deferred** — user chose Path A for safety. ~78 MB of backup storage retained but locked behind RLS. Path B remains available later if storage cleanup becomes desirable.
 
 ## Recent Changes (Session 35 — Mobile Scroll Fix + AdSense Disabled + Signup Cap, 2026-05-04)
 
