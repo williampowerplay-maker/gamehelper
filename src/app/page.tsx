@@ -6,21 +6,17 @@ import ChatInput from "@/components/ChatInput";
 import ChatMessage, { type Message } from "@/components/ChatMessage";
 import SpoilerTierSelector from "@/components/SpoilerTierSelector";
 import AuthButton from "@/components/AuthButton";
-import AdBanner from "@/components/AdBanner";
 import UpgradeCTA from "@/components/UpgradeCTA";
 import SignInWall from "@/components/SignInWall";
 import CoverageStats from "@/components/CoverageStats";
 import { useAuth } from "@/lib/auth-context";
 import { type SpoilerTier } from "@/lib/supabase";
 
-const AD_SLOT_BANNER = process.env.NEXT_PUBLIC_AD_SLOT_BANNER || "";
-const AD_SLOT_SIDEBAR = process.env.NEXT_PUBLIC_AD_SLOT_SIDEBAR || "";
 const ANON_QUERY_LIMIT = 2;
 const ANON_COUNT_KEY = "anonQueryCount";
 
 export default function Home() {
   const { user, session, tier } = useAuth();
-  const showAds = tier !== "premium" && !!AD_SLOT_BANNER;
   const [messages, setMessages] = useState<Message[]>([]);
   const [spoilerTier, setSpoilerTier] = useState<SpoilerTier>("nudge");
   const [isLoading, setIsLoading] = useState(false);
@@ -233,20 +229,11 @@ export default function Home() {
                   {isAssistant && msg.showUpgradeCTA && (
                     <UpgradeCTA rateLimitHit />
                   )}
-                  {/* Show upgrade CTA after every 5th assistant response (signed-in users only) */}
-                  {showAds && !!user && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
+                  {/* Show upgrade CTA after every 5th assistant response (signed-in non-premium users only).
+                      Previously gated by `showAds`; AdSense removed entirely so we now gate on
+                      `tier !== "premium"` directly — same boolean semantics. */}
+                  {tier !== "premium" && !!user && isAssistant && assistantCount > 0 && assistantCount % 5 === 0 && !msg.showUpgradeCTA && (
                     <UpgradeCTA />
-                  )}
-                  {/* Ad banner after every 2nd assistant response — TABLET + DESKTOP ONLY
-                      (`hidden md:block` = no inline ads on mobile <768px). Mobile inline ads
-                      caused a persistent screen-freeze that survived three rounds of
-                      mitigation (full-width-responsive=false, max-h-[120px], touch-pan-y).
-                      Disabling on mobile until we can instrument the root cause properly.
-                      Desktop sidebar ad (line 295) is also desktop-only via `hidden lg:flex`.
-                      Cadence: every 2nd response, skipping multiples of 5 (UpgradeCTA collision)
-                      and rate-limit messages (stacking). */}
-                  {showAds && isAssistant && assistantCount > 0 && assistantCount % 2 === 0 && assistantCount % 5 !== 0 && !msg.showUpgradeCTA && (
-                    <AdBanner slot={AD_SLOT_BANNER} format="horizontal" className="my-4 hidden md:block" />
                   )}
                 </>
               )}
@@ -288,14 +275,6 @@ export default function Home() {
       </div>
     </div>
 
-    {/* Desktop sidebar ad */}
-    {showAds && AD_SLOT_SIDEBAR && (
-      <aside className="hidden lg:flex flex-shrink-0 w-[300px] border-l border-[#2a2a3a] p-4 items-start justify-center pt-20">
-        <div className="sticky top-4">
-          <AdBanner slot={AD_SLOT_SIDEBAR} format="rectangle" />
-        </div>
-      </aside>
-    )}
     </div>
   );
 }
