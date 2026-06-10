@@ -4,6 +4,65 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## DB Design: When Your "Cache" Is Actually Your Analytics Table, Bulk DELETE Is A Footgun (Session 40)
+
+The response cache in this app isn't a separate table — it's a read-through view over `public.queries`, which is also the analytics table, the rate-limit-counter source, and (post session 39) the feedback foreign-key target. The lookup filter is `response IS NOT NULL AND created_at >= now()-7d AND question = cacheKey AND spoiler_tier = tier`. Writing into the "cache" means inserting a normal row into `queries`. There's no separate cache key.
+
+**This is a fine design** — one table, one source of truth, no cache-coherency problems. But it has one trap: **the obvious "clear the cache" instinct is `DELETE FROM queries WHERE …`, and that's destructive in ways that aren't immediately visible.**
+
+What bulk-DELETE actually does:
+1. Resets the anon rate limit (`COUNT(*) WHERE client_ip = … AND created_at >= now()-24h` collapses to 0).
+2. Resets the signed-in free-tier daily cap (same shape, keyed on `user_id`).
+3. **Cascade-deletes feedback rows** via `feedback.message_id` FK with `ON DELETE CASCADE`. Months of user feedback data, gone, with no warning beyond the row count in the DELETE output.
+4. Empties admin stats/export dashboards.
+5. Wipes retrieval instrumentation columns (`classified_content_type`, `retrieval_similarities`, etc.) used for offline eval.
+
+**The right pattern:** `UPDATE public.queries SET response = NULL WHERE …`. The lookup filter is `.not("response", "is", null)`, so nulling the response is enough to evict from cache. The row stays, analytics survive, FKs intact, rate-limit counters preserved.
+
+**Generalizable rule:** when one table serves both as a cache and as something else (analytics, FKs, counters), evict by **nulling the cache-relevant column**, not by deleting the row. The row is the durable thing; the column is the cache.
+
+Found this by investigation before clearing, not after a destructive ops mistake — which is the right time to find it. Future schema design: if a "cache" and an "analytics record" would naturally share a row, default to this same pattern (eviction by column-null) rather than splitting into two tables. The split is more code, more sync risk, and the shared-row pattern works fine as long as you remember the eviction discipline.
+
+Documented the full mental model + clearing recipes in RESUME.md ("Response cache" section). Future-me (or other-PC-me) doesn't have to re-derive this.
+
+---
+
+## DB/RLS: Service-Role Policies Don't Help PostgREST Anon — Explicit DENY Beats Implicit Empty (Session 39)
+
+When shipping the `feedback` table, verified RLS behavior with an explicit anon-client INSERT probe instead of trusting "no policy = blocked." Result: anon INSERT against the table returned `401` with Postgres code `42501` (`"new row violates row-level security policy"`) — the loud, correct failure mode. Service-role insert via the API route worked normally.
+
+**Contrast: session 35's silent 204 footgun.** A table without RLS enabled at all returns `204 No Content` to anon writes — PostgREST's idiom for "ok but no rows returned." That looks like success to a client and like silent data loss to a developer. The fix is `ALTER TABLE … ENABLE ROW LEVEL SECURITY` plus explicit policies for the roles that should have access. No policies attached to a role = that role gets nothing.
+
+**Pattern to copy for any future write table:**
+```sql
+ALTER TABLE public.<t> ENABLE ROW LEVEL SECURITY;
+CREATE POLICY "<t>_service_select" ON public.<t> FOR SELECT TO public USING (auth.role() = 'service_role');
+CREATE POLICY "<t>_service_insert" ON public.<t> FOR INSERT TO public WITH CHECK (auth.role() = 'service_role');
+CREATE POLICY "<t>_service_update" ON public.<t> FOR UPDATE TO public USING (auth.role() = 'service_role') WITH CHECK (auth.role() = 'service_role');
+-- DELETE policy as needed
+```
+
+Then verify with a curl against the anon endpoint. If you don't get `401 + 42501`, the policy isn't doing what you think.
+
+**SELECT special case:** anon SELECT on an RLS-locked table returns `200 [] ` (empty array), not 401. This is PostgREST's standard "policy filtered all rows" behavior. So the `query_feedback_summary` view, anon-read, returns `[]` — no leak, no error. If you want a hard error on anon SELECT, you need a `REVOKE` on the table grant level, which is rarely worth it.
+
+---
+
+## Next.js 16 Migration: `middleware` → `proxy` Rename Via Codemod (Session 39)
+
+Next 16 deprecated the `middleware.ts` filename convention in favor of `proxy.ts`, with the exported function renamed `middleware` → `proxy`. Same runtime (Edge), same matcher syntax, same request/response semantics — just a rename.
+
+**Codemod:** `npx @next/codemod@latest middleware-to-proxy . --force` (the `--force` is required when the git tree isn't clean). The codemod renames the file, renames the exported function, and (in some configurations) updates internal references. In this repo it reported "0 ok / 67 unmodified / 1 skipped" — misleading. The rename did happen; one stale "middleware" word in a comment had to be cleaned up by hand afterwards. Trust the file diff, not the codemod's summary.
+
+**Net result in this codebase:**
+- File path: `src/proxy.ts` (was nonexistent — created fresh; project didn't have a middleware before session 39).
+- Function name: `export function proxy(request: NextRequest)`.
+- Config: same `export const config = { matcher: [...] }`.
+
+If a future Next major changes this again, run the corresponding codemod first. Don't hand-edit the file — codemods catch internal references you'd miss.
+
+---
+
 ## UX/Ads: AdSense iframe Touch-Capture Is Unsolvable on Mobile From Parent CSS (Session 37)
 
 After re-enabling AdSense inline ads, mobile users reported persistent screen freezes when an ad rendered. Three rounds of mitigation didn't fix it; the decisive fix was to gate inline ads behind `hidden md:block` (no inline ads on viewports < 768px).

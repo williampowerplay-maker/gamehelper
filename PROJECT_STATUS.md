@@ -1,14 +1,16 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-05-04 (session 37 — AdSense re-enable + mobile inline-ads disabled due to freeze)
+**Last updated:** 2026-06-10 (session 40 — response-cache investigation; research-only, no code/DB changes)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `573e538`). Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. |
-| AdSense status | **PARTIALLY LIVE.** Head-level `<script>` loader: ✅ live. `public/ads.txt` publisher authorization: ✅ live. Desktop sidebar ad (`hidden lg:flex`): ✅ live. Inline AdBanner in chat: **tablet + desktop only (≥768px)** — `hidden md:block`. **No inline ads on mobile** due to unresolved screen-freeze (session 37 investigation; three rounds of mitigation didn't fully solve it). Auto-ads / vignettes / anchor ads: OFF in AdSense dashboard. |
+| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `121971c`). Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. Feedback feature live. |
+| AdSense status | **REMOVED ENTIRELY (session 38, commit `85ca60d`).** No `<script>` loader, no inline AdBanner, no desktop sidebar ad, no `public/ads.txt`. `tier !== "premium"` now gates UpgradeCTA directly. |
+| Feedback feature | **LIVE (session 39, commits `d144895` + `121971c`).** Per-response thumbs up/down with categorized downvote reasons (`wrong_info` / `spoiled_answer` / `unhelpful` / `other`). Service-role API at `/api/feedback`. Browser session cookie via `src/proxy.ts` (Next 16's renamed-from-middleware convention). `public.feedback` table + `public.query_feedback_summary` view. Cache hits ARE rateable. See RESUME.md "Feedback feature" section. |
+| Response cache | **Read-through view of `public.queries`** (NOT a separate table). Lookup key: `(question_normalized, spoiler_tier)` with 7-day TTL. Write happens on every successful Q+A insert. Cache hits log `cache_hit=true` rows that re-extend TTL. ⚠️ Bulk-delete on `queries` cascades into `feedback`, breaks anon rate limit + free-tier daily cap. **Prefer `UPDATE … SET response = NULL` to clear.** See RESUME.md "Response cache" section for full mental model + clearing recipes. Snapshot: 391 total rows, 7 live cache entries (all Nudge), 0 cache_hit logs yet. |
 | Signup cap | **50 users** (default in `src/lib/auth-context.tsx:7`; override via `NEXT_PUBLIC_MAX_USERS` env var). Currently 4 users signed up → **46 spots remaining** before signups close + waitlist UI activates. |
 | Retrieval Recall@10 (depth eval, 15 queries) | **86.7%** (deterministic, 3/3 runs post-Phase-2 reranker tuning. Cumulative Phase 1+2: 20.0% → 86.7% = **+66.7pp**) |
 | Retrieval MRR | **0.536** (deterministic, 3/3 runs. Cumulative Phase 1+2: 0.189 → 0.536) |
@@ -38,6 +40,120 @@
 | Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
 | **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
 | Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 40 — Response-Cache Investigation, 2026-06-10)
+
+Research-only session. No code or DB changes shipped.
+
+**Goal.** User wanted to understand cache mechanics before considering any clearing — wisely, given the cache shares its store with analytics, rate limiting, and (post session 39) feedback FKs.
+
+**Findings.** The "response cache" isn't a separate table. It's a read-through view of `public.queries`:
+- **Lookup** (`src/app/api/chat/route.ts:370–378`): `select response from queries where question=cacheKey and spoiler_tier=tier and created_at >= now()-7d and response is not null limit 1`.
+- **Normalization key** (route.ts:322): `question.trim().toLowerCase().replace(/[^a-z0-9\s]/g, "").replace(/\s+/g, " ")`.
+- **Writes** happen at three sites in the same file:
+  1. Main RAG insert (915–935) — writes `response` if `!isMissingOrDefaultResponse(answer)`.
+  2. No-info / content-gap insert (939–959) — writes `response: null` + `content_gap: true` so the row exists for analytics but won't serve.
+  3. Cache-hit logging insert (388–399) — re-inserts the same `response` with `cache_hit=true` and fresh `created_at`, which **effectively extends the TTL on every hit**.
+- **No separate cache utility.** Other readers of `queries`: `src/app/api/admin/stats/route.ts`, `src/app/api/admin/export/route.ts`, `src/app/page.tsx` (for `data.cached` flag).
+
+**Critical side effect to remember.** Bulk-deleting `queries` rows would:
+1. Reset the anon rate-limit (24h window of non-cached rows per `client_ip`).
+2. Reset the free-tier daily cap (24h window per `user_id`).
+3. **Cascade-delete `feedback` rows** via `ON DELETE CASCADE` on `feedback.message_id` FK.
+4. Wipe retrieval instrumentation (`classified_content_type`, `retrieval_similarities`, etc.).
+5. Empty admin stats/export dashboards.
+
+**Recommendation: use `UPDATE … SET response = NULL` to clear**, not DELETE. Row stays for analytics but stops qualifying for cache lookup.
+
+**Cache state snapshot.**
+
+| Metric | Count |
+|---|---|
+| Total `queries` rows | 391 |
+| Live cache entries (`response IS NOT NULL AND created_at >= now()-7d`) | 7 |
+| Live cache — Nudge | 7 |
+| Live cache — Full | 0 |
+| Rows where `cache_hit = true` | 0 |
+
+`cache_hit=0` is interesting — either production has had no repeat-question traffic since session 39 shipped, or no traffic at all. Either way, ammo for the telemetry-first recommendation.
+
+**Status:** clearing recipes presented to user (5 scopes: nuke / pattern / mode / stale / down-voted). User has not yet picked a scope. **Nothing was cleared.** Full recipes preserved in RESUME.md "Cache-clearing recipes" section so a continuation on a different PC can pick up.
+
+**No commit.** Research-only.
+
+## Recent Changes (Session 39 — Per-Response Feedback Feature, 2026-06-10)
+
+Shipped the per-response thumbs feedback feature in two commits, both pushed to main and deployed to Vercel.
+
+**Cycle commits:**
+- `d144895` — feat(db): add feedback table, query_feedback_summary view, and session cookie proxy
+- `121971c` — feat(feedback): per-response thumbs feedback with categorized downvote reasons
+
+**What shipped.**
+1. **DB layer** (via Supabase MCP `apply_migration`, no `supabase/migrations/` dir per project convention):
+   - `public.feedback` table — 8 columns, FK to `queries.id` with `ON DELETE CASCADE`, unique constraint on `(message_id, session_id)`, CHECK constraints on `rating ∈ {up, down}` / `mode ∈ {nudge, full}` / `reason ∈ {wrong_info, spoiled_answer, unhelpful, other, null}`, BEFORE UPDATE trigger for `updated_at`.
+   - 3 indexes: `idx_feedback_message_id`, `idx_feedback_mode_rating`, `idx_feedback_created_at DESC`.
+   - RLS enabled with service-role-only policies for SELECT/INSERT/UPDATE. Anon writes return explicit `401` + Postgres code `42501` (verified with explicit curl probe — contrast to session 35's silent 204 footgun).
+   - `public.query_feedback_summary` view: INNER JOIN feedback → queries, carries `mode`, `cache_hit`, `content_gap`, `question`, both timestamps.
+
+2. **Proxy / session cookie** (`src/proxy.ts`):
+   - Renamed from `middleware.ts` to `proxy.ts` via `npx @next/codemod@latest middleware-to-proxy . --force` (Next 16 deprecated `middleware` filename).
+   - Sets `feedback_session` cookie if absent: `httpOnly`, `secure`, `sameSite=lax`, 2-year `maxAge`, value = `crypto.randomUUID()`.
+   - Narrow matcher: `["/", "/api/feedback", "/api/feedback/:path*"]`.
+
+3. **API route** (`src/app/api/feedback/route.ts`):
+   - `POST`: upserts on `(message_id, session_id)`. Forces `reason=null` on up-votes. Validates rating/mode/reason against allowed sets.
+   - `GET ?message_id=<uuid>`: returns this session's existing vote or `null`. Used for client hydration on mount.
+   - Service-role client via inline `loadEnv()` pattern.
+   - FK violation (`23503`) → 400 "Unknown message_id". CHECK violation (`23514`) → 400 "Constraint violation". Unexpected failures log to `error_logs`.
+
+4. **UI component** (`src/components/MessageFeedback.tsx`, ~200 lines):
+   - Hydrates via `GET` on mount; suppresses render until hydrated (avoids flicker).
+   - Optimistic update + silent revert pattern.
+   - Click-currently-selected = no-op.
+   - `saving` flag disables buttons with `opacity-50 pointer-events-none`.
+   - Inline SVG Heroicons solid hand-thumbs-up/down.
+   - 4 reason pills appear only when downvote active: Wrong info / Spoiled answer / Unhelpful / Other.
+   - All errors silent (console.warn only — feedback is non-critical).
+   - aria-label, aria-pressed, title attributes for a11y.
+
+5. **Integration:**
+   - `src/components/ChatMessage.tsx` — added `queryId?: string` to `Message` interface. Renders `<MessageFeedback>` only when `message.queryId && message.spoilerTier` (skips sign-in walls, rate-limit messages, demo responses).
+   - `src/app/page.tsx` — threads `queryId: data.queryId` into AI messages (line ~112). Wall and rate-limit messages intentionally omit `queryId`.
+
+6. **Cache-hit queryId fix (Phase 5b):**
+   - `src/app/api/chat/route.ts:380–400` — cache hits now pre-generate a `queries.id` UUID, insert a `cache_hit=true` row with that ID, and return `queryId` to the client. **This is what makes cache hits rateable.** Critical for the "spoiled_answer on Nudge" headline metric, since cache hits are the bulk of repeat-question signal.
+
+**Headline analytics query (the eval angle the whole feature exists for):**
+
+```sql
+SELECT question, mode, reason, count(*) AS votes
+FROM query_feedback_summary
+WHERE rating = 'down' AND mode = 'nudge'
+GROUP BY question, mode, reason
+ORDER BY votes DESC LIMIT 50;
+```
+
+**Deferred from this cycle:**
+- Visual UI verification on the live deploy (manual phone/desktop testing).
+- `next lint` migration to ESLint flat-config (Next 16 removed `next lint` command; `eslint.config.js` flat-config needed).
+- RESUME / PROJECT_STATUS doc cleanup of session-37 AdSense bullets that were superseded by session 38.
+
+## Recent Changes (Session 38 — AdSense Fully Removed, 2026-05-XX)
+
+Reversed session 37. Mobile freeze investigation didn't yield a path forward, ad revenue projection didn't justify the broken mobile experience, and AdSense was creating ongoing complexity (touch capture, sidebar layout, gating logic). Removed entirely.
+
+**Cycle commit:**
+- `85ca60d` — chore: remove AdSense entirely
+
+**What was removed:**
+- `<script>` loader in `src/app/layout.tsx`.
+- `public/ads.txt`.
+- Desktop sidebar ad block in `src/app/page.tsx`.
+- Inline `AdBanner` mounts in chat flow.
+- `showAds` calculation (replaced with direct `tier !== "premium"` gating on UpgradeCTA — same boolean semantics).
+
+**Net effect:** chat UI is ad-free across all viewports. UpgradeCTA still fires every 5th assistant response for signed-in free users.
 
 ## Recent Changes (Session 37 — AdSense Re-Enable + Mobile Freeze Investigation, 2026-05-04)
 
