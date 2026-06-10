@@ -1,9 +1,15 @@
 "use client";
 
 import { type SpoilerTier } from "@/lib/supabase";
+import MessageFeedback from "@/components/MessageFeedback";
 
 interface Message {
-  id: string;
+  id: string;                            // React list key (ephemeral, client-generated)
+  queryId?: string;                      // DB FK to public.queries.id — present only for
+                                         //   real Q+A responses from /api/chat's main RAG
+                                         //   path. Absent on sign-in walls, rate-limit
+                                         //   messages, cache hits, off-topic shortcuts.
+                                         //   When present, enables per-message feedback UI.
   role: "user" | "assistant";
   content: string;
   spoilerTier?: SpoilerTier;
@@ -86,6 +92,17 @@ export default function ChatMessage({ message }: { message: Message }) {
               <path d="M15.932 7.757a.75.75 0 011.061 0 6 6 0 010 8.486.75.75 0 01-1.06-1.061 4.5 4.5 0 000-6.364.75.75 0 010-1.06z" />
             </svg>
           </button>
+        )}
+
+        {/* Per-response thumbs feedback — only when this is a real Q+A
+            response (queryId present) AND we know the mode (spoilerTier
+            present). Both guards together skip sign-in walls, rate-limit
+            messages, and cache hits / off-topic shortcuts. */}
+        {!isUser && message.queryId && message.spoilerTier && (
+          <MessageFeedback
+            queryId={message.queryId}
+            mode={message.spoilerTier}
+          />
         )}
       </div>
     </div>

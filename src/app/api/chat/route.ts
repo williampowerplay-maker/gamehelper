@@ -379,8 +379,14 @@ export async function POST(req: NextRequest) {
 
     if (cachedQuery?.response) {
       console.log("Cache hit — returning cached response");
+      // Pre-generate the queries.id so we can return it to the client. Without this,
+      // feedback can't be left on cache hits (which is the majority of traffic for
+      // popular questions) and the "spoiled_answer on Nudge" headline metric would
+      // miss its biggest source of signal.
+      const queryId = crypto.randomUUID();
       // Log cache hit for analytics (non-blocking)
       supabase.from("queries").insert({
+        id: queryId,
         question: cacheKey,
         response: cachedQuery.response,
         spoiler_tier: spoilerTier,
@@ -391,7 +397,7 @@ export async function POST(req: NextRequest) {
         user_id: authenticatedUserId,
         cache_hit: true,
       }).then(() => {});
-      return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true });
+      return NextResponse.json({ answer: cachedQuery.response, sources: [], cached: true, queryId });
     }
 
     // ===== ANONYMOUS QUERY LIMIT =====
@@ -971,7 +977,11 @@ export async function POST(req: NextRequest) {
         .then(() => {});
     }
 
-    return NextResponse.json({ answer, sources });
+    // queryId is the public/feedback-table FK for this response. Only the main
+    // RAG path returns it — cache hits, off-topic/no-info, and rate-limit/auth
+    // shortcuts intentionally omit it so the UI suppresses feedback controls
+    // on responses that don't have a corresponding DB row.
+    return NextResponse.json({ answer, sources, queryId });
   } catch (error) {
     console.error("Chat API error:", error);
     // Log to error_logs table (best effort)

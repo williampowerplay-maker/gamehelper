@@ -109,6 +109,9 @@ export default function Home() {
 
       const aiMessage: Message = {
         id: (Date.now() + 1).toString(),
+        queryId: data.queryId,   // present only for main-RAG-path responses; absent
+                                 //   for cache hits, off-topic, no-info — those won't
+                                 //   show feedback UI (Phase 5 — see ChatMessage)
         role: "assistant",
         content: data.answer || "Sorry, I couldn't find an answer to that.",
         spoilerTier: spoilerTier,

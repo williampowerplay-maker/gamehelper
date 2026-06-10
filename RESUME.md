@@ -1,7 +1,7 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: `573e538` (fix: gate inline AdBanner to tablet+desktop only — session 37). Followed up by docs commit (session 37 + session 36 captures).
+- Last commit: `<feedback feature> session 39` — see commit chain below. (Pre-feedback head: `85ca60d` "remove AdSense entirely".)
 - Branch: main, working tree clean (CSVs from breadth eval still untracked)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
@@ -14,6 +14,39 @@
 - **Signup cap: 50** users (default in `src/lib/auth-context.tsx:7`). Currently 4 signed up → 46 spots remaining. Override via `NEXT_PUBLIC_MAX_USERS` env var in Vercel.
 - UpgradeCTA copy: removed "premium voice" mention (feature was never implemented).
 - **Supabase RLS hardening (session 36):** all 18 backup/staging tables in the `public` schema now have RLS enabled (no policies attached). Supabase Security Advisor warnings cleared. **⚠️ Caveat: `scripts/fix-game8-titles.ts` reads `knowledge_chunks_backup_titlefix_20260430` via supabase-js and will now return zero rows silently.** If Phase 1f rollback is ever needed, either add a service-role policy to that table or switch the script to MCP-direct SQL. See LEARNINGS for the full PostgREST/RLS mental model.
+
+## Feedback feature — live as of 2026-06-10
+- **Per-response thumbs up/down** with categorized downvote reasons (`wrong_info` / `spoiled_answer` / `unhelpful` / `other`).
+- **Browser session cookie** — `feedback_session`, 2-year `Max-Age`, `HttpOnly` + `Secure` + `SameSite=lax`. Set by `src/proxy.ts` (Next 16's renamed-from-middleware convention; allowlist matcher `["/", "/api/feedback", "/api/feedback/:path*"]`). No auth required.
+- **Service-role API** at `src/app/api/feedback/route.ts` — `POST` upsert (on conflict `(message_id, session_id)`), `GET ?message_id=<uuid>` for hydration on mount.
+- **Schema** — `public.feedback` table + `public.query_feedback_summary` view that joins feedback → queries (carries `mode`, `cache_hit`, `content_gap`, `question`, both timestamps). Migration applied via Supabase MCP `apply_migration` (no `supabase/migrations/` dir in this repo — same convention as sessions 26, 27, 32, 34, 36).
+- **Cache-hit responses ARE rateable** — each cache hit pre-generates its own `queries.id` (Phase 5b fix) and returns `queryId` to the client. The "spoiled_answer on Nudge" signal therefore captures cache-hit responses too, which is where the bulk of repeated-question signal lives.
+- **Per-message gating** — `MessageFeedback` only mounts when `message.queryId` is defined. Sign-in walls, rate-limit messages, demo-mode responses, off-topic/no-info shortcuts → no feedback UI (no DB row to FK to).
+- **Optimistic UI + silent revert** — clicking a thumb snaps state immediately; POST runs in background; non-2xx response or network error reverts state without surfacing any error to the user. Feedback is non-critical, never blocks the user from reading the response itself.
+
+### Primary eval query
+
+```sql
+SELECT question, mode, reason, count(*) AS votes
+FROM query_feedback_summary
+WHERE rating = 'down' AND mode = 'nudge'
+GROUP BY question, mode, reason
+ORDER BY votes DESC
+LIMIT 50;
+```
+
+This is the headline metric — **Nudge-mode downvotes by reason**. `spoiled_answer` is the Nudge-quality signal: it tells us when the model is leaking solution-level detail that the user opted out of.
+
+### Outstanding cleanup
+- **`next lint` not functional post Next 16 upgrade.** Package script `"lint": "next lint"` fails because Next 16 removed the `next lint` command. Project needs ESLint flat-config migration (`eslint.config.js`). Not blocking; pick up in a dedicated hygiene session.
+- **Visual UI verification of `MessageFeedback`** — was deferred from Phase 5d. Test on first Vercel preview deploy: thumbs render, hover states, reason picker layout, click → state transitions, refresh hydration.
+- **RESUME / PROJECT_STATUS staleness from session 38** — the AdSense bullets here still reference the partially-live state from session 37. Session 38 removed AdSense entirely (commit `85ca60d`). A small doc pass would clean these up.
+
+### RLS reference (for future schema work)
+
+On the `feedback` table, **anon INSERT/UPDATE returns explicit `401` + Postgres code `42501`** (`"new row violates row-level security policy"`). Anon `SELECT` returns `200` with `[]` (PostgREST's standard behavior for filtered-zero-rows on a SELECT). Service role works both ways.
+
+This is the contrast to **session 35's silent `204` footgun**: the difference is having explicit policies that DENY anon writes (via no policy matching anon for the INSERT/UPDATE commands), vs missing policies entirely on a public-schema table. Pattern to copy for any future write-table: `ENABLE ROW LEVEL SECURITY`, then add explicit `service_role`-only policies for `SELECT`/`INSERT`/`UPDATE`/`DELETE` as needed.
 
 ## Database-only state
 - All prior backup tables (pre-1a through 1e)
@@ -31,7 +64,7 @@
 
 ## Next session — three real options
 
-**A. Production telemetry round.** Instrument live app to log: queries received, retrieval pool size, top similarity, which content_type fired, whether fallback ran, thumbs-up/down feedback if added. Build basic dashboard. Cost: 1–2 sessions. Value: every future decision benefits from real-user signal.
+**A. Production telemetry round.** Instrument live app to log: queries received, retrieval pool size, top similarity, which content_type fired, whether fallback ran. Build basic dashboard. Thumbs-up/down feedback **already lives as of session 39** — see Feedback feature section above; the dashboard would just visualize what's already captured. Cost: 1–2 sessions. Value: every future decision benefits from real-user signal.
 
 **B. "I don't know" UX round.** Confidence detection, low-confidence response styling, honest failure copy, query-rephrase suggestions. The user-facing quality work for the 3.3% failure cases. Cost: 1–2 sessions. Value: graceful failures preserve trust.
 
