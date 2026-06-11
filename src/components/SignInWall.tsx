@@ -15,12 +15,12 @@ export default function SignInWall({
       <p className="text-sm font-semibold text-gray-100 mb-1">
         {isSolution
           ? "Sign in to use Solution mode"
-          : "You've used your 2 free questions"}
+          : "You've used your free question"}
       </p>
       <p className="text-xs text-gray-400 mb-4">
         {isSolution
           ? "Solution mode gives you full strategies, exact locations, and step-by-step answers. Free to sign up."
-          : "Sign in for 5 questions a day and fewer ads. No credit card needed."}
+          : "Sign in for 2 questions a day. No credit card needed."}
       </p>
       <button
         onClick={onSignInClick}

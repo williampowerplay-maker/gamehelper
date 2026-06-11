@@ -8,7 +8,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/lib/auth-context";
 
 const FREE_FEATURES = [
-  "5 questions per day",
+  "2 questions per day",
   "Nudge spoiler tier only",
   "Boss strategies, item locations, puzzles",
   "Ads between responses",

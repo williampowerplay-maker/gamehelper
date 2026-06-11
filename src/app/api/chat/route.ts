@@ -413,11 +413,11 @@ export async function POST(req: NextRequest) {
         .eq("cache_hit", false)
         .gte("created_at", oneDayAgo);
 
-      if ((anonCount ?? 0) >= 2) {
+      if ((anonCount ?? 0) >= 1) {
         return NextResponse.json({
           requiresAuth: true,
           requiresAuthReason: "query_limit",
-          error: "You've used your 2 free questions. Sign in to keep going — it's free.",
+          error: "You've used your free question. Sign in to keep going — it's free.",
         }, { status: 401 });
       }
     }
@@ -434,9 +434,9 @@ export async function POST(req: NextRequest) {
         .eq("cache_hit", false)
         .gte("created_at", oneDayAgo);
 
-      if ((freeCount ?? 0) >= 5) {
+      if ((freeCount ?? 0) >= 2) {
         return NextResponse.json({
-          error: "You've reached your 5 free questions for today. Upgrade to Premium for unlimited access.",
+          error: "You've reached your 2 free questions for today. Upgrade to Premium for unlimited access.",
           rateLimited: true,
           showUpgradeCTA: true,
         }, { status: 429 });

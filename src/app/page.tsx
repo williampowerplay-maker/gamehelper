@@ -13,7 +13,7 @@ import CoverageStats from "@/components/CoverageStats";
 import { useAuth } from "@/lib/auth-context";
 import { type SpoilerTier } from "@/lib/supabase";
 
-const ANON_QUERY_LIMIT = 2;
+const ANON_QUERY_LIMIT = 1;
 const ANON_COUNT_KEY = "anonQueryCount";
 
 // ──────────────────────────────────────────────────────────────
