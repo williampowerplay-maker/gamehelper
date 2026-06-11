@@ -23,13 +23,18 @@ const PREMIUM_FEATURES = [
 ];
 
 export default function UpgradePage() {
-  const { user, tier } = useAuth();
+  const { user, session, tier, onUpgradeWaitlist, setOnUpgradeWaitlist } = useAuth();
   const router = useRouter();
   const [checkoutLoading, setCheckoutLoading] = useState(false);
   const [portalLoading, setPortalLoading] = useState(false);
   const [checkoutError, setCheckoutError] = useState("");
 
-  // Email notify form — for signed-out visitors
+  // Upgrade-waitlist join state (signed-in or anonymous via auth redirect)
+  const [waitlistJoining, setWaitlistJoining] = useState(false);
+  const [waitlistError, setWaitlistError] = useState<string | null>(null);
+
+  // Email notify form — for signed-out visitors (legacy email-only `waitlist` table,
+  // surfaced only when signups are closed)
   const [email, setEmail] = useState("");
   const [notifyStatus, setNotifyStatus] = useState<"idle" | "submitting" | "success" | "error">("idle");
 
@@ -82,10 +87,65 @@ export default function UpgradePage() {
     e.preventDefault();
     if (!email.trim()) return;
     setNotifyStatus("submitting");
-    const { error } = await supabase
-      .from("waitlist")
-      .upsert({ email: email.trim().toLowerCase() }, { onConflict: "email" });
-    setNotifyStatus(error ? "error" : "success");
+    // Session 41: wrap in try/catch — previously, if `.upsert()` threw
+    // (network error, RLS rejection, etc.), the second setNotifyStatus
+    // never ran and the button stayed disabled forever.
+    try {
+      const { error } = await supabase
+        .from("waitlist")
+        .upsert({ email: email.trim().toLowerCase() }, { onConflict: "email" });
+      setNotifyStatus(error ? "error" : "success");
+    } catch {
+      setNotifyStatus("error");
+    }
+  };
+
+  // Session 41: join the upgrade waitlist (separate, signed-in-only flow).
+  // Anonymous users see the same button but it routes them through sign-in
+  // with ?intent=waitlist, and the auth callback auto-joins them after.
+  const handleJoinWaitlist = async () => {
+    setWaitlistError(null);
+
+    if (!user) {
+      // Anonymous: send to sign-in with a returnTo + intent. AuthButton
+      // doesn't currently consume these params, but Google OAuth's
+      // redirectTo flows back through /auth/callback which DOES.
+      const returnTo = encodeURIComponent("/upgrade");
+      router.push(`/?signin=1&intent=waitlist&returnTo=${returnTo}`);
+      return;
+    }
+
+    if (!session?.access_token) {
+      setWaitlistError("Session expired. Please refresh and try again.");
+      return;
+    }
+
+    setWaitlistJoining(true);
+    try {
+      const res = await fetch("/api/upgrade-waitlist", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${session.access_token}`,
+        },
+        body: JSON.stringify({ source: "upgrade-page" }),
+      });
+      if (!res.ok) {
+        const body = await res.json().catch(() => ({}));
+        throw new Error(body?.error || `HTTP ${res.status}`);
+      }
+      // Success — flip the auth-context flag so the success state renders
+      // on this page AND anywhere else that reads onUpgradeWaitlist.
+      setOnUpgradeWaitlist(true);
+    } catch (err) {
+      const msg = err instanceof Error ? err.message : "Something went wrong.";
+      setWaitlistError(msg);
+    } finally {
+      // Always clear the pending flag — this is the explicit fix for the
+      // class-of-bug that bit the legacy notify form (button frozen in
+      // disabled state when the promise rejects).
+      setWaitlistJoining(false);
+    }
   };
 
   return (
@@ -157,15 +217,40 @@ export default function UpgradePage() {
               >
                 {portalLoading ? "Loading..." : "Manage billing"}
               </button>
+            ) : onUpgradeWaitlist ? (
+              <div>
+                <div
+                  role="status"
+                  aria-live="polite"
+                  className="w-full bg-green-500/15 border border-green-500/30 text-green-300 text-sm font-semibold rounded-xl py-3 text-center"
+                >
+                  You&rsquo;re on the list ✓
+                </div>
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  We&rsquo;ll email you when premium launches.
+                </p>
+              </div>
             ) : (
               <div>
                 <button
-                  disabled
-                  className="w-full bg-[#2a2a3a] text-gray-500 text-sm font-semibold rounded-xl py-3 cursor-not-allowed"
+                  type="button"
+                  onClick={handleJoinWaitlist}
+                  disabled={waitlistJoining}
+                  className="w-full bg-red-600 hover:bg-red-700 disabled:opacity-60 disabled:cursor-wait text-white text-sm font-semibold rounded-xl py-3 transition-colors"
                 >
-                  Coming Soon
+                  {waitlistJoining ? "Joining…" : "Join upgrade waitlist"}
                 </button>
-                <p className="text-xs text-gray-600 text-center mt-2">Premium subscriptions launching soon</p>
+                {waitlistError && (
+                  <p
+                    role="alert"
+                    className="text-xs text-red-400 text-center mt-2"
+                  >
+                    {waitlistError}
+                  </p>
+                )}
+                <p className="text-xs text-gray-500 text-center mt-2">
+                  Premium subscriptions launching soon — get notified.
+                </p>
               </div>
             )}
           </div>

@@ -117,15 +117,23 @@ export default function AuthButton({
     if (!waitlistEmail.trim()) return;
     setWaitlistStatus("submitting");
 
-    const { error } = await supabase
-      .from("waitlist")
-      .upsert({ email: waitlistEmail.trim().toLowerCase() }, { onConflict: "email" });
-
-    if (error) {
-      console.error("Waitlist error:", error);
+    // Session 41: wrap in try/catch. Previously, a rejection from
+    // `.upsert()` (network blip, RLS throw) left the button stuck in
+    // the "submitting" state because the next setWaitlistStatus call
+    // never ran. Same class of bug as the upgrade-page notify form.
+    try {
+      const { error } = await supabase
+        .from("waitlist")
+        .upsert({ email: waitlistEmail.trim().toLowerCase() }, { onConflict: "email" });
+      if (error) {
+        console.error("Waitlist error:", error);
+        setWaitlistStatus("error");
+      } else {
+        setWaitlistStatus("success");
+      }
+    } catch (err) {
+      console.error("Waitlist threw:", err);
       setWaitlistStatus("error");
-    } else {
-      setWaitlistStatus("success");
     }
   };
 

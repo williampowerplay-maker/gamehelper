@@ -1,7 +1,7 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: `121971c` "feat(feedback): per-response thumbs feedback with categorized downvote reasons" (session 39). Cache investigation (session 40) was research-only — no code or DB changes.
+- Last commit: session 41 — `feat(waitlist): upgrade waitlist replaces greyed-out coming-soon button`. Cache investigation (session 40) was research-only — no code or DB changes.
 - Branch: main, working tree clean (CSVs from breadth eval still untracked: `coverage-breadth-42.csv`, `coverage-breadth-42-run1.csv`, `coverage-breadth-42-runA.csv`, `coverage-breadth-42-runOLD.csv`, `coverage-breadth-99.csv`)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic
@@ -14,6 +14,30 @@
 - **Signup cap: 50** users (default in `src/lib/auth-context.tsx:7`). Override via `NEXT_PUBLIC_MAX_USERS` env var in Vercel.
 - **Feedback feature: live (session 39).** See section below.
 - **Supabase RLS hardening (session 36):** all 18 backup/staging tables in the `public` schema now have RLS enabled (no policies attached). Supabase Security Advisor warnings cleared. **⚠️ Caveat: `scripts/fix-game8-titles.ts` reads `knowledge_chunks_backup_titlefix_20260430` via supabase-js and will now return zero rows silently.** If Phase 1f rollback is ever needed, either add a service-role policy to that table or switch the script to MCP-direct SQL. See LEARNINGS for the full PostgREST/RLS mental model.
+
+## Upgrade waitlist — live as of 2026-06-11 (session 41)
+- **Replaces** the "Coming Soon" disabled button on `/upgrade` with a state-driven CTA.
+- **Three states:**
+  1. Signed in, not on list → "Join upgrade waitlist" (active red CTA). Click → loading → success state.
+  2. Signed in, on list → renders the green "You're on the list ✓" success state on load. Membership is fetched **server-side via `/api/upgrade-waitlist` GET, folded into `AuthContext.fetchUserProfile`** so the destination page renders the correct state without a separate round trip.
+  3. Anonymous → button is active. Click → `/?signin=1&intent=waitlist&returnTo=/upgrade`. Email/password sign-in: `WaitlistAuthBridge` in `src/app/page.tsx` opens the modal, then on auth completion POSTs to `/api/upgrade-waitlist` and `router.replace(returnTo)`. Google OAuth sign-in: `AuthContext.signInWithGoogle` propagates the params through `redirectTo` so `/auth/callback` does the service-role insert and redirects to `returnTo`.
+- **API:** `src/app/api/upgrade-waitlist/route.ts` — POST and GET, both require Bearer token (rejects 401 if missing). Email is pulled from the validated JWT, never trusted from client input. Source allowlist: `upgrade-banner`, `upgrade-page`, `settings`, `auth-callback`. Source field is nullable; invalid values silently coerce to null rather than rejecting (idempotency is the contract; analytics attribution is best-effort).
+- **DB:** `public.upgrade_waitlist` — `id uuid pk`, `user_id uuid NOT NULL UNIQUE references auth.users ON DELETE CASCADE`, `email text NOT NULL`, `source text NULL`, `created_at timestamptz default now()`. Two indexes (`created_at DESC`, partial on `source`). RLS enabled, **no policies attached** — service-role only. Pattern matches feedback table (session 39). Migration applied via Supabase MCP `apply_migration`, no `supabase/migrations/` dir per project convention.
+- **Idempotency:** insert with no `ON CONFLICT` clause; the API converts `23505 unique_violation` on `user_id` into `{joined: true, alreadyOnList: true}`. Same return shape across fresh and repeat inserts so the client doesn't have to branch.
+- **Error handling:** `finally { setWaitlistJoining(false); }` guarantees the button never freezes in a pending state — explicit fix for the class-of-bug that affected the legacy notify form (see below).
+- **Twin freeze-bug fix (session 41 ride-along):** the legacy `handleNotify` in `src/app/upgrade/page.tsx` and `handleWaitlist` in `src/components/AuthButton.tsx` both did `setStatus("submitting")` → bare `await supabase.upsert(...)` → `setStatus(error ? "error" : "success")`. If the `upsert` threw (network blip, RLS-throw), the second setStatus never ran and the button stayed `disabled` forever. Both wrapped in try/catch now. Both surface the legacy email-only `public.waitlist` table (distinct from the new `upgrade_waitlist`).
+
+### Export query
+
+```sql
+SELECT email, source, created_at FROM upgrade_waitlist
+ORDER BY created_at DESC;
+```
+
+### Outstanding follow-ups
+- **Visual UI verification** on Vercel preview / live deploy: button copy/styling in all three states, mobile responsive, success state on direct `/upgrade` load when already joined.
+- **Admin dashboard surface** for the new table (currently no UI to view it; just the SQL export above and the table directly in Supabase).
+- **Email notification at launch** — outside this feature's scope per spec; when premium actually launches, batch-email everyone in `upgrade_waitlist` and consider clearing the table after.
 
 ## Feedback feature — live as of 2026-06-10
 - **Per-response thumbs up/down** with categorized downvote reasons (`wrong_info` / `spoiled_answer` / `unhelpful` / `other`).

@@ -13,6 +13,8 @@ interface AuthState {
   tier: "free" | "premium";
   queriesToday: number;
   signupsClosed: boolean;
+  onUpgradeWaitlist: boolean;
+  setOnUpgradeWaitlist: (v: boolean) => void;
   signIn: (email: string, password: string) => Promise<{ error: string | null }>;
   signUp: (email: string, password: string) => Promise<{ error: string | null }>;
   signInWithGoogle: () => Promise<void>;
@@ -29,6 +31,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [tier, setTier] = useState<"free" | "premium">("free");
   const [queriesToday, setQueriesToday] = useState(0);
   const [signupsClosed, setSignupsClosed] = useState(false);
+  const [onUpgradeWaitlist, setOnUpgradeWaitlist] = useState(false);
 
   // Check if signups are at capacity
   async function checkCapacity(): Promise<boolean> {
@@ -87,6 +90,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         setQueriesToday(data.queries_today);
       }
     }
+
+    // Upgrade-waitlist membership. Folded into the same profile-fetch
+    // round trip per the session 41 spec so the UI doesn't need a
+    // separate request to render the correct button state on load.
+    // RLS blocks anon SELECT on upgrade_waitlist (returns []), but
+    // the authenticated user's JWT carries no special grant either —
+    // policies block all roles. We go through /api/upgrade-waitlist
+    // (service role) to do the actual check.
+    try {
+      const { data: { session: s } } = await supabase.auth.getSession();
+      if (s?.access_token) {
+        const res = await fetch("/api/upgrade-waitlist", {
+          method: "GET",
+          headers: { Authorization: `Bearer ${s.access_token}` },
+        });
+        if (res.ok) {
+          const body = await res.json().catch(() => null);
+          setOnUpgradeWaitlist(!!body?.onList);
+        } else {
+          // Don't poison state on transient failure — treat as unknown=false.
+          setOnUpgradeWaitlist(false);
+        }
+      }
+    } catch {
+      setOnUpgradeWaitlist(false);
+    }
   }
 
   async function signIn(email: string, password: string) {
@@ -118,10 +147,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       setSignupsClosed(true);
       return;
     }
+    // Propagate intent + returnTo through OAuth → /auth/callback so the
+    // server-side handler can auto-join the waitlist and bounce back to
+    // the original page. We read them from the current URL at click time
+    // so callers don't have to plumb the params explicitly.
+    const here = new URL(window.location.href);
+    const intent = here.searchParams.get("intent");
+    const returnTo = here.searchParams.get("returnTo");
+    const callback = new URL("/auth/callback", window.location.origin);
+    if (intent) callback.searchParams.set("intent", intent);
+    if (returnTo) callback.searchParams.set("returnTo", returnTo);
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {
-        redirectTo: `${window.location.origin}/auth/callback`,
+        redirectTo: callback.toString(),
       },
     });
   }
@@ -130,6 +169,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     await supabase.auth.signOut();
     setTier("free");
     setQueriesToday(0);
+    setOnUpgradeWaitlist(false);
   }
 
   async function refreshProfile() {
@@ -148,6 +188,8 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         tier,
         queriesToday,
         signupsClosed,
+        onUpgradeWaitlist,
+        setOnUpgradeWaitlist,
         signIn,
         signUp,
         signInWithGoogle,

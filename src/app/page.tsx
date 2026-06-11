@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import Image from "next/image";
+import { useRouter, useSearchParams } from "next/navigation";
 import ChatInput from "@/components/ChatInput";
 import ChatMessage, { type Message } from "@/components/ChatMessage";
 import SpoilerTierSelector from "@/components/SpoilerTierSelector";
@@ -14,6 +15,64 @@ import { type SpoilerTier } from "@/lib/supabase";
 
 const ANON_QUERY_LIMIT = 2;
 const ANON_COUNT_KEY = "anonQueryCount";
+
+// ──────────────────────────────────────────────────────────────
+// Anon → sign-in → auto-join upgrade waitlist (session 41)
+//
+// Entry: URL has `?signin=1&intent=waitlist&returnTo=/upgrade`.
+//   1. On mount with no user → open the sign-in modal (signals
+//      the parent via `onWantsSignin`).
+//   2. Google OAuth path: AuthContext.signInWithGoogle propagates
+//      intent+returnTo through to /auth/callback, which does the
+//      service-role insert and redirects to returnTo. We never get
+//      back here.
+//   3. Email/password path: signInWithPassword resolves in-place
+//      → user transitions null→signed-in → this effect fires the
+//      POST /api/upgrade-waitlist call and router.replace(returnTo).
+//
+// Isolated in its own component so it can sit inside a <Suspense>
+// boundary (required for Next 16 static prerender of /).
+// ──────────────────────────────────────────────────────────────
+function WaitlistAuthBridge({ onWantsSignin }: { onWantsSignin: () => void }) {
+  const { user, session, setOnUpgradeWaitlist } = useAuth();
+  const router = useRouter();
+  const searchParams = useSearchParams();
+
+  const wantsSignin = searchParams.get("signin") === "1";
+  const intent = searchParams.get("intent");
+  const returnTo = searchParams.get("returnTo");
+
+  useEffect(() => {
+    if (wantsSignin && !user) onWantsSignin();
+  }, [wantsSignin, user, onWantsSignin]);
+
+  useEffect(() => {
+    if (intent !== "waitlist") return;
+    if (!user || !session?.access_token) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        await fetch("/api/upgrade-waitlist", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${session.access_token}`,
+          },
+          body: JSON.stringify({ source: "auth-callback" }),
+        });
+      } catch { /* swallow */ }
+      if (cancelled) return;
+      setOnUpgradeWaitlist(true);
+      const dest = returnTo && returnTo.startsWith("/") && !returnTo.startsWith("//")
+        ? returnTo
+        : "/";
+      router.replace(dest);
+    })();
+    return () => { cancelled = true; };
+  }, [intent, returnTo, user, session?.access_token, router, setOnUpgradeWaitlist]);
+
+  return null;
+}
 
 export default function Home() {
   const { user, session, tier } = useAuth();
@@ -139,6 +198,10 @@ export default function Home() {
 
   return (
     <div className="flex h-[100dvh] max-w-5xl mx-auto">
+    {/* Suspense-isolated reader of URL search params (Next 16 prerender req) */}
+    <Suspense fallback={null}>
+      <WaitlistAuthBridge onWantsSignin={() => setShowAuthModal(true)} />
+    </Suspense>
     {/* Main chat column */}
     <div className="flex flex-col flex-1 min-h-0 min-w-0 max-w-3xl mx-auto">
       {/* Header */}
