@@ -4,6 +4,99 @@ Things discovered during development that are worth remembering across sessions.
 
 ---
 
+## Auth: Propagating Post-Sign-In Intent Through OAuth Redirect-Chains (Session 41)
+
+For the upgrade-waitlist anon flow ("sign in, then auto-join the waitlist, then return to /upgrade"), the natural approach in a SPA is to handle everything client-side after sign-in completes. That works for email/password but breaks for Google OAuth, because the OAuth flow navigates away from your tab entirely and comes back via `/auth/callback` — your in-memory client state (intent flags, return URL, anything in React) is gone. There's no `onAuthStateChange` listener that fires before the page reloads.
+
+**The pattern that works:** carry intent in URL params through every hop of the redirect chain.
+
+1. Click handler on the anon button pushes to `/?signin=1&intent=waitlist&returnTo=/upgrade`.
+2. Page mount: read the params, open the sign-in modal.
+3. Email/password sign-in: stays on this page, an effect detects user-became-non-null + intent present → POSTs to the API → `router.replace(returnTo)`.
+4. Google OAuth sign-in: the `signInWithGoogle` helper reads the current URL's params and appends them to the `redirectTo` callback URL (e.g. `redirectTo=https://app.com/auth/callback?intent=waitlist&returnTo=/upgrade`). The OAuth provider preserves the redirect URL faithfully across its own auth flow. `/auth/callback` parses the params, does the server-side join via service-role, and redirects to `returnTo`.
+
+**Why the params live in the URL, not localStorage / sessionStorage:** localStorage survives the OAuth round-trip, but it's a separate state surface that has to be cleared (forgetting to clear = stale intent fires on the next visit). URLs are self-cleaning — once `router.replace(returnTo)` runs, the params are gone for the rest of the session. URLs also work across browser-restarts mid-OAuth, which storage does not (different tab / private mode).
+
+**Security check on `returnTo`:** validate it's a relative path before redirecting. Reject anything that doesn't start with `/` or that starts with `//` (authority-relative URLs → external host). A naive `redirect(returnTo)` is an open-redirect vulnerability that turns your own auth callback into a phishing tool. Helper:
+
+```ts
+function safeReturnTo(raw: string | null): string {
+  if (!raw || !raw.startsWith("/") || raw.startsWith("//")) return "/";
+  return raw;
+}
+```
+
+**Why not put the side-effect (waitlist join) on the client after Google OAuth callback redirects back?** Because by the time the client's `AuthContext` notices the new session, you've already navigated to `returnTo` — the destination page would need its own logic to "did I just OAuth-in with an intent?" and re-check the URL. Putting the side-effect on the server inside `/auth/callback` keeps the destination pages simple: they just render against `onUpgradeWaitlist=true` and don't need to know about the auth flow at all.
+
+---
+
+## API Pattern: Idempotent Insert Via Postgres Error-Code Translation (Session 41)
+
+The waitlist API does `insert(...).select().single()` with no `ON CONFLICT` clause, then translates the Postgres `23505` unique_violation into a successful response:
+
+```ts
+const { data, error } = await supabase.from("upgrade_waitlist").insert({...}).select().single();
+if (error) {
+  if (error.code === "23505") return NextResponse.json({ joined: true, alreadyOnList: true });
+  // ... handle other errors
+}
+return NextResponse.json({ joined: true, alreadyOnList: false, row: data });
+```
+
+**Why not `upsert` or `INSERT ... ON CONFLICT DO NOTHING`?** Two reasons:
+
+1. **The API contract has a uniform return shape regardless of insert vs conflict.** With `upsert` the client has to do an extra round-trip to know whether the insert was novel (interesting for the UI: "Welcome to the list" vs "You were already on it"). With `ON CONFLICT DO NOTHING` + `RETURNING`, the row comes back null on conflict, which is what we want — but supabase-js's `.single()` errors on null rows, so you'd need `.maybeSingle()` plus null-check branching.
+2. **The error-code translation makes intent explicit at the response site.** Future maintainers reading the API handler see exactly which Postgres error means "already on the list, treat as success" and exactly which ones are real errors. With `upsert`, the "already there" case is silent and indistinguishable from a fresh insert at the API layer.
+
+The cost is a single rejected INSERT against a unique constraint, which is a fast index lookup. Not a hot path. The clarity is worth it.
+
+**Generalizable:** for write APIs that must be idempotent **and** must report whether the write was novel to the caller, prefer raw INSERT + 23505 translation. For write APIs where the caller doesn't care, `INSERT ... ON CONFLICT DO NOTHING` is simpler.
+
+---
+
+## UI Bug Pattern: `setState("pending")` → `await` → `setState(...)` Is A Freeze Waiting To Happen (Session 41)
+
+The "upgrade banner freeze" user-reported bug was actually two instances of the same anti-pattern, in `handleNotify` (upgrade page) and `handleWaitlist` (AuthButton):
+
+```ts
+// BUG — if .upsert() throws, status stays "submitting" forever, button stays disabled
+setStatus("submitting");
+const { error } = await supabase.from("waitlist").upsert(...);
+setStatus(error ? "error" : "success");
+```
+
+The `await` can reject for reasons that don't go through the `{ error }` channel — network errors, RLS-throwing-instead-of-returning-error, anything in the supabase-js client itself. When that happens, the function unwinds past the second `setStatus` call without running it. The button's `disabled={status === "submitting"}` then stays true permanently.
+
+**The fix is mechanical:**
+
+```ts
+setStatus("submitting");
+try {
+  const { error } = await supabase.from("waitlist").upsert(...);
+  setStatus(error ? "error" : "success");
+} catch {
+  setStatus("error");  // OR setStatus("idle") if you want the button immediately retryable
+}
+```
+
+**Or, for handlers with cleanup that must always run, use `finally`:**
+
+```ts
+setLoading(true);
+try {
+  await doThing();
+  setSuccess(true);
+} catch (err) {
+  setError(err.message);
+} finally {
+  setLoading(false);  // GUARANTEED to run, freeze-proof
+}
+```
+
+**Generalizable rule:** any state machine of the shape `setState("loading") → await X → setState("done")` is a freeze the moment `X` rejects. Always pair the pending-state setter with a `finally` (or a catch) that clears it. The new `handleJoinWaitlist` uses the `finally` form so it can't regress.
+
+---
+
 ## DB Design: When Your "Cache" Is Actually Your Analytics Table, Bulk DELETE Is A Footgun (Session 40)
 
 The response cache in this app isn't a separate table — it's a read-through view over `public.queries`, which is also the analytics table, the rate-limit-counter source, and (post session 39) the feedback foreign-key target. The lookup filter is `response IS NOT NULL AND created_at >= now()-7d AND question = cacheKey AND spoiler_tier = tier`. Writing into the "cache" means inserting a normal row into `queries`. There's no separate cache key.

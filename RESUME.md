@@ -1,7 +1,8 @@
 # Resume — Production-deployed at 96.7% breadth coverage
 
 ## Current state
-- Last commit: session 41 — `feat(waitlist): upgrade waitlist replaces greyed-out coming-soon button`. Cache investigation (session 40) was research-only — no code or DB changes.
+- Last commit: `43b023a` "chore: tighten free-question limits to 1 anon, 2 signed-in" (session 42). Session 41 shipped the upgrade waitlist. Cache investigation (session 40) was research-only — no code or DB changes.
+- **Free-question limits (session 42):** anon = **1 non-cached question per 24h per client_ip** (was 2). Signed-in free tier = **2 non-cached questions per 24h per user_id** (was 5). Premium bypasses entirely. Cache hits stay free at both layers — repeat-question traffic doesn't count against either limit. Enforcement sites: `src/app/page.tsx:16` (`ANON_QUERY_LIMIT` client-side backstop), `src/app/api/chat/route.ts:416` (anon server check), `src/app/api/chat/route.ts:437` (free-tier daily cap). Display copy in `src/components/SignInWall.tsx` and `src/app/upgrade/page.tsx` matches.
 - Branch: main, working tree clean (CSVs from breadth eval still untracked: `coverage-breadth-42.csv`, `coverage-breadth-42-run1.csv`, `coverage-breadth-42-runA.csv`, `coverage-breadth-42-runOLD.csv`, `coverage-breadth-99.csv`)
 - Production: live at gitgudai.com + crimson-guide.vercel.app
 - Recall (depth eval, 15 queries): **86.7% / 0.536** deterministic

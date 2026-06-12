@@ -1,13 +1,15 @@
 # Crimson Desert Guide - Project Status
 
-**Last updated:** 2026-06-10 (session 40 — response-cache investigation; research-only, no code/DB changes)
+**Last updated:** 2026-06-11 (session 42 — tightened free-question limits to 1 anon / 2 signed-in)
 
 ## Current State Snapshot
 
 | Aspect | Value |
 |---|---|
 | Corpus | **59,708 chunks** (1e deleted 3,096 Interactive Map URL-variant chunks) |
-| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `121971c`). Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. Feedback feature live. |
+| Production deployment | **LIVE** at `gitgudai.com` + `crimson-guide.vercel.app` (commit `43b023a`). Mobile scroll fix shipped (`min-h-0` on flex children). Coverage stats display live. Feedback feature live. Upgrade waitlist live (session 41). Tightened free-question limits (session 42). |
+| Free-question limits | **Anon = 1** non-cached question / 24h / client_ip (was 2). **Signed-in free tier = 2** non-cached / 24h / user_id (was 5). **Premium = bypass.** Cache hits don't count at either tier. Enforcement: `src/app/page.tsx:16` client backstop, `src/app/api/chat/route.ts:416 & :437` server checks. (Session 42) |
+| Upgrade waitlist | **LIVE (session 41).** `public.upgrade_waitlist` table (RLS-on, no policies). `/api/upgrade-waitlist` Bearer-auth POST/GET. State-driven button on `/upgrade` replacing the disabled "Coming Soon" CTA. Anon flow goes through `?signin=1&intent=waitlist&returnTo=…` + Google OAuth params propagation through `/auth/callback`. Idempotent via 23505 unique_violation handling. Twin freeze-bug fix (legacy notify form + AuthButton waitlist form) shipped alongside. |
 | AdSense status | **REMOVED ENTIRELY (session 38, commit `85ca60d`).** No `<script>` loader, no inline AdBanner, no desktop sidebar ad, no `public/ads.txt`. `tier !== "premium"` now gates UpgradeCTA directly. |
 | Feedback feature | **LIVE (session 39, commits `d144895` + `121971c`).** Per-response thumbs up/down with categorized downvote reasons (`wrong_info` / `spoiled_answer` / `unhelpful` / `other`). Service-role API at `/api/feedback`. Browser session cookie via `src/proxy.ts` (Next 16's renamed-from-middleware convention). `public.feedback` table + `public.query_feedback_summary` view. Cache hits ARE rateable. See RESUME.md "Feedback feature" section. |
 | Response cache | **Read-through view of `public.queries`** (NOT a separate table). Lookup key: `(question_normalized, spoiler_tier)` with 7-day TTL. Write happens on every successful Q+A insert. Cache hits log `cache_hit=true` rows that re-extend TTL. ⚠️ Bulk-delete on `queries` cascades into `feedback`, breaks anon rate limit + free-tier daily cap. **Prefer `UPDATE … SET response = NULL` to clear.** See RESUME.md "Response cache" section for full mental model + clearing recipes. Snapshot: 391 total rows, 7 live cache entries (all Nudge), 0 cache_hit logs yet. |
@@ -40,6 +42,63 @@
 | Post-1f title-fix slot 1 | 80.0% | 0.482 | data fix landed silently — embeddings improved but reranker masked the gain |
 | **Post-Phase-2 reranker tuning** | **86.7%** | **0.536** | **deterministic 3/3 runs** — current production state |
 | Coverage breadth eval baseline (seed=42) | 96.7% ± 2.1% | N/A | different metric — coverage across 276 stratified entities, not depth on 15 queries |
+
+## Recent Changes (Session 42 — Tightened Free-Question Limits, 2026-06-11)
+
+Trim sessions to push faster onto paid tiers / waitlist signups before any meaningful traffic. No DB change, no schema migration — pure literal flips + copy updates.
+
+**Cycle commit:**
+- `43b023a` — chore: tighten free-question limits to 1 anon, 2 signed-in
+
+**Changes:**
+- **Anonymous limit 2 → 1 non-cached question per 24h per `client_ip`.** Client-side backstop at `src/app/page.tsx:16` (`ANON_QUERY_LIMIT`). Server enforcement at `src/app/api/chat/route.ts:416`.
+- **Signed-in free-tier daily cap 5 → 2 non-cached queries per 24h per `user_id`.** Enforced at `src/app/api/chat/route.ts:437`. Premium still bypasses entirely.
+- **Cache hits still don't count** — both layers use `.eq("cache_hit", false)` in the count query, so the cache-as-analytics-table design (session 40 learnings) continues to do its job: repeat-question traffic stays free for everyone.
+- **Display copy updated to match:** `SignInWall` headline ("You've used your free question") + subhead ("Sign in for 2 questions a day"); chat-route error responses; `/upgrade` FREE_FEATURES list ("2 questions per day").
+
+**Known cleanup deferred:** the limit literals live inline at three enforcement sites instead of in a shared constants module. A small refactor pass could centralize them. Not blocking — flagged in commit message.
+
+## Recent Changes (Session 41 — Upgrade Waitlist, 2026-06-11)
+
+Replaced the "Coming Soon" disabled button on `/upgrade` with a working state-driven CTA backed by a new table. Captures signed-in interest ahead of premium launch.
+
+**Cycle commit:**
+- `23dcfdd` — feat(waitlist): upgrade waitlist replaces greyed-out coming-soon button
+
+**Database (via Supabase MCP `apply_migration`):**
+- `public.upgrade_waitlist` — id uuid pk, user_id uuid NOT NULL UNIQUE references auth.users ON DELETE CASCADE, email text NOT NULL (denormalized from auth at insert time for easy export), source text NULL, created_at timestamptz default now()
+- Two indexes: `idx_upgrade_waitlist_created_at DESC`, partial `idx_upgrade_waitlist_source WHERE source IS NOT NULL`
+- RLS enabled with **no policies attached** — service-role only. Matches the feedback-table pattern (session 39). Anon and authenticated-user clients both get []/401+42501.
+
+**Server:**
+- `src/app/api/upgrade-waitlist/route.ts` — POST/GET, Bearer-token auth via `supabase.auth.getUser(token)` (matches `/api/chat` pattern). Email pulled from the validated JWT, never trusted from client input.
+- POST: insert with no ON CONFLICT clause; the API converts Postgres `23505 unique_violation` on `user_id` into `{joined: true, alreadyOnList: true}`. Same return shape across fresh and repeat inserts.
+- Source allowlist: `upgrade-banner`, `upgrade-page`, `settings`, `auth-callback`. Invalid values silently coerce to null (idempotency is the contract; attribution is best-effort).
+- GET: `count(...) > 0` check, returns `{onList: boolean}`.
+
+**Auth-context:**
+- `AuthContext` now exposes `onUpgradeWaitlist` + `setOnUpgradeWaitlist`.
+- Membership is folded into the existing `fetchUserProfile` round trip — no separate request on mount. Auth-context calls GET `/api/upgrade-waitlist` with the same session as the `users` table fetch.
+
+**Anonymous flow:**
+- User clicks "Join upgrade waitlist" on `/upgrade` while signed out → `router.push("/?signin=1&intent=waitlist&returnTo=/upgrade")`.
+- `WaitlistAuthBridge` in `src/app/page.tsx` (Suspense-wrapped for Next 16 prerender) opens the sign-in modal.
+- **Email/password path:** post-sign-in, the bridge POSTs to `/api/upgrade-waitlist` then `router.replace(returnTo)`.
+- **Google OAuth path:** `AuthContext.signInWithGoogle` propagates intent+returnTo through the OAuth `redirectTo`. `/auth/callback` parses them, does the service-role insert, redirects to `returnTo`. (Validated relative-path-only — no `//` open-redirect.)
+
+**UI:**
+- `/upgrade`: state-driven CTA — "Join upgrade waitlist" (red active button) → "Joining…" (loading) → "You're on the list ✓" (green static badge). On already-joined load, success state renders immediately. Errors surface beneath the button without leaving it disabled. `finally { setWaitlistJoining(false); }` guarantees no freeze.
+
+**Bug fixes (ride-along, same surface):**
+- Identified and fixed the "upgrade banner freeze" the user mentioned. Twin pattern in `handleNotify` (upgrade-page legacy notify form) and `handleWaitlist` (AuthButton signups-closed waitlist form): `setStatus("submitting")` → bare `await supabase.upsert(...)` → `setStatus(error ? "error" : "success")`. If the `upsert` threw (network blip, RLS throw, anything past the `await`), the second `setStatus` never ran, leaving the button stuck `disabled` forever. Both wrapped in try/catch now.
+- These touch the **legacy email-only `public.waitlist`** table (used for signed-OUT visitors when signups are closed), distinct from the new `upgrade_waitlist`.
+
+**Verified end-to-end before commit** via a temp script (cleaned up post-test): anon POST → 401; authed fresh → `alreadyOnList:false`; authed repeat → `alreadyOnList:true` (idempotent); GET → `onList:true`; DB row visible with correct email + source. `next build` clean.
+
+**Outstanding:**
+- Visual UI verification on production for all three states.
+- Admin dashboard surface for `upgrade_waitlist` (currently SQL-only).
+- Batch-email at premium launch (outside session-41 scope per spec).
 
 ## Recent Changes (Session 40 — Response-Cache Investigation, 2026-06-10)
 

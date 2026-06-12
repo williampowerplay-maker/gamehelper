@@ -4,6 +4,53 @@ All notable changes to the Crimson Desert Guide project.
 
 ---
 
+## [0.24.0] - 2026-06-11 (Session 42 — Tightened Free-Question Limits)
+
+### Pure literal flips + copy updates. No DB or schema changes.
+
+### Commit
+- `43b023a` — chore: tighten free-question limits to 1 anon, 2 signed-in
+
+### Changes
+- **Anonymous limit 2 → 1** non-cached question per 24h per `client_ip`. Client-side backstop at `src/app/page.tsx:16`, server enforcement at `src/app/api/chat/route.ts:416`.
+- **Signed-in free-tier daily cap 5 → 2** non-cached queries per 24h per `user_id`. Enforced at `src/app/api/chat/route.ts:437`. Premium bypasses unchanged.
+- **Cache hits still don't count** at either tier — repeat-question traffic remains free for everyone.
+- Display copy updated in `SignInWall`, chat-route error responses, and the `/upgrade` FREE_FEATURES list.
+
+### Known cleanup deferred
+Literals live inline at three enforcement sites rather than in a shared constants module. Worth centralizing in a future hygiene pass.
+
+---
+
+## [0.23.0] - 2026-06-11 (Session 41 — Upgrade Waitlist)
+
+### Replaced "Coming Soon" disabled button on /upgrade with a working waitlist CTA.
+
+### Commit
+- `23dcfdd` — feat(waitlist): upgrade waitlist replaces greyed-out coming-soon button
+
+### What shipped
+1. **DB:** `public.upgrade_waitlist` (id uuid pk, user_id uuid UNIQUE references auth.users ON DELETE CASCADE, email NOT NULL denormalized from JWT, source nullable, created_at). Two indexes (`created_at DESC`, partial on source). RLS enabled with no policies — service-role only. Applied via Supabase MCP `apply_migration`.
+2. **API:** `src/app/api/upgrade-waitlist/route.ts` — POST/GET with Bearer-token auth (`supabase.auth.getUser`). Email pulled from validated JWT, never trusted from client. Idempotent via 23505 unique_violation → `{joined: true, alreadyOnList: true}` translation. Source allowlist (`upgrade-banner`, `upgrade-page`, `settings`, `auth-callback`).
+3. **AuthContext:** `onUpgradeWaitlist` + `setOnUpgradeWaitlist` exposed; membership check folded into the existing `fetchUserProfile` round trip so destination pages render correct state on load without an extra request.
+4. **/upgrade UI:** state-driven CTA replacing the disabled "Coming Soon" button — "Join upgrade waitlist" → "Joining…" → "You're on the list ✓". `finally { setWaitlistJoining(false); }` guarantees no freeze. Error message renders without leaving button disabled.
+5. **Anon flow:** click pushes to `/?signin=1&intent=waitlist&returnTo=/upgrade`. `WaitlistAuthBridge` (Suspense-wrapped) opens the modal. After auth, the bridge POSTs to the API and `router.replace(returnTo)`. Google OAuth: `signInWithGoogle` propagates intent+returnTo through `redirectTo` so `/auth/callback` does the service-role insert and redirects.
+6. **/auth/callback hardening:** `safeReturnTo` validates relative-path-only (rejects `//` open-redirects).
+
+### Bug fixes (ride-along)
+Identified and fixed the "upgrade banner freeze" the user mentioned. Twin pattern in `handleNotify` (upgrade page legacy notify form) and `handleWaitlist` (AuthButton signups-closed waitlist form): `setStatus("submitting")` → bare `await supabase.upsert(...)` → `setStatus(...)`. If `upsert` threw, the second setStatus never ran and the button stayed `disabled` forever. Both wrapped in try/catch now. These touch the legacy email-only `public.waitlist` table, distinct from the new `upgrade_waitlist`.
+
+### Verified
+- End-to-end API tests: anon POST → 401; authed fresh → `alreadyOnList:false`; authed repeat → `alreadyOnList:true`; GET → `onList:true`. Row visible in DB with correct email + source. Test script cleaned up before commit.
+- `npx next build` clean.
+
+### Outstanding
+- Visual UI verification on production for all three states.
+- Admin dashboard surface for `upgrade_waitlist`.
+- Batch-email at premium launch (outside session scope).
+
+---
+
 ## [0.22.0] - 2026-06-10 (Session 40 — Response-Cache Investigation, Research-Only)
 
 ### Documentation only. No code, schema, or production changes.
