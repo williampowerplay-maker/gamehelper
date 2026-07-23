@@ -175,6 +175,8 @@ This is the contrast to **session 35's silent `204` footgun**: the difference is
 
 **C. Continued retrieval optimization.** Cross-domain bias on bosses (5 entities), Bounty Notice cluster collisions (3–4 entities), parser-fix for game8 markdown bug (queued in `known_issues/game8_markdown_parser_bug.md`), slot-2 H1 fix for tier-list pages (would lift the one missing chunk for `best-one-handed-weapons`). Cost: variable. Value: marginal eval gains, may not affect real-user perceived quality.
 
+**D. Knowledgebase refresh from the wikis (Phase 2 ingest rewrite).** Full plan queued in `known_issues/knowledgebase_refresh_plan.md`. ⚠️ Do NOT re-crawl with the current scripts and do NOT set the `wiki-reseed.yml` Actions secrets first — the phase 1a–1f cleanup lives only in DB rows and a re-crawl would clobber it. Prerequisites: crawler bug fixes (incl. `crawl-game8.ts:177` hyphen-truncating title regex), URL canonicalization, stable chunk identity + changed-only upsert, then pilot → full refresh behind backup + eval gates. Cost: 2–3 sessions.
+
 **Recommended order: A then B.** Telemetry first because you can't tune UX for "I don't know" cases without knowing what those cases look like in the wild. Real production data after 1–2 weeks tells you whether the 3.3% failure rate correlates with real user queries or not.
 
 **Possible micro-task before A/B/C:** apply a cache-clearing recipe from the section above. Session 40 stopped at "options presented, awaiting scope." If you sit back down at a different PC and want to e.g. clear all Nudge-mode cache entries before letting telemetry collect, run recipe 3.
